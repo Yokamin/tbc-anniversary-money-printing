@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
     <title>TBC Crafting Calculator</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1507,6 +1508,16 @@
                 ]
             },
             {
+                id: 'girdle_of_ruination',
+                name: 'Girdle of Ruination',
+                category: 'epic',
+                ingredients: [
+                    { item: 'Shadowcloth', qty: 10, type: 'ah' },
+                    { item: 'Primal Fire', qty: 16, type: 'ah', craftFrom: { item: 'Mote of Fire', qty: 10 } },
+                    { item: 'Primal Nether', qty: 1, type: 'bop' }
+                ]
+            },
+            {
                 id: 'bracers_of_havok',
                 name: 'Bracers of Havok',
                 category: 'epic',
@@ -1575,6 +1586,8 @@
             ['alch_mat_mote_of_shadow', 'gear_mat_mote_of_shadow'],
             ['alch_mat_primal_earth',   'gear_mat_primal_earth'],
             ['alch_mat_mote_of_earth',  'gear_mat_mote_of_earth'],
+            ['alch_mat_primal_fire',    'gear_mat_primal_fire'],
+            ['alch_mat_mote_of_fire',   'gear_mat_mote_of_fire'],
         ];
 
         function syncSharedPrice(changedId) {
