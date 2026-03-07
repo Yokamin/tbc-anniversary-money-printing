@@ -13,7 +13,7 @@
             line-height: 1.5;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1600px;
             margin: auto;
         }
         h1 {
@@ -65,6 +65,29 @@
             color: #888;
             margin-bottom: 12px;
             letter-spacing: 0.5px;
+        }
+        .panel h2.collapsible {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+        }
+        .panel h2.collapsible:hover {
+            color: #ccc;
+        }
+        .panel h2.collapsible .collapse-arrow {
+            font-size: 0.7em;
+            transition: transform 0.15s;
+        }
+        .panel h2.collapsible.collapsed .collapse-arrow {
+            transform: rotate(-90deg);
+        }
+        .panel h2.collapsible.collapsed {
+            margin-bottom: 0;
+        }
+        .panel-body.collapsed {
+            display: none;
         }
         .input-row {
             margin-bottom: 12px;
@@ -306,6 +329,101 @@
             background: #4a4a6c;
         }
         .recipe-list { margin-top: 4px; }
+        .crafting-overview {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: start;
+        }
+        .crafting-trees {
+            min-width: 0;
+        }
+        .crafting-side {
+            width: 340px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 20px;
+        }
+        .craft-tree {
+            font-size: 0.88em;
+            margin-bottom: 10px;
+        }
+        .tree-node {
+            display: flex;
+            align-items: baseline;
+            padding: 3px 0;
+        }
+        .tree-prefix {
+            color: #555;
+            font-family: 'Consolas', monospace;
+            white-space: pre;
+            flex-shrink: 0;
+        }
+        .tree-name {
+            color: #ccc;
+            flex: 1;
+            white-space: nowrap;
+        }
+        .tree-cost {
+            font-family: 'Consolas', monospace;
+            color: #eee;
+            margin-left: 12px;
+            white-space: nowrap;
+        }
+        .tree-unit {
+            color: #888;
+            font-size: 0.85em;
+            font-family: 'Consolas', monospace;
+        }
+        .tree-vs {
+            display: flex;
+            gap: 10px;
+            margin-left: 12px;
+            flex-shrink: 0;
+        }
+        .tree-opt {
+            font-family: 'Consolas', monospace;
+            font-size: 0.92em;
+            white-space: nowrap;
+        }
+        .tree-opt.better { color: #4ade80; }
+        .tree-opt.worse { color: #666; }
+        .tree-craftable {
+            cursor: pointer;
+        }
+        .tree-craftable:hover .tree-name {
+            color: #fff;
+        }
+        .tree-craftable .tree-name::after {
+            content: ' ▸';
+            color: #555;
+            font-size: 0.8em;
+        }
+        .tree-craftable.expanded .tree-name::after {
+            content: ' ▾';
+            color: #888;
+        }
+        .tree-detail {
+            display: none;
+            background: #1e1e36;
+            border-left: 2px solid #3a3a5c;
+            padding: 6px 12px;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.92em;
+            margin: 2px 0 4px;
+        }
+        .tree-detail.open {
+            display: block;
+        }
+        .tree-detail.depth-1 { margin-left: 28px; }
+        .tree-detail.depth-2 { margin-left: 60px; }
+        .tree-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+        }
+        .tree-detail-row .td-label { color: #999; font-size: 0.9em; }
+        .tree-detail-row .td-value { font-family: 'Consolas', monospace; color: #eee; }
         .recipe-item {
             padding: 6px 10px;
             cursor: pointer;
@@ -431,11 +549,119 @@
             padding: 8px 12px 3px;
             letter-spacing: 0.5px;
         }
-        .alch-summary {
+        .recipe-dropdown-wrapper {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+        }
+        .recipe-dropdown-wrapper .recipe-dropdown {
+            flex: 1;
+        }
+        .recipe-manage-btn {
+            background: #1a1a2e;
+            border: 1px solid #3a3a5c;
+            border-radius: 4px;
+            color: #888;
+            font-size: 1.1em;
+            cursor: pointer;
+            padding: 0 10px;
+            transition: border-color 0.15s, color 0.15s;
+            display: flex;
+            align-items: center;
+        }
+        .recipe-manage-btn:hover {
+            border-color: #ffd700;
+            color: #ffd700;
+        }
+        .recipe-manage-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .recipe-manage-overlay.open {
+            display: flex;
+        }
+        .recipe-manage-modal {
+            background: #252540;
+            border: 1px solid #3a3a5c;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+        }
+        .recipe-manage-modal h2 {
+            font-size: 1em;
+            color: #ffd700;
+            margin-bottom: 4px;
+        }
+        .recipe-manage-hint {
+            font-size: 0.8em;
+            color: #888;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #3a3a5c;
+        }
+        .recipe-manage-cat {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            color: #666;
+            padding: 10px 0 4px;
+            letter-spacing: 0.5px;
+        }
+        .recipe-manage-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 0;
+            font-size: 0.9em;
+            color: #ccc;
+            cursor: pointer;
+        }
+        .recipe-manage-item:hover {
+            color: #fff;
+        }
+        .recipe-manage-item input[type="checkbox"] {
+            accent-color: #ffd700;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .recipe-manage-close {
+            width: 100%;
+            margin-top: 15px;
+            padding: 8px;
+            background: #3a3a5c;
+            border: none;
+            border-radius: 4px;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+        .recipe-manage-close:hover {
+            background: #4a4a6c;
+            color: #fff;
+        }
+        .recipe-item.recipe-hidden {
+            display: none !important;
+        }
+        .alch-layout {
+            display: grid;
+            grid-template-columns: auto auto 1fr;
+            gap: 20px;
+        }
+        .alch-summary, .gear-summary {
             width: 100%;
             border-collapse: collapse;
         }
-        .alch-summary th {
+        .alch-summary th, .gear-summary th {
             text-align: left;
             color: #888;
             font-size: 0.8em;
@@ -444,18 +670,44 @@
             border-bottom: 1px solid #3a3a5c;
             letter-spacing: 0.5px;
         }
-        .alch-summary td {
+        .alch-summary td, .gear-summary td {
             padding: 10px 12px;
             border-bottom: 1px solid #2a2a44;
             font-family: 'Consolas', monospace;
             font-size: 0.9em;
         }
-        .alch-summary td:first-child {
+        .alch-summary td:first-child, .gear-summary td:first-child {
             font-family: 'Segoe UI', Tahoma, sans-serif;
             color: #ccc;
         }
-        .alch-summary-row { cursor: pointer; }
-        .alch-summary-row:hover { background: #2a2a44; }
+        .alch-summary-row, .gear-summary-row { cursor: pointer; }
+        .alch-summary-row:hover, .gear-summary-row:hover { background: #2a2a44; }
+        .silver-nudge-wrap {
+            position: relative;
+        }
+        .silver-nudge {
+            position: absolute;
+            left: -32px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+        .silver-nudge button {
+            background: none;
+            border: none;
+            color: #aab;
+            font-size: 0.85em;
+            cursor: pointer;
+            padding: 0 3px;
+            line-height: 1.1;
+            font-family: 'Consolas', monospace;
+        }
+        .silver-nudge button:hover {
+            color: #dde;
+        }
     </style>
 </head>
 <body>
@@ -463,11 +715,12 @@
         <h1>TBC Crafting Calculator</h1>
 
         <div class="tab-bar">
-            <button class="tab-btn active" data-tab="tailoring">Tailoring</button>
+            <button class="tab-btn active" data-tab="bags">Bags</button>
+            <button class="tab-btn" data-tab="gear">Tailoring Gear</button>
             <button class="tab-btn" data-tab="alchemy">Alchemy</button>
         </div>
 
-        <div id="tab-tailoring" class="tab-content">
+        <div id="tab-bags" class="tab-content">
         <div class="layout">
             <div class="sidebar">
                 <div class="panel import-panel">
@@ -479,95 +732,49 @@
 
                 <div class="panel">
                     <h2>Raw Materials</h2>
-                    <div class="input-row">
-                        <label>Netherweave Cloth <button class="lock-btn" data-input="price_cloth">&#x1f513;</button></label>
-                        <div class="price-control">
-                            <input type="number" id="price_cloth" value="0.15" step="0.0001">
+                    <div class="price-table">
+                        <div class="price-table-row silver-nudge-wrap">
+                            <div class="silver-nudge">
+                                <button onclick="nudgeClothSilver(1)" title="+1 silver">&#9650;</button>
+                                <button onclick="nudgeClothSilver(-1)" title="-1 silver">&#9660;</button>
+                            </div>
+                            <span class="pt-name">Netherweave Cloth</span>
+                            <button class="lock-btn" data-input="price_cloth" data-locks-key="tbc_bag_calculator_locks">&#x1f513;</button>
+                            <div class="price-control"><input type="number" id="price_cloth" value="0.15" step="0.0001"></div>
                             <div class="gsc-group" data-input="price_cloth">
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="1">&#9650;</button>
-                                    <span class="gsc-val gold">0g</span>
-                                    <button class="gsc-btn" data-delta="-1">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.01">&#9650;</button>
-                                    <span class="gsc-val silver">0s</span>
-                                    <button class="gsc-btn" data-delta="-0.01">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.0001">&#9650;</button>
-                                    <span class="gsc-val copper">0c</span>
-                                    <button class="gsc-btn" data-delta="-0.0001">&#9660;</button>
-                                </div>
+                                <span class="gsc-val gold">0g</span>
+                                <span class="gsc-val silver">0s</span>
+                                <span class="gsc-val copper">0c</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="input-row">
-                        <label>Arcane Dust <button class="lock-btn" data-input="price_dust">&#x1f513;</button></label>
-                        <div class="price-control">
-                            <input type="number" id="price_dust" value="1.50" step="0.0001">
+                        <div class="price-table-row">
+                            <span class="pt-name">Arcane Dust</span>
+                            <button class="lock-btn" data-input="price_dust" data-locks-key="tbc_bag_calculator_locks">&#x1f513;</button>
+                            <div class="price-control"><input type="number" id="price_dust" value="1.50" step="0.0001"></div>
                             <div class="gsc-group" data-input="price_dust">
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="1">&#9650;</button>
-                                    <span class="gsc-val gold">0g</span>
-                                    <button class="gsc-btn" data-delta="-1">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.01">&#9650;</button>
-                                    <span class="gsc-val silver">0s</span>
-                                    <button class="gsc-btn" data-delta="-0.01">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.0001">&#9650;</button>
-                                    <span class="gsc-val copper">0c</span>
-                                    <button class="gsc-btn" data-delta="-0.0001">&#9660;</button>
-                                </div>
+                                <span class="gsc-val gold">0g</span>
+                                <span class="gsc-val silver">0s</span>
+                                <span class="gsc-val copper">0c</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="input-row">
-                        <label>Netherweb Spider Silk <button class="lock-btn" data-input="price_silk">&#x1f513;</button></label>
-                        <div class="price-control">
-                            <input type="number" id="price_silk" value="5.00" step="0.0001">
+                        <div class="price-table-row">
+                            <span class="pt-name">Netherweb Spider Silk</span>
+                            <button class="lock-btn" data-input="price_silk" data-locks-key="tbc_bag_calculator_locks">&#x1f513;</button>
+                            <div class="price-control"><input type="number" id="price_silk" value="5.00" step="0.0001"></div>
                             <div class="gsc-group" data-input="price_silk">
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="1">&#9650;</button>
-                                    <span class="gsc-val gold">0g</span>
-                                    <button class="gsc-btn" data-delta="-1">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.01">&#9650;</button>
-                                    <span class="gsc-val silver">0s</span>
-                                    <button class="gsc-btn" data-delta="-0.01">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.0001">&#9650;</button>
-                                    <span class="gsc-val copper">0c</span>
-                                    <button class="gsc-btn" data-delta="-0.0001">&#9660;</button>
-                                </div>
+                                <span class="gsc-val gold">0g</span>
+                                <span class="gsc-val silver">0s</span>
+                                <span class="gsc-val copper">0c</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="input-row">
-                        <label>Lesser Planar Essence <button class="lock-btn" data-input="price_lesser">&#x1f513;</button></label>
-                        <div class="price-control">
-                            <input type="number" id="price_lesser" value="2.00" step="0.0001">
+                        <div class="price-table-row">
+                            <span class="pt-name">Lesser Planar Essence</span>
+                            <button class="lock-btn" data-input="price_lesser" data-locks-key="tbc_bag_calculator_locks">&#x1f513;</button>
+                            <div class="price-control"><input type="number" id="price_lesser" value="2.00" step="0.0001"></div>
                             <div class="gsc-group" data-input="price_lesser">
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="1">&#9650;</button>
-                                    <span class="gsc-val gold">0g</span>
-                                    <button class="gsc-btn" data-delta="-1">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.01">&#9650;</button>
-                                    <span class="gsc-val silver">0s</span>
-                                    <button class="gsc-btn" data-delta="-0.01">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.0001">&#9650;</button>
-                                    <span class="gsc-val copper">0c</span>
-                                    <button class="gsc-btn" data-delta="-0.0001">&#9660;</button>
-                                </div>
+                                <span class="gsc-val gold">0g</span>
+                                <span class="gsc-val silver">0s</span>
+                                <span class="gsc-val copper">0c</span>
                             </div>
                         </div>
                     </div>
@@ -575,72 +782,35 @@
 
                 <div class="panel">
                     <h2>Intermediate Items</h2>
-                    <div class="input-row">
-                        <label>Bolt of Netherweave <button class="lock-btn" data-input="price_bolt">&#x1f513;</button></label>
-                        <div class="price-control">
-                            <input type="number" id="price_bolt" value="1.30" step="0.0001">
+                    <div class="price-table">
+                        <div class="price-table-row">
+                            <span class="pt-name">Bolt of Netherweave</span>
+                            <button class="lock-btn" data-input="price_bolt" data-locks-key="tbc_bag_calculator_locks">&#x1f513;</button>
+                            <div class="price-control"><input type="number" id="price_bolt" value="1.30" step="0.0001"></div>
                             <div class="gsc-group" data-input="price_bolt">
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="1">&#9650;</button>
-                                    <span class="gsc-val gold">0g</span>
-                                    <button class="gsc-btn" data-delta="-1">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.01">&#9650;</button>
-                                    <span class="gsc-val silver">0s</span>
-                                    <button class="gsc-btn" data-delta="-0.01">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.0001">&#9650;</button>
-                                    <span class="gsc-val copper">0c</span>
-                                    <button class="gsc-btn" data-delta="-0.0001">&#9660;</button>
-                                </div>
+                                <span class="gsc-val gold">0g</span>
+                                <span class="gsc-val silver">0s</span>
+                                <span class="gsc-val copper">0c</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="input-row">
-                        <label>Greater Planar Essence <button class="lock-btn" data-input="price_greater">&#x1f513;</button></label>
-                        <div class="price-control">
-                            <input type="number" id="price_greater" value="6.00" step="0.0001">
+                        <div class="price-table-row">
+                            <span class="pt-name">Greater Planar Essence</span>
+                            <button class="lock-btn" data-input="price_greater" data-locks-key="tbc_bag_calculator_locks">&#x1f513;</button>
+                            <div class="price-control"><input type="number" id="price_greater" value="6.00" step="0.0001"></div>
                             <div class="gsc-group" data-input="price_greater">
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="1">&#9650;</button>
-                                    <span class="gsc-val gold">0g</span>
-                                    <button class="gsc-btn" data-delta="-1">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.01">&#9650;</button>
-                                    <span class="gsc-val silver">0s</span>
-                                    <button class="gsc-btn" data-delta="-0.01">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.0001">&#9650;</button>
-                                    <span class="gsc-val copper">0c</span>
-                                    <button class="gsc-btn" data-delta="-0.0001">&#9660;</button>
-                                </div>
+                                <span class="gsc-val gold">0g</span>
+                                <span class="gsc-val silver">0s</span>
+                                <span class="gsc-val copper">0c</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="input-row">
-                        <label>Bolt of Imbued NW <button class="lock-btn" data-input="price_imbued_bolt">&#x1f513;</button></label>
-                        <div class="price-control">
-                            <input type="number" id="price_imbued_bolt" value="50.00" step="0.0001">
+                        <div class="price-table-row">
+                            <span class="pt-name">Bolt of Imbued NW</span>
+                            <button class="lock-btn" data-input="price_imbued_bolt" data-locks-key="tbc_bag_calculator_locks">&#x1f513;</button>
+                            <div class="price-control"><input type="number" id="price_imbued_bolt" value="50.00" step="0.0001"></div>
                             <div class="gsc-group" data-input="price_imbued_bolt">
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="1">&#9650;</button>
-                                    <span class="gsc-val gold">0g</span>
-                                    <button class="gsc-btn" data-delta="-1">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.01">&#9650;</button>
-                                    <span class="gsc-val silver">0s</span>
-                                    <button class="gsc-btn" data-delta="-0.01">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.0001">&#9650;</button>
-                                    <span class="gsc-val copper">0c</span>
-                                    <button class="gsc-btn" data-delta="-0.0001">&#9660;</button>
-                                </div>
+                                <span class="gsc-val gold">0g</span>
+                                <span class="gsc-val silver">0s</span>
+                                <span class="gsc-val copper">0c</span>
                             </div>
                         </div>
                     </div>
@@ -648,49 +818,25 @@
 
                 <div class="panel">
                     <h2>Bag Sale Prices</h2>
-                    <div class="input-row">
-                        <label>Netherweave Bag <button class="lock-btn" data-input="price_nw_bag">&#x1f513;</button></label>
-                        <div class="price-control">
-                            <input type="number" id="price_nw_bag" value="5.40" step="0.0001">
+                    <div class="price-table">
+                        <div class="price-table-row">
+                            <span class="pt-name">Netherweave Bag</span>
+                            <button class="lock-btn" data-input="price_nw_bag" data-locks-key="tbc_bag_calculator_locks">&#x1f513;</button>
+                            <div class="price-control"><input type="number" id="price_nw_bag" value="5.40" step="0.0001"></div>
                             <div class="gsc-group" data-input="price_nw_bag">
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="1">&#9650;</button>
-                                    <span class="gsc-val gold">0g</span>
-                                    <button class="gsc-btn" data-delta="-1">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.01">&#9650;</button>
-                                    <span class="gsc-val silver">0s</span>
-                                    <button class="gsc-btn" data-delta="-0.01">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.0001">&#9650;</button>
-                                    <span class="gsc-val copper">0c</span>
-                                    <button class="gsc-btn" data-delta="-0.0001">&#9660;</button>
-                                </div>
+                                <span class="gsc-val gold">0g</span>
+                                <span class="gsc-val silver">0s</span>
+                                <span class="gsc-val copper">0c</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="input-row">
-                        <label>Imbued NW Bag <button class="lock-btn" data-input="price_imbued_bag">&#x1f513;</button></label>
-                        <div class="price-control">
-                            <input type="number" id="price_imbued_bag" value="39.00" step="0.0001">
+                        <div class="price-table-row">
+                            <span class="pt-name">Imbued NW Bag</span>
+                            <button class="lock-btn" data-input="price_imbued_bag" data-locks-key="tbc_bag_calculator_locks">&#x1f513;</button>
+                            <div class="price-control"><input type="number" id="price_imbued_bag" value="39.00" step="0.0001"></div>
                             <div class="gsc-group" data-input="price_imbued_bag">
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="1">&#9650;</button>
-                                    <span class="gsc-val gold">0g</span>
-                                    <button class="gsc-btn" data-delta="-1">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.01">&#9650;</button>
-                                    <span class="gsc-val silver">0s</span>
-                                    <button class="gsc-btn" data-delta="-0.01">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.0001">&#9650;</button>
-                                    <span class="gsc-val copper">0c</span>
-                                    <button class="gsc-btn" data-delta="-0.0001">&#9660;</button>
-                                </div>
+                                <span class="gsc-val gold">0g</span>
+                                <span class="gsc-val silver">0s</span>
+                                <span class="gsc-val copper">0c</span>
                             </div>
                         </div>
                     </div>
@@ -698,95 +844,41 @@
 
                 <div class="panel">
                     <h2>AH Deposits</h2>
-                    <div class="input-row">
-                        <label>Bolt of NW</label>
-                        <div class="price-control">
-                            <input type="number" id="deposit_bolt" value="0.06" step="0.0001">
+                    <div class="price-table">
+                        <div class="price-table-row">
+                            <span class="pt-name">Bolt of NW</span>
+                            <div class="price-control"><input type="number" id="deposit_bolt" value="0.06" step="0.0001"></div>
                             <div class="gsc-group" data-input="deposit_bolt">
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="1">&#9650;</button>
-                                    <span class="gsc-val gold">0g</span>
-                                    <button class="gsc-btn" data-delta="-1">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.01">&#9650;</button>
-                                    <span class="gsc-val silver">0s</span>
-                                    <button class="gsc-btn" data-delta="-0.01">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.0001">&#9650;</button>
-                                    <span class="gsc-val copper">0c</span>
-                                    <button class="gsc-btn" data-delta="-0.0001">&#9660;</button>
-                                </div>
+                                <span class="gsc-val gold">0g</span>
+                                <span class="gsc-val silver">0s</span>
+                                <span class="gsc-val copper">0c</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="input-row">
-                        <label>Bolt of Imbued NW</label>
-                        <div class="price-control">
-                            <input type="number" id="deposit_imbued_bolt" value="0.12" step="0.0001">
+                        <div class="price-table-row">
+                            <span class="pt-name">Bolt of Imbued NW</span>
+                            <div class="price-control"><input type="number" id="deposit_imbued_bolt" value="0.12" step="0.0001"></div>
                             <div class="gsc-group" data-input="deposit_imbued_bolt">
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="1">&#9650;</button>
-                                    <span class="gsc-val gold">0g</span>
-                                    <button class="gsc-btn" data-delta="-1">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.01">&#9650;</button>
-                                    <span class="gsc-val silver">0s</span>
-                                    <button class="gsc-btn" data-delta="-0.01">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.0001">&#9650;</button>
-                                    <span class="gsc-val copper">0c</span>
-                                    <button class="gsc-btn" data-delta="-0.0001">&#9660;</button>
-                                </div>
+                                <span class="gsc-val gold">0g</span>
+                                <span class="gsc-val silver">0s</span>
+                                <span class="gsc-val copper">0c</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="input-row">
-                        <label>Netherweave Bag</label>
-                        <div class="price-control">
-                            <input type="number" id="deposit_nw_bag" value="0.15" step="0.0001">
+                        <div class="price-table-row">
+                            <span class="pt-name">Netherweave Bag</span>
+                            <div class="price-control"><input type="number" id="deposit_nw_bag" value="0.15" step="0.0001"></div>
                             <div class="gsc-group" data-input="deposit_nw_bag">
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="1">&#9650;</button>
-                                    <span class="gsc-val gold">0g</span>
-                                    <button class="gsc-btn" data-delta="-1">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.01">&#9650;</button>
-                                    <span class="gsc-val silver">0s</span>
-                                    <button class="gsc-btn" data-delta="-0.01">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.0001">&#9650;</button>
-                                    <span class="gsc-val copper">0c</span>
-                                    <button class="gsc-btn" data-delta="-0.0001">&#9660;</button>
-                                </div>
+                                <span class="gsc-val gold">0g</span>
+                                <span class="gsc-val silver">0s</span>
+                                <span class="gsc-val copper">0c</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="input-row">
-                        <label>Imbued NW Bag</label>
-                        <div class="price-control">
-                            <input type="number" id="deposit_imbued_bag" value="0.30" step="0.0001">
+                        <div class="price-table-row">
+                            <span class="pt-name">Imbued NW Bag</span>
+                            <div class="price-control"><input type="number" id="deposit_imbued_bag" value="0.30" step="0.0001"></div>
                             <div class="gsc-group" data-input="deposit_imbued_bag">
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="1">&#9650;</button>
-                                    <span class="gsc-val gold">0g</span>
-                                    <button class="gsc-btn" data-delta="-1">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.01">&#9650;</button>
-                                    <span class="gsc-val silver">0s</span>
-                                    <button class="gsc-btn" data-delta="-0.01">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.0001">&#9650;</button>
-                                    <span class="gsc-val copper">0c</span>
-                                    <button class="gsc-btn" data-delta="-0.0001">&#9660;</button>
-                                </div>
+                                <span class="gsc-val gold">0g</span>
+                                <span class="gsc-val silver">0s</span>
+                                <span class="gsc-val copper">0c</span>
                             </div>
                         </div>
                     </div>
@@ -794,238 +886,272 @@
 
                 <div class="panel">
                     <h2>Vendor / Settings</h2>
-                    <div class="input-row">
-                        <label>Rune Thread</label>
-                        <div class="price-control">
-                            <input type="number" id="price_thread" value="0.50" step="0.0001">
+                    <div class="price-table">
+                        <div class="price-table-row">
+                            <span class="pt-name">Rune Thread</span>
+                            <div class="price-control"><input type="number" id="price_thread" value="0.50" step="0.0001"></div>
                             <div class="gsc-group" data-input="price_thread">
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="1">&#9650;</button>
-                                    <span class="gsc-val gold">0g</span>
-                                    <button class="gsc-btn" data-delta="-1">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.01">&#9650;</button>
-                                    <span class="gsc-val silver">0s</span>
-                                    <button class="gsc-btn" data-delta="-0.01">&#9660;</button>
-                                </div>
-                                <div class="gsc-unit">
-                                    <button class="gsc-btn" data-delta="0.0001">&#9650;</button>
-                                    <span class="gsc-val copper">0c</span>
-                                    <button class="gsc-btn" data-delta="-0.0001">&#9660;</button>
-                                </div>
+                                <span class="gsc-val gold">0g</span>
+                                <span class="gsc-val silver">0s</span>
+                                <span class="gsc-val copper">0c</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="input-row">
-                        <label>AH Cut (%)</label>
-                        <div class="price-control">
-                            <input type="number" id="ah_cut" value="5" step="0.1" style="width: 60px;">
-                            <span style="color: #888; font-size: 0.85em;">%</span>
+                        <div class="price-table-row">
+                            <span class="pt-name">AH Cut</span>
+                            <div class="price-control">
+                                <input type="number" id="ah_cut" value="5" step="0.1">
+                                <span style="color: #888; font-size: 0.82em; margin-left: 2px;">%</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="main-area">
-                <div class="tier-label">Tier 1 Crafts</div>
+                <div class="crafting-overview">
+                <div class="crafting-trees">
+                <div class="tier-label">Full Breakdown: Netherweave Bag</div>
                 <div class="tier">
-                    <div class="card" id="card_bolt">
-                        <h3>Bolt of Netherweave</h3>
-                        <div class="sourcing">
-                            <div class="sourcing-title">Ingredients</div>
-                            <div class="sourcing-row fixed">
-                                <span>6x Netherweave Cloth</span>
-                                <span class="cost" id="bolt_cloth_cost">-</span>
+                    <div class="card" id="card_nw_bag_breakdown" style="grid-column: 1 / -1;">
+                        <h3>Netherweave Bag — Crafting Tree</h3>
+                        <div class="craft-tree">
+                            <div class="tree-node tree-craftable" data-detail="nbt-bolt-detail">
+                                <span class="tree-prefix">├── </span>
+                                <span class="tree-name">4x Bolt of Netherweave <span class="tree-unit" id="nbt_bolt_unit"></span></span>
+                                <span class="tree-vs">
+                                    <span class="tree-opt" id="nbt_bolt_buy">buy: -</span>
+                                    <span class="tree-opt" id="nbt_bolt_craft">craft: -</span>
+                                </span>
                             </div>
-                        </div>
-                        <div class="card-row">
-                            <span class="label">Craft cost</span>
-                            <span class="value" id="bolt_craft_cost">-</span>
-                        </div>
-                        <div class="card-row">
-                            <span class="label">AH price</span>
-                            <span class="value" id="bolt_ah_price">-</span>
-                        </div>
-                        <div class="card-row">
-                            <span class="label">Best source</span>
-                            <span class="value" id="bolt_best_source">-</span>
-                        </div>
-                        <div class="card-row">
-                            <span class="label">AH cut (if sold)</span>
-                            <span class="value" id="bolt_ah_cut">-</span>
+                            <div class="tree-detail depth-1" id="nbt-bolt-detail">
+                                <div class="tree-detail-row">
+                                    <span class="td-label">Craft cost (per unit)</span>
+                                    <span class="td-value" id="nbt_bolt_d_craft">-</span>
+                                </div>
+                                <div class="tree-detail-row">
+                                    <span class="td-label">AH price (per unit)</span>
+                                    <span class="td-value" id="nbt_bolt_d_ah">-</span>
+                                </div>
+                                <div class="tree-detail-row">
+                                    <span class="td-label">AH cut</span>
+                                    <span class="td-value" id="nbt_bolt_d_cut">-</span>
+                                </div>
+                                <div class="tree-detail-row">
+                                    <span class="td-label">Sell profit (per unit)</span>
+                                    <span class="td-value" id="nbt_bolt_d_profit">-</span>
+                                </div>
+                            </div>
+                            <div class="tree-node">
+                                <span class="tree-prefix">│   └── </span>
+                                <span class="tree-name">24x Netherweave Cloth <span class="tree-unit" id="nbt_cloth_unit"></span></span>
+                                <span class="tree-cost" id="nbt_cloth">-</span>
+                            </div>
+                            <div class="tree-node">
+                                <span class="tree-prefix">└── </span>
+                                <span class="tree-name">1x Rune Thread (vendor)</span>
+                                <span class="tree-cost" id="nbt_thread">-</span>
+                            </div>
                         </div>
                         <div class="card-row highlight">
-                            <span class="label">Sell profit (per unit)</span>
-                            <span class="value" id="bolt_sell_profit">-</span>
-                        </div>
-                        <div class="deposit-note" id="bolt_deposit_note">-</div>
-                    </div>
-
-                    <div class="card" id="card_greater">
-                        <h3>Greater Planar Essence</h3>
-                        <div class="sourcing">
-                            <div class="sourcing-title">Ingredients</div>
-                            <div class="sourcing-row fixed">
-                                <span>3x Lesser Planar Essence</span>
-                                <span class="cost" id="greater_lesser_cost">-</span>
-                            </div>
+                            <span class="label">Optimal cost (best at each tier)</span>
+                            <span class="value" id="nbd_optimal_cost">-</span>
                         </div>
                         <div class="card-row">
-                            <span class="label">Craft cost</span>
-                            <span class="value" id="greater_craft_cost">-</span>
-                        </div>
-                        <div class="card-row">
-                            <span class="label">AH price</span>
-                            <span class="value" id="greater_ah_price">-</span>
-                        </div>
-                        <div class="card-row">
-                            <span class="label">Best source</span>
-                            <span class="value" id="greater_best_source">-</span>
-                        </div>
-                        <div class="card-row">
-                            <span class="label">AH cut (if sold)</span>
-                            <span class="value" id="greater_ah_cut">-</span>
-                        </div>
-                        <div class="card-row highlight">
-                            <span class="label">Sell profit (per unit)</span>
-                            <span class="value" id="greater_sell_profit">-</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tier-label">Tier 2 Crafts</div>
-                <div class="tier">
-                    <div class="card" id="card_imbued_bolt">
-                        <h3>Bolt of Imbued Netherweave</h3>
-                        <div class="sourcing">
-                            <div class="sourcing-title">Ingredients</div>
-                            <div class="sourcing-row">
-                                <span class="opt" id="imbued_bolt_src_craft">3x Bolt (craft)</span>
-                                <span class="opt" id="imbued_bolt_src_craft_price">-</span>
-                            </div>
-                            <div class="sourcing-row">
-                                <span class="opt" id="imbued_bolt_src_buy">3x Bolt (buy)</span>
-                                <span class="opt" id="imbued_bolt_src_buy_price">-</span>
-                            </div>
-                            <div class="sourcing-row fixed">
-                                <span>2x Arcane Dust</span>
-                                <span class="cost" id="imbued_bolt_dust_cost">-</span>
-                            </div>
-                        </div>
-                        <div class="card-row">
-                            <span class="label">Craft cost</span>
-                            <span class="value" id="imbued_bolt_craft_cost">-</span>
-                        </div>
-                        <div class="card-row">
-                            <span class="label">AH price</span>
-                            <span class="value" id="imbued_bolt_ah_price">-</span>
-                        </div>
-                        <div class="card-row">
-                            <span class="label">Best source</span>
-                            <span class="value" id="imbued_bolt_best_source">-</span>
-                        </div>
-                        <div class="card-row">
-                            <span class="label">AH cut (if sold)</span>
-                            <span class="value" id="imbued_bolt_ah_cut">-</span>
-                        </div>
-                        <div class="card-row highlight">
-                            <span class="label">Sell profit (per unit)</span>
-                            <span class="value" id="imbued_bolt_sell_profit">-</span>
-                        </div>
-                        <div class="deposit-note" id="imbued_bolt_deposit_note">-</div>
-                    </div>
-                </div>
-
-                <div class="tier-label">Final Products</div>
-                <div class="tier">
-                    <div class="card" id="card_nw_bag">
-                        <h3>Netherweave Bag (16 slot)</h3>
-                        <div class="sourcing">
-                            <div class="sourcing-title">Ingredients</div>
-                            <div class="sourcing-row">
-                                <span class="opt" id="nw_bag_src_craft">4x Bolt (craft)</span>
-                                <span class="opt" id="nw_bag_src_craft_price">-</span>
-                            </div>
-                            <div class="sourcing-row">
-                                <span class="opt" id="nw_bag_src_buy">4x Bolt (buy)</span>
-                                <span class="opt" id="nw_bag_src_buy_price">-</span>
-                            </div>
-                            <div class="sourcing-row fixed">
-                                <span>1x Rune Thread</span>
-                                <span class="cost" id="nw_bag_thread_cost">-</span>
-                            </div>
-                        </div>
-                        <div class="card-row">
-                            <span class="label">Craft cost</span>
-                            <span class="value" id="nw_bag_craft_cost">-</span>
+                            <span class="label">Full raw cost (craft everything)</span>
+                            <span class="value" id="nbd_raw_cost">-</span>
                         </div>
                         <div class="card-row">
                             <span class="label">Sale price</span>
-                            <span class="value" id="nw_bag_sale_price">-</span>
+                            <span class="value" id="nbd_sale_price">-</span>
                         </div>
                         <div class="card-row">
                             <span class="label">AH cut</span>
-                            <span class="value" id="nw_bag_ah_cut">-</span>
+                            <span class="value" id="nbd_ah_cut">-</span>
                         </div>
                         <div class="card-row highlight">
-                            <span class="label">Net profit</span>
-                            <span class="value" id="nw_bag_profit">-</span>
+                            <span class="label">Net profit (optimal)</span>
+                            <span class="value" id="nbd_profit_optimal">-</span>
                         </div>
-                        <div class="deposit-note" id="nw_bag_deposit_note">-</div>
+                        <div class="deposit-note" id="nbd_deposit_note">-</div>
                     </div>
-
-                    <div class="card" id="card_imbued_bag">
-                        <h3>Imbued Netherweave Bag (18 slot)</h3>
-                        <div class="sourcing">
-                            <div class="sourcing-title">Ingredients</div>
-                            <div class="sourcing-row">
-                                <span class="opt" id="imbued_bag_src_craft">4x Imbued Bolt (craft)</span>
-                                <span class="opt" id="imbued_bag_src_craft_price">-</span>
+                </div>
+                <div class="tier-label">Full Breakdown: Imbued Netherweave Bag</div>
+                <div class="tier">
+                    <div class="card" id="card_imbued_bag_breakdown" style="grid-column: 1 / -1;">
+                        <h3>Imbued Netherweave Bag — Crafting Tree</h3>
+                        <div class="craft-tree">
+                            <div class="tree-node tree-craftable" data-detail="bt-ibolt-detail">
+                                <span class="tree-prefix">├── </span>
+                                <span class="tree-name">4x Bolt of Imbued Netherweave <span class="tree-unit" id="bt_ibolt_unit"></span></span>
+                                <span class="tree-vs">
+                                    <span class="tree-opt" id="bt_ibolt_buy">buy: -</span>
+                                    <span class="tree-opt" id="bt_ibolt_craft">craft: -</span>
+                                </span>
                             </div>
-                            <div class="sourcing-row">
-                                <span class="opt" id="imbued_bag_src_buy">4x Imbued Bolt (buy)</span>
-                                <span class="opt" id="imbued_bag_src_buy_price">-</span>
+                            <div class="tree-detail depth-1" id="bt-ibolt-detail">
+                                <div class="tree-detail-row">
+                                    <span class="td-label">Craft cost (per unit)</span>
+                                    <span class="td-value" id="bt_ibolt_d_craft">-</span>
+                                </div>
+                                <div class="tree-detail-row">
+                                    <span class="td-label">AH price (per unit)</span>
+                                    <span class="td-value" id="bt_ibolt_d_ah">-</span>
+                                </div>
+                                <div class="tree-detail-row">
+                                    <span class="td-label">AH cut</span>
+                                    <span class="td-value" id="bt_ibolt_d_cut">-</span>
+                                </div>
+                                <div class="tree-detail-row">
+                                    <span class="td-label">Sell profit (per unit)</span>
+                                    <span class="td-value" id="bt_ibolt_d_profit">-</span>
+                                </div>
                             </div>
-                            <div class="sourcing-row fixed">
-                                <span>2x Netherweb Spider Silk</span>
-                                <span class="cost" id="imbued_bag_silk_cost">-</span>
+                            <div class="tree-node tree-craftable" data-detail="bt-bolt-detail">
+                                <span class="tree-prefix">│   ├── </span>
+                                <span class="tree-name">12x Bolt of Netherweave <span class="tree-unit" id="bt_bolt_unit"></span></span>
+                                <span class="tree-vs">
+                                    <span class="tree-opt" id="bt_bolt_buy">buy: -</span>
+                                    <span class="tree-opt" id="bt_bolt_craft">craft: -</span>
+                                </span>
                             </div>
-                            <div class="sourcing-row">
-                                <span class="opt" id="imbued_bag_ess_craft">1x Greater (transmute)</span>
-                                <span class="opt" id="imbued_bag_ess_craft_price">-</span>
+                            <div class="tree-detail depth-2" id="bt-bolt-detail">
+                                <div class="tree-detail-row">
+                                    <span class="td-label">Craft cost (per unit)</span>
+                                    <span class="td-value" id="bt_bolt_d_craft">-</span>
+                                </div>
+                                <div class="tree-detail-row">
+                                    <span class="td-label">AH price (per unit)</span>
+                                    <span class="td-value" id="bt_bolt_d_ah">-</span>
+                                </div>
+                                <div class="tree-detail-row">
+                                    <span class="td-label">AH cut</span>
+                                    <span class="td-value" id="bt_bolt_d_cut">-</span>
+                                </div>
+                                <div class="tree-detail-row">
+                                    <span class="td-label">Sell profit (per unit)</span>
+                                    <span class="td-value" id="bt_bolt_d_profit">-</span>
+                                </div>
                             </div>
-                            <div class="sourcing-row">
-                                <span class="opt" id="imbued_bag_ess_buy">1x Greater (buy)</span>
-                                <span class="opt" id="imbued_bag_ess_buy_price">-</span>
+                            <div class="tree-node">
+                                <span class="tree-prefix">│   │   └── </span>
+                                <span class="tree-name">72x Netherweave Cloth <span class="tree-unit" id="bt_cloth_unit"></span></span>
+                                <span class="tree-cost" id="bt_cloth">-</span>
                             </div>
+                            <div class="tree-node">
+                                <span class="tree-prefix">│   └── </span>
+                                <span class="tree-name">8x Arcane Dust <span class="tree-unit" id="bt_dust_unit"></span></span>
+                                <span class="tree-cost" id="bt_dust">-</span>
+                            </div>
+                            <div class="tree-node">
+                                <span class="tree-prefix">├── </span>
+                                <span class="tree-name">2x Netherweb Spider Silk <span class="tree-unit" id="bt_silk_unit"></span></span>
+                                <span class="tree-cost" id="bt_silk">-</span>
+                            </div>
+                            <div class="tree-node tree-craftable" data-detail="bt-greater-detail">
+                                <span class="tree-prefix">└── </span>
+                                <span class="tree-name">1x Greater Planar Essence</span>
+                                <span class="tree-vs">
+                                    <span class="tree-opt" id="bt_greater_buy">buy: -</span>
+                                    <span class="tree-opt" id="bt_greater_craft">craft: -</span>
+                                </span>
+                            </div>
+                            <div class="tree-detail depth-1" id="bt-greater-detail">
+                                <div class="tree-detail-row">
+                                    <span class="td-label">Craft cost (per unit)</span>
+                                    <span class="td-value" id="bt_greater_d_craft">-</span>
+                                </div>
+                                <div class="tree-detail-row">
+                                    <span class="td-label">AH price (per unit)</span>
+                                    <span class="td-value" id="bt_greater_d_ah">-</span>
+                                </div>
+                                <div class="tree-detail-row">
+                                    <span class="td-label">AH cut</span>
+                                    <span class="td-value" id="bt_greater_d_cut">-</span>
+                                </div>
+                                <div class="tree-detail-row">
+                                    <span class="td-label">Sell profit (per unit)</span>
+                                    <span class="td-value" id="bt_greater_d_profit">-</span>
+                                </div>
+                            </div>
+                            <div class="tree-node">
+                                <span class="tree-prefix">    └── </span>
+                                <span class="tree-name">3x Lesser Planar Essence <span class="tree-unit" id="bt_lesser_unit"></span></span>
+                                <span class="tree-cost" id="bt_lesser">-</span>
+                            </div>
+                        </div>
+                        <div class="card-row highlight">
+                            <span class="label">Optimal cost (best at each tier)</span>
+                            <span class="value" id="bd_optimal_cost">-</span>
                         </div>
                         <div class="card-row">
-                            <span class="label">Craft cost</span>
-                            <span class="value" id="imbued_bag_craft_cost">-</span>
+                            <span class="label">Full raw cost (craft everything)</span>
+                            <span class="value" id="bd_raw_cost">-</span>
                         </div>
                         <div class="card-row">
                             <span class="label">Sale price</span>
-                            <span class="value" id="imbued_bag_sale_price">-</span>
+                            <span class="value" id="bd_sale_price">-</span>
                         </div>
                         <div class="card-row">
                             <span class="label">AH cut</span>
-                            <span class="value" id="imbued_bag_ah_cut">-</span>
+                            <span class="value" id="bd_ah_cut">-</span>
                         </div>
                         <div class="card-row highlight">
-                            <span class="label">Net profit</span>
-                            <span class="value" id="imbued_bag_profit">-</span>
+                            <span class="label">Net profit (optimal)</span>
+                            <span class="value" id="bd_profit_optimal">-</span>
                         </div>
-                        <div class="deposit-note" id="imbued_bag_deposit_note">-</div>
+                        <div class="deposit-note" id="bd_deposit_note">-</div>
                     </div>
                 </div>
+                </div><!-- end crafting-trees -->
+                <div class="crafting-side">
+                    <div class="card" id="card_bandage">
+                        <h3>Bandage Vendor Alternative</h3>
+                        <div class="sourcing">
+                            <div class="sourcing-title">Heavy Netherweave Bandage</div>
+                            <div class="sourcing-row fixed">
+                                <span>2x Cloth → 1x Bandage</span>
+                                <span class="cost">30s vendor</span>
+                            </div>
+                        </div>
+                        <div class="card-row" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #3a3a5c;">
+                            <span class="label">Profit per cloth</span>
+                            <span class="value" style="color: #888; font-size: 0.8em;">revenue − cloth cost</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="label">Bandages <span style="color:#888; font-size:0.8em;">(vendor, no AH fee)</span></span>
+                            <span class="value" id="band_per_cloth">-</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="label">NW Bag (24 cloth)</span>
+                            <span class="value" id="band_nw_per_cloth">-</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="label">Imbued Bag (72 cloth)</span>
+                            <span class="value" id="band_ib_per_cloth">-</span>
+                        </div>
+                        <div class="card-row highlight">
+                            <span class="label">Best use of cloth</span>
+                            <span class="value" id="band_verdict">-</span>
+                        </div>
+                    </div>
+                </div><!-- end crafting-side -->
+                </div><!-- end crafting-overview -->
             </div>
         </div>
-        </div><!-- end tab-tailoring -->
+        </div><!-- end tab-bags -->
+
+        <div id="tab-gear" class="tab-content" style="display:none">
+            <div class="alch-layout">
+                <div class="sidebar" id="gear-col-left"></div>
+                <div class="sidebar" id="gear-col-right"></div>
+                <div class="main-area" id="gear-main"></div>
+            </div>
+        </div>
 
         <div id="tab-alchemy" class="tab-content" style="display:none">
-            <div class="layout">
-                <div class="sidebar" id="alch-sidebar"></div>
+            <div class="alch-layout">
+                <div class="sidebar" id="alch-col-left"></div>
+                <div class="sidebar" id="alch-col-right"></div>
                 <div class="main-area" id="alch-main"></div>
             </div>
         </div>
@@ -1039,6 +1165,8 @@
         const ALCH_LOCKS_KEY = 'tbc_alchemy_locks';
         const TAB_STORAGE_KEY = 'tbc_calculator_tab';
         const ALCH_RECIPE_KEY = 'tbc_alchemy_selected_recipe';
+        const ALCH_HIDDEN_KEY = 'tbc_alchemy_hidden_recipes';
+        const ALCH_COLLAPSED_KEY = 'tbc_alchemy_collapsed_panels';
 
         // ===== TAILORING NAME MAP =====
         const NAME_TO_INPUT = {
@@ -1117,6 +1245,46 @@
                     { item: 'Imbued Vial', qty: 1, type: 'vendor' },
                 ]
             },
+            {
+                id: 'elixir_of_mastery',
+                name: 'Elixir of Mastery',
+                category: 'elixir',
+                ingredients: [
+                    { item: 'Felweed', qty: 1, type: 'ah' },
+                    { item: 'Terocone', qty: 3, type: 'ah' },
+                    { item: 'Imbued Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+            {
+                id: 'elixir_major_fortitude',
+                name: 'Elixir of Major Fortitude',
+                category: 'elixir',
+                ingredients: [
+                    { item: 'Felweed', qty: 1, type: 'ah' },
+                    { item: 'Ragveil', qty: 2, type: 'ah' },
+                    { item: 'Imbued Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+            {
+                id: 'elixir_major_strength',
+                name: 'Elixir of Major Strength',
+                category: 'elixir',
+                ingredients: [
+                    { item: 'Mountain Silversage', qty: 1, type: 'ah' },
+                    { item: 'Felweed', qty: 1, type: 'ah' },
+                    { item: 'Imbued Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+            {
+                id: 'elixir_onslaught',
+                name: 'Onslaught Elixir',
+                category: 'elixir',
+                ingredients: [
+                    { item: 'Mountain Silversage', qty: 1, type: 'ah' },
+                    { item: 'Felweed', qty: 1, type: 'ah' },
+                    { item: 'Imbued Vial', qty: 1, type: 'vendor' },
+                ]
+            },
             // === Potions ===
             {
                 id: 'volatile_healing_potion',
@@ -1187,7 +1355,39 @@
                     { item: 'Imbued Vial', qty: 1, type: 'vendor' },
                 ]
             },
+            {
+                id: 'elixir_major_firepower',
+                name: 'Elixir of Major Firepower',
+                category: 'elixir',
+                ingredients: [
+                    { item: 'Mote of Fire', qty: 2, type: 'ah' },
+                    { item: 'Ancient Lichen', qty: 1, type: 'ah' },
+                    { item: 'Imbued Vial', qty: 1, type: 'vendor' },
+                ]
+            },
             // === Flasks ===
+            {
+                id: 'flask_fortification',
+                name: 'Flask of Fortification',
+                category: 'flask',
+                ingredients: [
+                    { item: 'Fel Lotus', qty: 1, type: 'ah' },
+                    { item: 'Mana Thistle', qty: 3, type: 'ah' },
+                    { item: 'Ancient Lichen', qty: 7, type: 'ah' },
+                    { item: 'Imbued Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+            {
+                id: 'flask_mighty_restoration',
+                name: 'Flask of Mighty Restoration',
+                category: 'flask',
+                ingredients: [
+                    { item: 'Fel Lotus', qty: 1, type: 'ah' },
+                    { item: 'Mana Thistle', qty: 3, type: 'ah' },
+                    { item: 'Dreaming Glory', qty: 7, type: 'ah' },
+                    { item: 'Imbued Vial', qty: 1, type: 'vendor' },
+                ]
+            },
             {
                 id: 'flask_relentless_assault',
                 name: 'Flask of Relentless Assault',
@@ -1258,10 +1458,167 @@
 
         const VENDOR_DEFAULTS = {
             'Imbued Vial': 0.40,
+            'Rune Thread': 0.50,
         };
+
+        const GEAR_STORAGE_KEY = 'tbc_gear_calculator';
+        const GEAR_LOCKS_KEY = 'tbc_gear_locks';
+        const GEAR_RECIPE_KEY = 'tbc_gear_selected_recipe';
+        const GEAR_COLLAPSED_KEY = 'tbc_gear_collapsed_panels';
+
+        const GEAR_RECIPES = [
+            {
+                id: 'spellstrike_pants',
+                name: 'Spellstrike Pants',
+                category: 'epic',
+                ingredients: [
+                    { item: 'Primal Might', qty: 5, type: 'ah' },
+                    { item: 'Spellcloth', qty: 10, type: 'ah' },
+                    { item: 'Primal Nether', qty: 1, type: 'bop' }
+                ]
+            },
+            {
+                id: 'spellstrike_hood',
+                name: 'Spellstrike Hood',
+                category: 'epic',
+                ingredients: [
+                    { item: 'Primal Might', qty: 5, type: 'ah' },
+                    { item: 'Spellcloth', qty: 10, type: 'ah' },
+                    { item: 'Primal Nether', qty: 1, type: 'bop' }
+                ]
+            },
+            {
+                id: 'mystic_spellthread',
+                name: 'Mystic Spellthread',
+                category: 'rare',
+                ingredients: [
+                    { item: 'Rune Thread', qty: 1, type: 'vendor' },
+                    { item: 'Primal Mana', qty: 5, type: 'ah', craftFrom: { item: 'Mote of Mana', qty: 10 } }
+                ]
+            },
+            {
+                id: 'runic_spellthread',
+                name: 'Runic Spellthread',
+                category: 'epic',
+                ingredients: [
+                    { item: 'Rune Thread', qty: 1, type: 'vendor' },
+                    { item: 'Primal Mana', qty: 10, type: 'ah', craftFrom: { item: 'Mote of Mana', qty: 10 } },
+                    { item: 'Primal Nether', qty: 1, type: 'bop' }
+                ]
+            },
+            {
+                id: 'bracers_of_havok',
+                name: 'Bracers of Havok',
+                category: 'epic',
+                ingredients: [
+                    {
+                        item: 'Bolt of Imbued Netherweave', qty: 4, type: 'ah',
+                        craftFrom: { mats: [
+                            {
+                                item: 'Bolt of Netherweave', qty: 3, type: 'ah',
+                                craftFrom: { mats: [
+                                    { item: 'Netherweave Cloth', qty: 6, type: 'ah' }
+                                ]}
+                            },
+                            { item: 'Arcane Dust', qty: 2, type: 'ah' }
+                        ]}
+                    },
+                    { item: 'Primal Earth', qty: 4, type: 'ah', craftFrom: { item: 'Mote of Earth', qty: 10 } },
+                    { item: 'Primal Shadow', qty: 4, type: 'ah', craftFrom: { item: 'Mote of Shadow', qty: 10 } }
+                ]
+            },
+            {
+                id: 'cloak_black_void',
+                name: 'Cloak of the Black Void',
+                category: 'epic',
+                ingredients: [
+                    {
+                        item: 'Bolt of Imbued Netherweave', qty: 6, type: 'ah',
+                        craftFrom: { mats: [
+                            {
+                                item: 'Bolt of Netherweave', qty: 3, type: 'ah',
+                                craftFrom: { mats: [
+                                    { item: 'Netherweave Cloth', qty: 6, type: 'ah' }
+                                ]}
+                            },
+                            { item: 'Arcane Dust', qty: 2, type: 'ah' }
+                        ]}
+                    },
+                    { item: 'Primal Mana', qty: 3, type: 'ah', craftFrom: { item: 'Mote of Mana', qty: 10 } },
+                    { item: 'Primal Shadow', qty: 3, type: 'ah', craftFrom: { item: 'Mote of Shadow', qty: 10 } }
+                ]
+            }
+        ];
+
+        const GEAR_CATEGORY_ORDER = [
+            { label: 'Epic Gear', includes: ['epic'] },
+            { label: 'Rare Gear', includes: ['rare'] },
+            { label: 'Uncommon Gear', includes: ['uncommon'] }
+        ];
 
         // Built dynamically by alchInit: maps item/product names to input IDs
         const alchNameToInput = {};
+        const gearNameToInput = {};
+
+        // ===== SHARED PRICE GROUPS =====
+        // Each group is a list of input IDs that all represent the same item.
+        // When one is updated, the others sync automatically.
+        const SHARED_PRICE_GROUPS = [
+            ['price_cloth',       'gear_mat_netherweave_cloth'],
+            ['price_dust',        'gear_mat_arcane_dust'],
+            ['price_bolt',        'gear_mat_bolt_of_netherweave'],
+            ['price_imbued_bolt', 'gear_mat_bolt_of_imbued_netherweave'],
+            ['price_thread',      'gear_vendor_rune_thread'],
+            ['alch_mat_primal_mana',    'gear_mat_primal_mana'],
+            ['alch_mat_mote_of_mana',   'gear_mat_mote_of_mana'],
+            ['alch_mat_primal_shadow',  'gear_mat_primal_shadow'],
+            ['alch_mat_mote_of_shadow', 'gear_mat_mote_of_shadow'],
+            ['alch_mat_primal_earth',   'gear_mat_primal_earth'],
+            ['alch_mat_mote_of_earth',  'gear_mat_mote_of_earth'],
+        ];
+
+        function syncSharedPrice(changedId) {
+            var input = document.getElementById(changedId);
+            if (!input) return;
+            var value = input.value;
+            SHARED_PRICE_GROUPS.forEach(function(group) {
+                if (group.indexOf(changedId) === -1) return;
+                group.forEach(function(id) {
+                    if (id === changedId) return;
+                    var sibling = document.getElementById(id);
+                    if (sibling && sibling.value !== value) {
+                        sibling.value = value;
+                        updateGSCDisplay(id);
+                        autoSizeInput(sibling);
+                    }
+                });
+            });
+        }
+
+        function syncAllSharedPrices() {
+            SHARED_PRICE_GROUPS.forEach(function(group) {
+                // Find the first group member with a non-zero value and sync from it
+                var sourceId = null;
+                var sourceVal = null;
+                group.forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el && parseFloat(el.value) && sourceId === null) {
+                        sourceId = id;
+                        sourceVal = el.value;
+                    }
+                });
+                if (sourceId === null) return;
+                group.forEach(function(id) {
+                    if (id === sourceId) return;
+                    var el = document.getElementById(id);
+                    if (el && el.value !== sourceVal) {
+                        el.value = sourceVal;
+                        updateGSCDisplay(id);
+                        autoSizeInput(el);
+                    }
+                });
+            });
+        }
 
         // ===== LOCK FUNCTIONS =====
         function getLocks(key) {
@@ -1347,7 +1704,10 @@
                 }
             }
 
+            syncAllSharedPrices();
             calculate();
+            alchCalculate();
+            gearCalculate();
 
             var msg = 'Updated ' + updated + ' price' + (updated !== 1 ? 's' : '');
             if (skipped > 0) {
@@ -1363,20 +1723,20 @@
         }
 
         function toGSC(value) {
-            const totalCopper = Math.round(value * 10000);
+            const totalCopper = Math.round(Math.abs(value) * 10000);
             const g = Math.floor(totalCopper / 10000);
             const s = Math.floor((totalCopper % 10000) / 100);
             const c = totalCopper % 100;
-            return { g, s, c };
+            return { g, s, c, negative: value < 0 };
         }
 
         function goldGSC(amount) {
-            const { g, s, c } = toGSC(amount);
+            const { g, s, c, negative } = toGSC(amount);
             let parts = [];
             if (g > 0) parts.push(g + 'g');
             if (s > 0 || g > 0) parts.push(s + 's');
             parts.push(c + 'c');
-            return parts.join(' ');
+            return (negative ? '-' : '') + parts.join(' ');
         }
 
         function gold(amount) {
@@ -1416,19 +1776,6 @@
             return 'neutral';
         }
 
-        function bestSourceHTML(craftCost, buyPrice, label) {
-            const diff = Math.abs(craftCost - buyPrice);
-            const diffStr = diff > 0.001 ? ' <span class="savings">(save ' + gold(diff) + ')</span>' : '';
-
-            if (craftCost < buyPrice - 0.001) {
-                return '<span class="best-source craft">' + (label || 'CRAFT') + '</span>' + diffStr;
-            } else if (buyPrice < craftCost - 0.001) {
-                return '<span class="best-source buy">BUY</span>' + diffStr;
-            } else {
-                return '<span class="best-source equal">EQUAL</span> <span class="savings">(buy to save effort)</span>';
-            }
-        }
-
         function sanitizeId(name) {
             return name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
         }
@@ -1436,7 +1783,7 @@
         // ===== TAILORING SAVE / LOAD =====
         function saveToStorage() {
             const data = {};
-            document.querySelectorAll('#tab-tailoring input').forEach(input => {
+            document.querySelectorAll('#tab-bags input').forEach(input => {
                 if (input.id) data[input.id] = input.value;
             });
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -1449,7 +1796,7 @@
                     const data = JSON.parse(stored);
                     Object.keys(data).forEach(id => {
                         const input = document.getElementById(id);
-                        if (input && input.closest('#tab-tailoring')) {
+                        if (input && input.closest('#tab-bags')) {
                             input.value = data[id];
                         }
                     });
@@ -1457,6 +1804,15 @@
                     console.error('Failed to load saved data:', e);
                 }
             }
+        }
+
+        function nudgeClothSilver(dir) {
+            var inp = document.getElementById('price_cloth');
+            var val = parseFloat(inp.value) || 0;
+            val = Math.round(val * 10000 + dir * 100) / 10000;
+            if (val < 0) val = 0;
+            inp.value = val;
+            inp.dispatchEvent(new Event('input', { bubbles: true }));
         }
 
         // ===== TAILORING CALCULATE =====
@@ -1484,111 +1840,134 @@
             const boltSellRevenue = boltAH * (1 - ahCutPct);
             const boltSellProfit = boltSellRevenue - boltCraftCost;
 
-            const boltAHCut = boltAH * ahCutPct;
-            document.getElementById('bolt_cloth_cost').textContent = gold(cloth * 6);
-            document.getElementById('bolt_craft_cost').textContent = gold(boltCraftCost);
-            document.getElementById('bolt_ah_price').textContent = gold(boltAH);
-            document.getElementById('bolt_best_source').innerHTML = bestSourceHTML(boltCraftCost, boltAH);
-            document.getElementById('bolt_ah_cut').textContent = gold(boltAHCut);
-            document.getElementById('bolt_sell_profit').innerHTML =
-                '<span class="' + profitClass(boltSellProfit) + '">' + (boltSellProfit >= 0 ? '+' : '') + gold(boltSellProfit) + '</span>';
-            document.getElementById('bolt_deposit_note').textContent = 'Deposit: ' + gold(depositBolt) + ' (lost if unsold)';
-
-            // === GREATER PLANAR ESSENCE ===
+            // === INTERMEDIATE CALCULATIONS (used by crafting trees) ===
             const greaterCraftCost = lesser * 3;
             const greaterBest = Math.min(greaterCraftCost, greaterAH);
-            const greaterSellRevenue = greaterAH * (1 - ahCutPct);
-            const greaterSellProfit = greaterSellRevenue - greaterCraftCost;
-
-            const greaterAHCut = greaterAH * ahCutPct;
-            document.getElementById('greater_lesser_cost').textContent = gold(lesser * 3);
-            document.getElementById('greater_craft_cost').textContent = gold(greaterCraftCost);
-            document.getElementById('greater_ah_price').textContent = gold(greaterAH);
-            document.getElementById('greater_best_source').innerHTML = bestSourceHTML(greaterCraftCost, greaterAH, 'TRANSMUTE');
-            document.getElementById('greater_ah_cut').textContent = gold(greaterAHCut);
-            document.getElementById('greater_sell_profit').innerHTML =
-                '<span class="' + profitClass(greaterSellProfit) + '">' + (greaterSellProfit >= 0 ? '+' : '') + gold(greaterSellProfit) + '</span>';
-
-            // === BOLT OF IMBUED NETHERWEAVE ===
-            const boltCraftCostFor3 = boltCraftCost * 3;
-            const boltBuyCostFor3 = boltAH * 3;
             const imbuedBoltCraftCost = (boltBest * 3) + (dust * 2);
             const imbuedBoltBest = Math.min(imbuedBoltCraftCost, imbuedBoltAH);
-            const imbuedBoltSellRevenue = imbuedBoltAH * (1 - ahCutPct);
-            const imbuedBoltSellProfit = imbuedBoltSellRevenue - imbuedBoltCraftCost;
 
-            const boltCraftActive = boltCraftCost <= boltAH;
-            document.getElementById('imbued_bolt_src_craft').className = 'opt' + (boltCraftActive ? ' active' : '');
-            document.getElementById('imbued_bolt_src_craft_price').className = 'opt' + (boltCraftActive ? ' active' : '');
-            document.getElementById('imbued_bolt_src_craft_price').innerHTML = gold(boltCraftCostFor3) + (boltCraftActive ? '<span class="using">USING</span>' : '');
-            document.getElementById('imbued_bolt_src_buy').className = 'opt' + (!boltCraftActive ? ' active' : '');
-            document.getElementById('imbued_bolt_src_buy_price').className = 'opt' + (!boltCraftActive ? ' active' : '');
-            document.getElementById('imbued_bolt_src_buy_price').innerHTML = gold(boltBuyCostFor3) + (!boltCraftActive ? '<span class="using">USING</span>' : '');
-            document.getElementById('imbued_bolt_dust_cost').textContent = gold(dust * 2);
+            // Helper to set buy/craft comparison
+            function setTreeVs(buyId, craftId, buyVal, craftVal, craftIsBetter) {
+                var buyEl = document.getElementById(buyId);
+                var craftEl = document.getElementById(craftId);
+                buyEl.textContent = 'buy: ' + gold(buyVal);
+                craftEl.textContent = 'craft: ' + gold(craftVal);
+                buyEl.className = 'tree-opt ' + (craftIsBetter ? 'worse' : 'better');
+                craftEl.className = 'tree-opt ' + (craftIsBetter ? 'better' : 'worse');
+            }
 
-            const imbuedBoltAHCut = imbuedBoltAH * ahCutPct;
-            document.getElementById('imbued_bolt_craft_cost').textContent = gold(imbuedBoltCraftCost);
-            document.getElementById('imbued_bolt_ah_price').textContent = gold(imbuedBoltAH);
-            document.getElementById('imbued_bolt_best_source').innerHTML = bestSourceHTML(imbuedBoltCraftCost, imbuedBoltAH);
-            document.getElementById('imbued_bolt_ah_cut').textContent = gold(imbuedBoltAHCut);
-            document.getElementById('imbued_bolt_sell_profit').innerHTML =
-                '<span class="' + profitClass(imbuedBoltSellProfit) + '">' + (imbuedBoltSellProfit >= 0 ? '+' : '') + gold(imbuedBoltSellProfit) + '</span>';
-            document.getElementById('imbued_bolt_deposit_note').textContent = 'Deposit: ' + gold(depositImbuedBolt) + ' (lost if unsold)';
+            // Helper to populate sell detail panel
+            function setTreeDetail(prefix, craftCostUnit, ahPriceUnit) {
+                var ahCut = ahPriceUnit * ahCutPct;
+                var sellProfit = ahPriceUnit - ahCut - craftCostUnit;
+                document.getElementById(prefix + '_d_craft').textContent = gold(craftCostUnit);
+                document.getElementById(prefix + '_d_ah').textContent = gold(ahPriceUnit);
+                document.getElementById(prefix + '_d_cut').textContent = gold(ahCut);
+                document.getElementById(prefix + '_d_profit').innerHTML =
+                    '<span class="' + profitClass(sellProfit) + '">' + (sellProfit >= 0 ? '+' : '') + gold(sellProfit) + '</span>';
+            }
 
-            // === NETHERWEAVE BAG ===
-            const boltCraftCostFor4 = boltCraftCost * 4;
-            const boltBuyCostFor4 = boltAH * 4;
-            const nwBagCraftCost = (boltBest * 4) + thread;
-            const nwBagAHCut = nwBagSale * ahCutPct;
-            const nwBagProfit = nwBagSale - nwBagAHCut - nwBagCraftCost;
+            // === NW BAG CRAFTING TREE ===
+            const nbtCloth = cloth * 24;
+            const nbtBoltBuy = boltAH * 4;
+            const nbtBoltCraft = nbtCloth;
+            const nbtBoltCraftBetter = nbtBoltCraft <= nbtBoltBuy;
+            const nbtOptimalCost = (nbtBoltCraftBetter ? nbtBoltCraft : nbtBoltBuy) + thread;
+            const nbtRawCost = nbtCloth + thread;
+            const nbdAHCut = nwBagSale * ahCutPct;
+            const nbdProfitOptimal = nwBagSale - nbdAHCut - nbtOptimalCost;
 
-            document.getElementById('nw_bag_src_craft').className = 'opt' + (boltCraftActive ? ' active' : '');
-            document.getElementById('nw_bag_src_craft_price').className = 'opt' + (boltCraftActive ? ' active' : '');
-            document.getElementById('nw_bag_src_craft_price').innerHTML = gold(boltCraftCostFor4) + (boltCraftActive ? '<span class="using">USING</span>' : '');
-            document.getElementById('nw_bag_src_buy').className = 'opt' + (!boltCraftActive ? ' active' : '');
-            document.getElementById('nw_bag_src_buy_price').className = 'opt' + (!boltCraftActive ? ' active' : '');
-            document.getElementById('nw_bag_src_buy_price').innerHTML = gold(boltBuyCostFor4) + (!boltCraftActive ? '<span class="using">USING</span>' : '');
-            document.getElementById('nw_bag_thread_cost').textContent = gold(thread);
+            setTreeVs('nbt_bolt_buy', 'nbt_bolt_craft', nbtBoltBuy, nbtBoltCraft, nbtBoltCraftBetter);
+            setTreeDetail('nbt_bolt', boltCraftCost, boltAH);
 
-            document.getElementById('nw_bag_craft_cost').textContent = gold(nwBagCraftCost);
-            document.getElementById('nw_bag_sale_price').textContent = gold(nwBagSale);
-            document.getElementById('nw_bag_ah_cut').textContent = gold(nwBagAHCut);
-            document.getElementById('nw_bag_profit').innerHTML =
-                '<span class="' + profitClass(nwBagProfit) + '">' + (nwBagProfit >= 0 ? '+' : '') + gold(nwBagProfit) + '</span>';
-            document.getElementById('nw_bag_deposit_note').textContent = 'Deposit: ' + gold(depositNwBag) + ' (lost if unsold)';
+            document.getElementById('nbt_bolt_unit').textContent = '(' + gold(boltAH) + ' ea)';
+            document.getElementById('nbt_cloth_unit').textContent = '(' + gold(cloth) + ' ea)';
+            document.getElementById('nbt_cloth').textContent = gold(nbtCloth);
+            document.getElementById('nbt_thread').textContent = gold(thread);
+            document.getElementById('nbd_optimal_cost').textContent = gold(nbtOptimalCost);
+            document.getElementById('nbd_raw_cost').textContent = gold(nbtRawCost);
+            document.getElementById('nbd_sale_price').textContent = gold(nwBagSale);
+            document.getElementById('nbd_ah_cut').textContent = gold(nbdAHCut);
+            document.getElementById('nbd_profit_optimal').innerHTML =
+                '<span class="' + profitClass(nbdProfitOptimal) + '">' + (nbdProfitOptimal >= 0 ? '+' : '') + gold(nbdProfitOptimal) + '</span>';
+            document.getElementById('nbd_deposit_note').textContent = 'Deposit: ' + gold(depositNwBag) + ' (lost if unsold)';
 
-            // === IMBUED NETHERWEAVE BAG ===
-            const imbuedBoltCraftFor4 = imbuedBoltCraftCost * 4;
-            const imbuedBoltBuyFor4 = imbuedBoltAH * 4;
-            const imbuedBoltCraftActive = imbuedBoltCraftCost <= imbuedBoltAH;
-            const greaterCraftActive = greaterCraftCost <= greaterAH;
+            // === IMBUED BAG CRAFTING TREE ===
+            const btCloth = cloth * 72;
+            const btDust = dust * 8;
+            const btSilk = silk * 2;
+            const btLesser = lesser * 3;
 
-            const imbuedBagCraftCost = (imbuedBoltBest * 4) + (silk * 2) + greaterBest;
-            const imbuedBagAHCut = imbuedBagSale * ahCutPct;
-            const imbuedBagProfit = imbuedBagSale - imbuedBagAHCut - imbuedBagCraftCost;
+            const btBoltBuy = boltAH * 12;
+            const btBoltCraft = btCloth;
+            const boltCraftBetter = btBoltCraft <= btBoltBuy;
 
-            document.getElementById('imbued_bag_src_craft').className = 'opt' + (imbuedBoltCraftActive ? ' active' : '');
-            document.getElementById('imbued_bag_src_craft_price').className = 'opt' + (imbuedBoltCraftActive ? ' active' : '');
-            document.getElementById('imbued_bag_src_craft_price').innerHTML = gold(imbuedBoltCraftFor4) + (imbuedBoltCraftActive ? '<span class="using">USING</span>' : '');
-            document.getElementById('imbued_bag_src_buy').className = 'opt' + (!imbuedBoltCraftActive ? ' active' : '');
-            document.getElementById('imbued_bag_src_buy_price').className = 'opt' + (!imbuedBoltCraftActive ? ' active' : '');
-            document.getElementById('imbued_bag_src_buy_price').innerHTML = gold(imbuedBoltBuyFor4) + (!imbuedBoltCraftActive ? '<span class="using">USING</span>' : '');
+            const btIboltBuy = imbuedBoltAH * 4;
+            const btIboltCraft = (boltCraftBetter ? btBoltCraft : btBoltBuy) + btDust;
+            const iboltCraftBetter = btIboltCraft <= btIboltBuy;
 
-            document.getElementById('imbued_bag_silk_cost').textContent = gold(silk * 2);
+            const btGreaterBuy = greaterAH;
+            const btGreaterCraft = btLesser;
+            const greaterCraftBetter2 = btGreaterCraft <= btGreaterBuy;
 
-            document.getElementById('imbued_bag_ess_craft').className = 'opt' + (greaterCraftActive ? ' active' : '');
-            document.getElementById('imbued_bag_ess_craft_price').className = 'opt' + (greaterCraftActive ? ' active' : '');
-            document.getElementById('imbued_bag_ess_craft_price').innerHTML = gold(greaterCraftCost) + (greaterCraftActive ? '<span class="using">USING</span>' : '');
-            document.getElementById('imbued_bag_ess_buy').className = 'opt' + (!greaterCraftActive ? ' active' : '');
-            document.getElementById('imbued_bag_ess_buy_price').className = 'opt' + (!greaterCraftActive ? ' active' : '');
-            document.getElementById('imbued_bag_ess_buy_price').innerHTML = gold(greaterAH) + (!greaterCraftActive ? '<span class="using">USING</span>' : '');
+            const bdOptimalCost = (iboltCraftBetter ? btIboltCraft : btIboltBuy) + btSilk + (greaterCraftBetter2 ? btGreaterCraft : btGreaterBuy);
+            const bdRawCost = btCloth + btDust + btSilk + btLesser;
+            const bdAHCut = imbuedBagSale * ahCutPct;
+            const bdProfitOptimal = imbuedBagSale - bdAHCut - bdOptimalCost;
 
-            document.getElementById('imbued_bag_craft_cost').textContent = gold(imbuedBagCraftCost);
-            document.getElementById('imbued_bag_sale_price').textContent = gold(imbuedBagSale);
-            document.getElementById('imbued_bag_ah_cut').textContent = gold(imbuedBagAHCut);
-            document.getElementById('imbued_bag_profit').innerHTML =
-                '<span class="' + profitClass(imbuedBagProfit) + '">' + (imbuedBagProfit >= 0 ? '+' : '') + gold(imbuedBagProfit) + '</span>';
-            document.getElementById('imbued_bag_deposit_note').textContent = 'Deposit: ' + gold(depositImbuedBag) + ' (lost if unsold)';
+            setTreeVs('bt_ibolt_buy', 'bt_ibolt_craft', btIboltBuy, btIboltCraft, iboltCraftBetter);
+            setTreeVs('bt_bolt_buy', 'bt_bolt_craft', btBoltBuy, btBoltCraft, boltCraftBetter);
+            setTreeVs('bt_greater_buy', 'bt_greater_craft', btGreaterBuy, btGreaterCraft, greaterCraftBetter2);
+
+            // Sell detail panels for imbued tree
+            setTreeDetail('bt_ibolt', imbuedBoltCraftCost, imbuedBoltAH);
+            setTreeDetail('bt_bolt', boltCraftCost, boltAH);
+            setTreeDetail('bt_greater', greaterCraftCost, greaterAH);
+
+            document.getElementById('bt_ibolt_unit').textContent = '(' + gold(imbuedBoltAH) + ' ea)';
+            document.getElementById('bt_bolt_unit').textContent = '(' + gold(boltAH) + ' ea)';
+            document.getElementById('bt_cloth_unit').textContent = '(' + gold(cloth) + ' ea)';
+            document.getElementById('bt_dust_unit').textContent = '(' + gold(dust) + ' ea)';
+            document.getElementById('bt_silk_unit').textContent = '(' + gold(silk) + ' ea)';
+            document.getElementById('bt_lesser_unit').textContent = '(' + gold(lesser) + ' ea)';
+            document.getElementById('bt_cloth').textContent = gold(btCloth);
+            document.getElementById('bt_dust').textContent = gold(btDust);
+            document.getElementById('bt_silk').textContent = gold(btSilk);
+            document.getElementById('bt_lesser').textContent = gold(btLesser);
+
+            document.getElementById('bd_optimal_cost').textContent = gold(bdOptimalCost);
+            document.getElementById('bd_raw_cost').textContent = gold(bdRawCost);
+            document.getElementById('bd_sale_price').textContent = gold(imbuedBagSale);
+            document.getElementById('bd_ah_cut').textContent = gold(bdAHCut);
+            document.getElementById('bd_profit_optimal').innerHTML =
+                '<span class="' + profitClass(bdProfitOptimal) + '">' + (bdProfitOptimal >= 0 ? '+' : '') + gold(bdProfitOptimal) + '</span>';
+            document.getElementById('bd_deposit_note').textContent = 'Deposit: ' + gold(depositImbuedBag) + ' (lost if unsold)';
+
+            // === BANDAGE VENDOR ALTERNATIVE ===
+            // Profit per cloth = revenue per cloth - cloth cost
+            const bandageProfitPerCloth = 0.15 - cloth; // 30s per bandage / 2 cloth - cost
+            // NW Bag: profit per cloth = (sale - AH cut - thread) / 24 - cloth cost
+            const nwProfitPerCloth = (nwBagSale - (nwBagSale * ahCutPct) - thread) / 24 - cloth;
+            // Imbued Bag: profit per cloth = (sale - AH cut - non-cloth costs) / 72 - cloth cost
+            const ibOtherCosts = (dust * 8) + (silk * 2) + greaterBest;
+            const ibProfitPerCloth = (imbuedBagSale - (imbuedBagSale * ahCutPct) - ibOtherCosts) / 72 - cloth;
+
+            document.getElementById('band_per_cloth').innerHTML =
+                '<span class="' + profitClass(bandageProfitPerCloth) + '">' + (bandageProfitPerCloth >= 0 ? '+' : '') + gold(bandageProfitPerCloth) + '</span>';
+            document.getElementById('band_nw_per_cloth').innerHTML =
+                '<span class="' + profitClass(nwProfitPerCloth) + '">' + (nwProfitPerCloth >= 0 ? '+' : '') + gold(nwProfitPerCloth) + '</span>';
+            document.getElementById('band_ib_per_cloth').innerHTML =
+                '<span class="' + profitClass(ibProfitPerCloth) + '">' + (ibProfitPerCloth >= 0 ? '+' : '') + gold(ibProfitPerCloth) + '</span>';
+
+            // Verdict
+            var options = [
+                { name: 'Bandages', val: bandageProfitPerCloth },
+                { name: 'NW Bag', val: nwProfitPerCloth },
+                { name: 'Imbued Bag', val: ibProfitPerCloth }
+            ];
+            options.sort(function(a, b) { return b.val - a.val; });
+            var verdictEl = document.getElementById('band_verdict');
+            verdictEl.innerHTML = '<span class="profit">' + options[0].name + '</span> <span style="color:#888; font-size:0.85em;">(' + (options[0].val >= 0 ? '+' : '') + gold(options[0].val) + '/cloth)</span>';
 
             saveToStorage();
         }
@@ -1625,8 +2004,59 @@
             '</div>';
         }
 
+        // ===== ALCHEMY: RECIPE VISIBILITY =====
+        function getHiddenRecipes() {
+            try { return JSON.parse(localStorage.getItem(ALCH_HIDDEN_KEY)) || {}; }
+            catch (e) { return {}; }
+        }
+
+        function setHiddenRecipes(hidden) {
+            localStorage.setItem(ALCH_HIDDEN_KEY, JSON.stringify(hidden));
+        }
+
+        function applyHiddenRecipes() {
+            var hidden = getHiddenRecipes();
+            document.querySelectorAll('#recipe-dropdown .recipe-item[data-recipe]').forEach(function(el) {
+                if (el.dataset.recipe === 'all') return;
+                el.classList.toggle('recipe-hidden', !!hidden[el.dataset.recipe]);
+            });
+            var currentRecipe = localStorage.getItem(ALCH_RECIPE_KEY);
+            if (currentRecipe && currentRecipe !== 'all' && hidden[currentRecipe]) {
+                alchSelectRecipe('all');
+            }
+            alchCalculate();
+        }
+
+        function buildManageRecipesHTML() {
+            var hidden = getHiddenRecipes();
+            var html = '<div class="recipe-manage-overlay" id="recipe-manage-overlay">' +
+                '<div class="recipe-manage-modal">' +
+                '<h2>Manage Recipes</h2>' +
+                '<div class="recipe-manage-hint">Uncheck recipes you haven\'t unlocked yet.</div>';
+
+            CATEGORY_ORDER.forEach(function(cat) {
+                var recipes = ALCHEMY_RECIPES.filter(function(r) {
+                    return cat.includes.indexOf(r.category) !== -1;
+                });
+                if (recipes.length === 0) return;
+                html += '<div class="recipe-manage-cat">' + cat.label + '</div>';
+                recipes.forEach(function(r) {
+                    var checked = !hidden[r.id] ? ' checked' : '';
+                    html += '<label class="recipe-manage-item">' +
+                        '<input type="checkbox" data-recipe-manage="' + r.id + '"' + checked + '>' +
+                        r.name +
+                    '</label>';
+                });
+            });
+
+            html += '<button class="recipe-manage-close" id="recipe-manage-close">Done</button>';
+            html += '</div></div>';
+            return html;
+        }
+
         function buildRecipeDropdownHTML() {
-            var html = '<div class="recipe-dropdown" id="recipe-dropdown">' +
+            var html = '<div class="recipe-dropdown-wrapper">' +
+                '<div class="recipe-dropdown" id="recipe-dropdown">' +
                 '<button class="recipe-dropdown-trigger" id="recipe-dropdown-trigger">' +
                     '<span id="recipe-dropdown-label">All (Profit Overview)</span>' +
                     '<span class="dd-arrow">&#9660;</span>' +
@@ -1646,7 +2076,9 @@
                 });
             });
 
-            html += '</div></div>';
+            html += '</div></div>' +
+                '<button class="recipe-manage-btn" id="recipe-manage-btn" title="Manage unlocked recipes">&#9881;</button>' +
+                '</div>';
             return html;
         }
 
@@ -1752,19 +2184,7 @@
             var transmuteAhItems = allAhItems.filter(function(i) { return transmuteItemsSet[i]; });
             var vendorItems = Object.keys(vendorItemsSet).sort();
 
-            // Build sidebar
-            var sidebar = '';
-
-            // Recipe dropdown (at top)
-            sidebar += buildRecipeDropdownHTML();
-
-            // Import panel
-            sidebar += '<div class="panel import-panel">' +
-                '<h2>Import AH Prices</h2>' +
-                '<textarea id="alch_ah_import" placeholder="Paste AH export data here..."></textarea>' +
-                '<button class="import-btn" onclick="alchImportPrices()">Update Prices</button>' +
-                '<div id="alch_import_status" style="font-size: 0.8em; margin-top: 6px; min-height: 1.2em;"></div>' +
-            '</div>';
+            // (sidebar panels are now built below as colLeft and colRight)
 
             // Helper to build a compact table row
             function alchTableRow(label, inputId, defaultValue, hasLock, locksKey, recipeIds) {
@@ -1786,68 +2206,81 @@
                 '</div>';
             }
 
+            // Helper for collapsible panel header
+            function collapsibleH2(label, panelId) {
+                return '<h2 class="collapsible" data-panel="' + panelId + '">' + label + '<span class="collapse-arrow">&#9660;</span></h2>';
+            }
+
+            // === LEFT COLUMN: AH Materials + Transmute Materials ===
+            var colLeft = '';
+            colLeft += buildRecipeDropdownHTML();
+
+            // Import panel
+            colLeft += '<div class="panel import-panel">' +
+                '<h2>Import AH Prices</h2>' +
+                '<textarea id="alch_ah_import" placeholder="Paste AH export data here..."></textarea>' +
+                '<button class="import-btn" onclick="alchImportPrices()">Update Prices</button>' +
+                '<div id="alch_import_status" style="font-size: 0.8em; margin-top: 6px; min-height: 1.2em;"></div>' +
+            '</div>';
+
             // AH Materials (herbs, etc.)
-            sidebar += '<div class="panel alch-filterable"><h2>AH Materials</h2><div class="price-table">';
+            colLeft += '<div class="panel alch-filterable">' + collapsibleH2('AH Materials', 'ah-mats') + '<div class="panel-body" data-panel-body="ah-mats"><div class="price-table">';
             regularAhItems.forEach(function(item) {
                 var inputId = 'alch_mat_' + sanitizeId(item);
                 alchNameToInput[item] = inputId;
-                sidebar += alchTableRow(item, inputId, 0, true, ALCH_LOCKS_KEY, itemToRecipes[item]);
+                colLeft += alchTableRow(item, inputId, 0, true, ALCH_LOCKS_KEY, itemToRecipes[item]);
             });
-            sidebar += '</div></div>';
+            colLeft += '</div></div></div>';
 
             // Transmute Materials (primals + motes)
             if (transmuteAhItems.length > 0) {
-                sidebar += '<div class="panel alch-filterable"><h2>Transmute Materials</h2><div class="price-table">';
+                colLeft += '<div class="panel alch-filterable">' + collapsibleH2('Transmute Materials', 'transmute-mats') + '<div class="panel-body" data-panel-body="transmute-mats"><div class="price-table">';
                 transmuteAhItems.forEach(function(item) {
                     var inputId = 'alch_mat_' + sanitizeId(item);
                     alchNameToInput[item] = inputId;
-                    sidebar += alchTableRow(item, inputId, 0, true, ALCH_LOCKS_KEY, itemToRecipes[item]);
+                    colLeft += alchTableRow(item, inputId, 0, true, ALCH_LOCKS_KEY, itemToRecipes[item]);
                 });
-                sidebar += '</div></div>';
+                colLeft += '</div></div></div>';
             }
 
-            // Vendor Items
-            if (vendorItems.length > 0) {
-                sidebar += '<div class="panel alch-filterable"><h2>Vendor Items</h2><div class="price-table">';
-                vendorItems.forEach(function(item) {
-                    var inputId = 'alch_vendor_' + sanitizeId(item);
-                    var defaultPrice = VENDOR_DEFAULTS[item] || 0;
-                    sidebar += alchTableRow(item, inputId, defaultPrice, false, null, itemToRecipes[item]);
-                });
-                sidebar += '</div></div>';
-            }
+            // === RIGHT COLUMN: Sale Prices + Deposits & Settings ===
+            var colRight = '';
 
             // Product Sale Prices
-            sidebar += '<div class="panel alch-filterable"><h2>Product Sale Prices</h2><div class="price-table">';
+            colRight += '<div class="panel alch-filterable">' + collapsibleH2('Product Sale Prices', 'sale-prices') + '<div class="panel-body" data-panel-body="sale-prices"><div class="price-table">';
             ALCHEMY_RECIPES.forEach(function(r) {
                 var inputId = 'alch_sale_' + r.id;
                 var productName = r.product || r.name;
                 alchNameToInput[productName] = inputId;
-                sidebar += alchTableRow(productName, inputId, 0, true, ALCH_LOCKS_KEY, [r.id]);
+                colRight += alchTableRow(productName, inputId, 0, true, ALCH_LOCKS_KEY, [r.id]);
             });
-            sidebar += '</div></div>';
+            colRight += '</div></div></div>';
 
-            // AH Deposits
-            sidebar += '<div class="panel alch-filterable"><h2>AH Deposits</h2><div class="price-table">';
+            // AH Deposits + Vendor Items + Settings (combined)
+            colRight += '<div class="panel alch-filterable">' + collapsibleH2('Deposits, Vendor & Settings', 'deposits') + '<div class="panel-body" data-panel-body="deposits"><div class="price-table">';
             ALCHEMY_RECIPES.forEach(function(r) {
                 var inputId = 'alch_deposit_' + r.id;
                 var productName = r.product || r.name;
-                sidebar += alchTableRow(productName, inputId, 0, false, null, [r.id]);
+                colRight += alchTableRow(productName + ' (deposit)', inputId, 0, false, null, [r.id]);
             });
-            sidebar += '</div></div>';
-
-            // Settings
-            sidebar += '<div class="panel"><h2>Settings</h2><div class="price-table">' +
-                '<div class="price-table-row">' +
+            // Vendor items inline
+            vendorItems.forEach(function(item) {
+                var inputId = 'alch_vendor_' + sanitizeId(item);
+                var defaultPrice = VENDOR_DEFAULTS[item] || 0;
+                colRight += alchTableRow(item + ' (vendor)', inputId, defaultPrice, false, null, itemToRecipes[item]);
+            });
+            // AH Cut inline
+            colRight += '<div class="price-table-row">' +
                     '<span class="pt-name">AH Cut</span>' +
                     '<div class="price-control">' +
                         '<input type="number" id="alch_ah_cut" value="5" step="0.1">' +
                         '<span style="color: #888; font-size: 0.82em; margin-left: 2px;">%</span>' +
                     '</div>' +
-                '</div>' +
-            '</div></div>';
+                '</div>';
+            colRight += '</div></div></div>';
 
-            document.getElementById('alch-sidebar').innerHTML = sidebar;
+            document.getElementById('alch-col-left').innerHTML = colLeft;
+            document.getElementById('alch-col-right').innerHTML = colRight;
 
             // Build main area
             var main = buildAllViewHTML();
@@ -1855,6 +2288,9 @@
                 main += buildRecipeDetailHTML(r);
             });
             document.getElementById('alch-main').innerHTML = main;
+
+            // Add manage recipes modal overlay
+            document.getElementById('tab-alchemy').insertAdjacentHTML('beforeend', buildManageRecipesHTML());
         }
 
         // ===== ALCHEMY: IMPORT =====
@@ -1900,7 +2336,10 @@
                 }
             }
 
+            syncAllSharedPrices();
             alchCalculate();
+            calculate();
+            gearCalculate();
 
             var msg = 'Updated ' + updated + ' price' + (updated !== 1 ? 's' : '');
             if (skipped > 0) {
@@ -2007,10 +2446,12 @@
                 results.push({ recipe: r, craftCost: craftCost, salePrice: salePrice, profit: profit });
             });
 
-            // Update "All" summary view, sorted by profit (best first)
-            results.sort(function(a, b) { return b.profit - a.profit; });
+            // Update "All" summary view, sorted by profit (best first), excluding hidden recipes
+            var hidden = getHiddenRecipes();
+            var visibleResults = results.filter(function(r) { return !hidden[r.recipe.id]; });
+            visibleResults.sort(function(a, b) { return b.profit - a.profit; });
             var tbody = '';
-            results.forEach(function(r) {
+            visibleResults.forEach(function(r) {
                 var cls = profitClass(r.profit);
                 tbody += '<tr class="alch-summary-row" data-recipe="' + r.recipe.id + '">' +
                     '<td>' + r.recipe.name + '</td>' +
@@ -2046,9 +2487,9 @@
                 if (view) view.style.display = r.id === recipeId ? '' : 'none';
             });
 
-            // Filter sidebar: show only relevant prices for the selected recipe
-            var sidebar = document.getElementById('alch-sidebar');
-            sidebar.querySelectorAll('.price-table-row[data-recipes]').forEach(function(row) {
+            // Filter both input columns: show only relevant prices for the selected recipe
+            var alchTab = document.getElementById('tab-alchemy');
+            alchTab.querySelectorAll('.price-table-row[data-recipes]').forEach(function(row) {
                 if (recipeId === 'all') {
                     row.style.display = 'flex';
                 } else {
@@ -2058,7 +2499,7 @@
             });
 
             // Hide panels that have no visible rows
-            sidebar.querySelectorAll('.alch-filterable').forEach(function(panel) {
+            alchTab.querySelectorAll('.alch-filterable').forEach(function(panel) {
                 var anyVisible = false;
                 panel.querySelectorAll('.price-table-row[data-recipes]').forEach(function(row) {
                     if (row.style.display !== 'none') anyVisible = true;
@@ -2067,6 +2508,390 @@
             });
 
             localStorage.setItem(ALCH_RECIPE_KEY, recipeId);
+        }
+
+        // ===== GEAR: UI GENERATION =====
+
+        function buildGearRecipeDropdownHTML() {
+            var html = '<div class="recipe-dropdown-wrapper">' +
+                '<div class="recipe-dropdown" id="gear-recipe-dropdown">' +
+                '<button class="recipe-dropdown-trigger" id="gear-recipe-dropdown-trigger">' +
+                    '<span id="gear-recipe-dropdown-label">All (Profit Overview)</span>' +
+                    '<span class="dd-arrow">&#9660;</span>' +
+                '</button>' +
+                '<div class="recipe-dropdown-menu">';
+            html += '<div class="recipe-item active" data-recipe="all">All (Profit Overview)</div>';
+            GEAR_CATEGORY_ORDER.forEach(function(cat) {
+                var recipes = GEAR_RECIPES.filter(function(r) { return cat.includes.indexOf(r.category) !== -1; });
+                if (recipes.length === 0) return;
+                html += '<div class="recipe-category">' + cat.label + '</div>';
+                recipes.forEach(function(r) {
+                    html += '<div class="recipe-item" data-recipe="' + r.id + '">' + r.name + '</div>';
+                });
+            });
+            html += '</div></div></div>';
+            return html;
+        }
+
+        function buildGearAllViewHTML() {
+            return '<div id="gear-view-all">' +
+                '<div class="tier-label">Profit Overview</div>' +
+                '<table class="gear-summary">' +
+                    '<thead><tr><th>Recipe</th><th>Craft Cost</th><th>Sale Price</th><th>Profit</th></tr></thead>' +
+                    '<tbody id="gear-summary-body"></tbody>' +
+                '</table>' +
+            '</div>';
+        }
+
+        // Recursive ingredient HTML builder
+        function buildGearIngHTML(ing, recipeId, totalQty, depth) {
+            depth = depth || 0;
+            var indent = depth > 0 ? ' style="padding-left:' + (depth * 14) + 'px"' : '';
+            var baseId = 'gear_' + recipeId + '_ing_' + sanitizeId(ing.item);
+            var html = '';
+
+            if (ing.type === 'bop') {
+                html += '<div class="sourcing-row fixed"' + indent + '><span>' + totalQty + 'x ' + ing.item + '</span><span class="cost" style="color:#f59e0b">BOP</span></div>';
+            } else if (ing.craftFrom && ing.craftFrom.item) {
+                // Simple: buy vs craft from N× source item (e.g. primal vs 10× motes)
+                html += '<div class="sourcing-row"' + indent + '><span class="opt" id="' + baseId + '_buy_label">' + totalQty + 'x ' + ing.item + ' (buy)</span><span class="opt" id="' + baseId + '_buy_price">-</span></div>';
+                html += '<div class="sourcing-row"' + indent + '><span class="opt" id="' + baseId + '_craft_label">' + (totalQty * ing.craftFrom.qty) + 'x ' + ing.craftFrom.item + '</span><span class="opt" id="' + baseId + '_craft_price">-</span></div>';
+            } else if (ing.craftFrom && ing.craftFrom.mats) {
+                // Tiered: buy vs craft, then show sub-mats indented
+                html += '<div class="sourcing-row"' + indent + '><span class="opt" id="' + baseId + '_buy_label">' + totalQty + 'x ' + ing.item + ' (buy)</span><span class="opt" id="' + baseId + '_buy_price">-</span></div>';
+                html += '<div class="sourcing-row"' + indent + '><span class="opt" id="' + baseId + '_craft_label">' + totalQty + 'x ' + ing.item + ' (craft)</span><span class="opt" id="' + baseId + '_craft_price">-</span></div>';
+                ing.craftFrom.mats.forEach(function(mat) {
+                    html += buildGearIngHTML(mat, recipeId, totalQty * mat.qty, depth + 1);
+                });
+            } else {
+                // Simple fixed cost
+                html += '<div class="sourcing-row fixed"' + indent + '><span>' + totalQty + 'x ' + ing.item + '</span><span class="cost" id="' + baseId + '">-</span></div>';
+            }
+            return html;
+        }
+
+        function buildGearRecipeDetailHTML(recipe) {
+            var html = '<div id="gear-view-' + recipe.id + '" class="gear-view" style="display:none">';
+            html += '<div class="card"><h3>' + recipe.name + '</h3>';
+            html += '<div class="sourcing"><div class="sourcing-title">Ingredients</div>';
+            recipe.ingredients.forEach(function(ing) {
+                html += buildGearIngHTML(ing, recipe.id, ing.qty, 0);
+            });
+            html += '</div>';
+            html += '<div class="card-row"><span class="label">Craft cost</span><span class="value" id="gear_' + recipe.id + '_craft_cost">-</span></div>';
+            html += '<div class="card-row"><span class="label">Sale price</span><span class="value" id="gear_' + recipe.id + '_sale_display">-</span></div>';
+            html += '<div class="card-row"><span class="label">AH cut</span><span class="value" id="gear_' + recipe.id + '_ah_cut_display">-</span></div>';
+            html += '<div class="card-row highlight"><span class="label">Net profit</span><span class="value" id="gear_' + recipe.id + '_profit">-</span></div>';
+            html += '<div class="deposit-note" id="gear_' + recipe.id + '_deposit_note">-</div>';
+            html += '</div></div>';
+            return html;
+        }
+
+        function gearInit() {
+            var ahItemsSet = {};
+            var vendorItemsSet = {};
+            var itemToRecipes = {};
+            function collectGearItems(ing, recipeId) {
+                if (ing.type === 'ah') {
+                    ahItemsSet[ing.item] = true;
+                    if (!itemToRecipes[ing.item]) itemToRecipes[ing.item] = [];
+                    if (itemToRecipes[ing.item].indexOf(recipeId) === -1) itemToRecipes[ing.item].push(recipeId);
+                } else if (ing.type === 'vendor') {
+                    vendorItemsSet[ing.item] = true;
+                    if (!itemToRecipes[ing.item]) itemToRecipes[ing.item] = [];
+                    if (itemToRecipes[ing.item].indexOf(recipeId) === -1) itemToRecipes[ing.item].push(recipeId);
+                }
+                if (ing.craftFrom) {
+                    if (ing.craftFrom.item) {
+                        ahItemsSet[ing.craftFrom.item] = true;
+                        if (!itemToRecipes[ing.craftFrom.item]) itemToRecipes[ing.craftFrom.item] = [];
+                        if (itemToRecipes[ing.craftFrom.item].indexOf(recipeId) === -1) itemToRecipes[ing.craftFrom.item].push(recipeId);
+                    } else if (ing.craftFrom.mats) {
+                        ing.craftFrom.mats.forEach(function(mat) { collectGearItems(mat, recipeId); });
+                    }
+                }
+            }
+            GEAR_RECIPES.forEach(function(r) {
+                r.ingredients.forEach(function(ing) { collectGearItems(ing, r.id); });
+            });
+
+            var allAhItems = Object.keys(ahItemsSet).sort();
+            var vendorItems = Object.keys(vendorItemsSet).sort();
+
+            function gearTableRow(label, inputId, defaultValue, hasLock, locksKey, recipeIds) {
+                var recipesAttr = recipeIds ? ' data-recipes="' + recipeIds.join(',') + '"' : '';
+                var lockHTML = hasLock ? '<button class="lock-btn" data-input="' + inputId + '" data-locks-key="' + locksKey + '">&#x1f513;</button>' : '';
+                return '<div class="price-table-row"' + recipesAttr + '>' +
+                    '<span class="pt-name">' + label + '</span>' + lockHTML +
+                    '<div class="price-control"><input type="number" id="' + inputId + '" value="' + defaultValue + '" step="0.0001"></div>' +
+                    '<div class="gsc-group" data-input="' + inputId + '"><span class="gsc-val gold">0g</span><span class="gsc-val silver">0s</span><span class="gsc-val copper">0c</span></div>' +
+                '</div>';
+            }
+
+            function gearCollapsibleH2(label, panelId) {
+                return '<h2 class="collapsible" data-panel="gear-' + panelId + '">' + label + '<span class="collapse-arrow">&#9660;</span></h2>';
+            }
+
+            // === LEFT COLUMN: AH Materials + Import ===
+            var colLeft = '';
+            colLeft += buildGearRecipeDropdownHTML();
+            colLeft += '<div class="panel import-panel">' +
+                '<h2>Import AH Prices</h2>' +
+                '<textarea id="gear_ah_import" placeholder="Paste AH export data here..."></textarea>' +
+                '<button class="import-btn" onclick="gearImportPrices()">Update Prices</button>' +
+                '<div id="gear_import_status" style="font-size: 0.8em; margin-top: 6px; min-height: 1.2em;"></div>' +
+            '</div>';
+
+            if (allAhItems.length > 0) {
+                colLeft += '<div class="panel gear-filterable">' + gearCollapsibleH2('AH Materials', 'ah-mats') + '<div class="panel-body" data-panel-body="gear-ah-mats"><div class="price-table">';
+                allAhItems.forEach(function(item) {
+                    var inputId = 'gear_mat_' + sanitizeId(item);
+                    gearNameToInput[item] = inputId;
+                    colLeft += gearTableRow(item, inputId, 0, true, GEAR_LOCKS_KEY, itemToRecipes[item]);
+                });
+                colLeft += '</div></div></div>';
+            }
+
+            // === RIGHT COLUMN: Sale Prices + Deposits & Settings ===
+            var colRight = '';
+            colRight += '<div class="panel gear-filterable">' + gearCollapsibleH2('Product Sale Prices', 'sale-prices') + '<div class="panel-body" data-panel-body="gear-sale-prices"><div class="price-table">';
+            GEAR_RECIPES.forEach(function(r) {
+                var inputId = 'gear_sale_' + r.id;
+                var productName = r.product || r.name;
+                gearNameToInput[productName] = inputId;
+                colRight += gearTableRow(productName, inputId, 0, true, GEAR_LOCKS_KEY, [r.id]);
+            });
+            colRight += '</div></div></div>';
+
+            colRight += '<div class="panel gear-filterable">' + gearCollapsibleH2('Deposits & Settings', 'deposits') + '<div class="panel-body" data-panel-body="gear-deposits"><div class="price-table">';
+            GEAR_RECIPES.forEach(function(r) {
+                var inputId = 'gear_deposit_' + r.id;
+                var productName = r.product || r.name;
+                colRight += gearTableRow(productName + ' (deposit)', inputId, 0, false, null, [r.id]);
+            });
+            if (vendorItems.length > 0) {
+                vendorItems.forEach(function(item) {
+                    var inputId = 'gear_vendor_' + sanitizeId(item);
+                    var defaultPrice = VENDOR_DEFAULTS[item] || 0;
+                    colRight += gearTableRow(item + ' (vendor)', inputId, defaultPrice, false, null, itemToRecipes[item]);
+                });
+            }
+            colRight += '<div class="price-table-row"><span class="pt-name">AH Cut</span><div class="price-control"><input type="number" id="gear_ah_cut" value="5" step="0.1"><span style="color: #888; font-size: 0.82em; margin-left: 2px;">%</span></div></div>';
+            colRight += '</div></div></div>';
+
+            document.getElementById('gear-col-left').innerHTML = colLeft;
+            document.getElementById('gear-col-right').innerHTML = colRight;
+
+            var main = buildGearAllViewHTML();
+            GEAR_RECIPES.forEach(function(r) { main += buildGearRecipeDetailHTML(r); });
+            document.getElementById('gear-main').innerHTML = main;
+        }
+
+        // ===== GEAR: IMPORT =====
+        function gearImportPrices() {
+            var textarea = document.getElementById('gear_ah_import');
+            var status = document.getElementById('gear_import_status');
+            var text = textarea.value.trim();
+            if (!text) { status.textContent = 'Paste AH data first'; status.style.color = '#f87171'; return; }
+
+            var locks = getLocks(GEAR_LOCKS_KEY);
+            var lines = text.split('\n');
+            var updated = 0, skipped = 0, skippedNames = [];
+
+            for (var i = 0; i < lines.length; i++) {
+                var match = lines[i].match(/^"?(\d+)"?,\s*"([^"]+)"/);
+                if (!match) continue;
+                var copperPrice = parseInt(match[1]);
+                var name = match[2];
+                var inputId = gearNameToInput[name] || gearNameToInput[name.replace(/\s*\(\d+\)$/, '')];
+                if (!inputId) continue;
+                if (locks[inputId]) { skipped++; skippedNames.push(name); continue; }
+                var goldPrice = Math.round(copperPrice) / 10000;
+                var input = document.getElementById(inputId);
+                if (input) { input.value = goldPrice; updateGSCDisplay(inputId); autoSizeInput(input); updated++; }
+            }
+
+            syncAllSharedPrices();
+            gearCalculate();
+            calculate();
+            alchCalculate();
+            var msg = 'Updated ' + updated + ' price' + (updated !== 1 ? 's' : '');
+            if (skipped > 0) msg += ', ' + skipped + ' locked (' + skippedNames.join(', ') + ')';
+            status.textContent = msg;
+            status.style.color = '#4ade80';
+        }
+
+        // ===== GEAR: SAVE / LOAD =====
+        function gearSaveToStorage() {
+            var data = {};
+            document.querySelectorAll('#tab-gear input').forEach(function(input) { if (input.id) data[input.id] = input.value; });
+            localStorage.setItem(GEAR_STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function gearLoadFromStorage() {
+            var stored = localStorage.getItem(GEAR_STORAGE_KEY);
+            if (stored) {
+                try {
+                    var data = JSON.parse(stored);
+                    Object.keys(data).forEach(function(id) {
+                        var input = document.getElementById(id);
+                        if (input && input.closest('#tab-gear')) input.value = data[id];
+                    });
+                } catch (e) { console.error('Failed to load gear data:', e); }
+            }
+        }
+
+        // ===== GEAR: CALCULATE =====
+
+        // Recursive ingredient cost calculator — updates DOM sourcing display and returns best cost
+        function computeGearIngCost(ing, recipeId, totalQty) {
+            var baseId = 'gear_' + recipeId + '_ing_' + sanitizeId(ing.item);
+
+            if (ing.type === 'bop') return 0;
+
+            if (ing.craftFrom && ing.craftFrom.item) {
+                // Simple: buy vs craft from N× source item (e.g. primal vs motes)
+                var buyCost = getVal('gear_mat_' + sanitizeId(ing.item)) * totalQty;
+                var craftCost = getVal('gear_mat_' + sanitizeId(ing.craftFrom.item)) * ing.craftFrom.qty * totalQty;
+                var useCraft = craftCost < buyCost;
+                var buyLbl = document.getElementById(baseId + '_buy_label');
+                if (buyLbl) {
+                    var buyPEl = document.getElementById(baseId + '_buy_price');
+                    var craftLbl = document.getElementById(baseId + '_craft_label');
+                    var craftPEl = document.getElementById(baseId + '_craft_price');
+                    buyLbl.className = 'opt' + (!useCraft ? ' active' : '');
+                    buyPEl.className = 'opt' + (!useCraft ? ' active' : '');
+                    buyPEl.innerHTML = gold(buyCost) + (!useCraft ? '<span class="using">USING</span>' : '');
+                    craftLbl.className = 'opt' + (useCraft ? ' active' : '');
+                    craftPEl.className = 'opt' + (useCraft ? ' active' : '');
+                    craftPEl.innerHTML = gold(craftCost) + (useCraft ? '<span class="using">USING</span>' : '');
+                }
+                return useCraft ? craftCost : buyCost;
+            }
+
+            if (ing.craftFrom && ing.craftFrom.mats) {
+                // Tiered: buy AH vs craft from sub-mats (recurse)
+                var buyCost = getVal('gear_mat_' + sanitizeId(ing.item)) * totalQty;
+                var craftSubCost = 0;
+                ing.craftFrom.mats.forEach(function(mat) {
+                    craftSubCost += computeGearIngCost(mat, recipeId, totalQty * mat.qty);
+                });
+                var useCraft = craftSubCost < buyCost;
+                var buyLbl = document.getElementById(baseId + '_buy_label');
+                if (buyLbl) {
+                    var buyPEl = document.getElementById(baseId + '_buy_price');
+                    var craftLbl = document.getElementById(baseId + '_craft_label');
+                    var craftPEl = document.getElementById(baseId + '_craft_price');
+                    buyLbl.className = 'opt' + (!useCraft ? ' active' : '');
+                    buyPEl.className = 'opt' + (!useCraft ? ' active' : '');
+                    buyPEl.innerHTML = gold(buyCost) + (!useCraft ? '<span class="using">USING</span>' : '');
+                    craftLbl.className = 'opt' + (useCraft ? ' active' : '');
+                    craftPEl.className = 'opt' + (useCraft ? ' active' : '');
+                    craftPEl.innerHTML = gold(craftSubCost) + (useCraft ? '<span class="using">USING</span>' : '');
+                }
+                return useCraft ? craftSubCost : buyCost;
+            }
+
+            // Simple fixed cost (AH or vendor, no craft option)
+            var price = ing.type === 'vendor'
+                ? getVal('gear_vendor_' + sanitizeId(ing.item))
+                : getVal('gear_mat_' + sanitizeId(ing.item));
+            var cost = (price || 0) * totalQty;
+            var costEl = document.getElementById(baseId);
+            if (costEl) costEl.textContent = gold(cost);
+            return cost;
+        }
+
+        function gearCalculate() {
+            var ahCutPct = getVal('gear_ah_cut') / 100;
+            var results = [];
+
+            GEAR_RECIPES.forEach(function(r) {
+                var craftCost = 0;
+                r.ingredients.forEach(function(ing) {
+                    craftCost += computeGearIngCost(ing, r.id, ing.qty);
+                });
+
+                var salePrice = getVal('gear_sale_' + r.id);
+                var ahCut = salePrice * ahCutPct;
+                var deposit = getVal('gear_deposit_' + r.id);
+                var profit = salePrice - ahCut - craftCost;
+
+                var elById = function(id) { return document.getElementById(id); };
+                var craftEl = elById('gear_' + r.id + '_craft_cost'); if (craftEl) craftEl.textContent = gold(craftCost);
+                var saleEl = elById('gear_' + r.id + '_sale_display'); if (saleEl) saleEl.textContent = gold(salePrice);
+                var cutEl = elById('gear_' + r.id + '_ah_cut_display'); if (cutEl) cutEl.textContent = gold(ahCut);
+                var profitEl = elById('gear_' + r.id + '_profit');
+                if (profitEl) profitEl.innerHTML = '<span class="' + profitClass(profit) + '">' + (profit >= 0 ? '+' : '') + gold(profit) + '</span>';
+                var depositEl = elById('gear_' + r.id + '_deposit_note');
+                if (depositEl) depositEl.textContent = 'Deposit: ' + gold(deposit) + ' (lost if unsold)';
+
+                // Profit per BOP item
+                var bopIng = r.ingredients.find(function(i) { return i.type === 'bop'; });
+                if (bopIng && depositEl) {
+                    var profitPerBop = profit / bopIng.qty;
+                    var bopNoteId = 'gear_' + r.id + '_bop_note';
+                    var existing = elById(bopNoteId);
+                    var bopHtml = '<div class="card-row highlight" id="' + bopNoteId + '" style="border-top:none; margin-top:4px; padding-top:4px;">' +
+                        '<span class="label">Profit per ' + bopIng.item + '</span>' +
+                        '<span class="value"><span class="' + profitClass(profitPerBop) + '">' + (profitPerBop >= 0 ? '+' : '') + gold(profitPerBop) + '</span></span>' +
+                    '</div>';
+                    if (existing) { existing.outerHTML = bopHtml; } else { depositEl.insertAdjacentHTML('beforebegin', bopHtml); }
+                }
+
+                results.push({ recipe: r, craftCost: craftCost, salePrice: salePrice, profit: profit });
+            });
+
+            results.sort(function(a, b) { return b.profit - a.profit; });
+            var tbody = '';
+            results.forEach(function(r) {
+                var cls = profitClass(r.profit);
+                tbody += '<tr class="gear-summary-row" data-recipe="' + r.recipe.id + '">' +
+                    '<td>' + r.recipe.name + '</td><td>' + gold(r.craftCost) + '</td>' +
+                    '<td>' + gold(r.salePrice) + '</td>' +
+                    '<td class="' + cls + '">' + (r.profit >= 0 ? '+' : '') + gold(r.profit) + '</td></tr>';
+            });
+            var summaryBody = document.getElementById('gear-summary-body');
+            if (summaryBody) summaryBody.innerHTML = tbody;
+
+            gearSaveToStorage();
+        }
+
+        // ===== GEAR: RECIPE SELECTION =====
+        function gearSelectRecipe(recipeId) {
+            var dropdown = document.getElementById('gear-recipe-dropdown');
+            var label = document.getElementById('gear-recipe-dropdown-label');
+            document.querySelectorAll('#gear-recipe-dropdown .recipe-item').forEach(function(el) {
+                var isActive = el.dataset.recipe === recipeId;
+                el.classList.toggle('active', isActive);
+                if (isActive && label) label.textContent = el.textContent;
+            });
+            if (dropdown) dropdown.classList.remove('open');
+
+            var allView = document.getElementById('gear-view-all');
+            if (allView) allView.style.display = recipeId === 'all' ? '' : 'none';
+            GEAR_RECIPES.forEach(function(r) {
+                var view = document.getElementById('gear-view-' + r.id);
+                if (view) view.style.display = r.id === recipeId ? '' : 'none';
+            });
+
+            var colLeft = document.getElementById('gear-col-left');
+            var colRight = document.getElementById('gear-col-right');
+            [colLeft, colRight].forEach(function(col) {
+                if (!col) return;
+                col.querySelectorAll('.price-table-row[data-recipes]').forEach(function(row) {
+                    if (recipeId === 'all') { row.style.display = 'flex'; return; }
+                    var recipes = row.dataset.recipes.split(',');
+                    row.style.display = recipes.indexOf(recipeId) !== -1 ? 'flex' : 'none';
+                });
+                col.querySelectorAll('.gear-filterable').forEach(function(panel) {
+                    var anyVisible = false;
+                    panel.querySelectorAll('.price-table-row[data-recipes]').forEach(function(row) { if (row.style.display !== 'none') anyVisible = true; });
+                    panel.style.display = anyVisible ? '' : 'none';
+                });
+            });
+
+            localStorage.setItem(GEAR_RECIPE_KEY, recipeId);
         }
 
         // ===== TAB SWITCHING =====
@@ -2087,16 +2912,33 @@
         // 1. Load tailoring saved data
         loadFromStorage();
 
-        // 2. Generate alchemy UI
+        // 2. Generate alchemy UI and gear UI
         alchInit();
+        gearInit();
 
-        // 3. Load alchemy saved data
+        // 3. Load saved data
         alchLoadFromStorage();
+        gearLoadFromStorage();
+
+        // 3b. Sync shared prices across tabs
+        syncAllSharedPrices();
 
         // 4. Setup delegated event handlers (works for both static tailoring and dynamic alchemy elements)
 
         // GSC button clicks + lock button clicks + recipe item clicks
         document.addEventListener('click', function(e) {
+            // Tree craftable expand/collapse
+            var craftableNode = e.target.closest('.tree-craftable');
+            if (craftableNode) {
+                var detailId = craftableNode.dataset.detail;
+                var detail = document.getElementById(detailId);
+                if (detail) {
+                    var isOpen = detail.classList.toggle('open');
+                    craftableNode.classList.toggle('expanded', isOpen);
+                }
+                return;
+            }
+
             // GSC buttons
             var gscBtn = e.target.closest('.gsc-btn');
             if (gscBtn) {
@@ -2111,10 +2953,26 @@
                 input.value = value;
                 updateGSCDisplay(inputId);
                 autoSizeInput(input);
-                if (gscBtn.closest('#tab-alchemy')) {
-                    alchCalculate();
-                } else {
-                    calculate();
+                syncSharedPrice(inputId);
+                calculate();
+                alchCalculate();
+                gearCalculate();
+                return;
+            }
+
+            // Collapsible panel headers
+            var collapsibleH2 = e.target.closest('h2.collapsible');
+            if (collapsibleH2) {
+                var panelId = collapsibleH2.dataset.panel;
+                var body = document.querySelector('[data-panel-body="' + panelId + '"]');
+                if (body) {
+                    var isCollapsed = collapsibleH2.classList.toggle('collapsed');
+                    body.classList.toggle('collapsed', isCollapsed);
+                    var collapsed = {};
+                    try { collapsed = JSON.parse(localStorage.getItem(ALCH_COLLAPSED_KEY)) || {}; } catch(e) {}
+                    if (isCollapsed) collapsed[panelId] = true;
+                    else delete collapsed[panelId];
+                    localStorage.setItem(ALCH_COLLAPSED_KEY, JSON.stringify(collapsed));
                 }
                 return;
             }
@@ -2127,10 +2985,33 @@
                 return;
             }
 
+            // Manage recipes button
+            var manageBtn = e.target.closest('#recipe-manage-btn');
+            if (manageBtn) {
+                var overlay = document.getElementById('recipe-manage-overlay');
+                if (overlay) overlay.remove();
+                document.getElementById('tab-alchemy').insertAdjacentHTML('beforeend', buildManageRecipesHTML());
+                document.getElementById('recipe-manage-overlay').classList.add('open');
+                return;
+            }
+
+            // Close manage recipes modal
+            var closeManage = e.target.closest('#recipe-manage-close');
+            if (closeManage) {
+                document.getElementById('recipe-manage-overlay').classList.remove('open');
+                return;
+            }
+
+            // Click overlay background to close
+            if (e.target.id === 'recipe-manage-overlay') {
+                e.target.classList.remove('open');
+                return;
+            }
+
             // Recipe dropdown trigger
             var ddTrigger = e.target.closest('.recipe-dropdown-trigger');
             if (ddTrigger) {
-                var dd = document.getElementById('recipe-dropdown');
+                var dd = ddTrigger.closest('.recipe-dropdown');
                 if (dd) dd.classList.toggle('open');
                 return;
             }
@@ -2138,20 +3019,28 @@
             // Recipe dropdown items
             var recipeItem = e.target.closest('.recipe-item');
             if (recipeItem) {
-                alchSelectRecipe(recipeItem.dataset.recipe);
+                if (recipeItem.closest('#tab-gear')) {
+                    gearSelectRecipe(recipeItem.dataset.recipe);
+                } else {
+                    alchSelectRecipe(recipeItem.dataset.recipe);
+                }
                 return;
             }
 
-            // Close dropdown on outside click
-            var dropdown = document.getElementById('recipe-dropdown');
-            if (dropdown && !dropdown.contains(e.target)) {
-                dropdown.classList.remove('open');
-            }
+            // Close dropdowns on outside click
+            var alchDropdown = document.getElementById('recipe-dropdown');
+            if (alchDropdown && !alchDropdown.contains(e.target)) alchDropdown.classList.remove('open');
+            var gearDropdown = document.getElementById('gear-recipe-dropdown');
+            if (gearDropdown && !gearDropdown.contains(e.target)) gearDropdown.classList.remove('open');
 
             // Summary table rows
-            var summaryRow = e.target.closest('.alch-summary-row');
+            var summaryRow = e.target.closest('.alch-summary-row, .gear-summary-row');
             if (summaryRow) {
-                alchSelectRecipe(summaryRow.dataset.recipe);
+                if (summaryRow.closest('#tab-gear')) {
+                    gearSelectRecipe(summaryRow.dataset.recipe);
+                } else {
+                    alchSelectRecipe(summaryRow.dataset.recipe);
+                }
                 return;
             }
 
@@ -2163,19 +3052,50 @@
             }
         });
 
+        // Recipe manage checkbox handler
+        document.addEventListener('change', function(e) {
+            var checkbox = e.target.closest('[data-recipe-manage]');
+            if (checkbox) {
+                var hidden = getHiddenRecipes();
+                if (checkbox.checked) {
+                    delete hidden[checkbox.dataset.recipeManage];
+                } else {
+                    hidden[checkbox.dataset.recipeManage] = true;
+                }
+                setHiddenRecipes(hidden);
+                applyHiddenRecipes();
+            }
+        });
+
         // Input change handlers (scoped per tab)
         ['input', 'change', 'keyup'].forEach(function(eventType) {
-            document.getElementById('tab-tailoring').addEventListener(eventType, function(e) {
+            document.getElementById('tab-bags').addEventListener(eventType, function(e) {
                 if (e.target.tagName === 'INPUT' && e.target.id) {
                     updateGSCDisplay(e.target.id);
                     autoSizeInput(e.target);
+                    syncSharedPrice(e.target.id);
                     calculate();
+                    alchCalculate();
+                    gearCalculate();
                 }
             });
             document.getElementById('tab-alchemy').addEventListener(eventType, function(e) {
                 if (e.target.tagName === 'INPUT' && e.target.id) {
                     updateGSCDisplay(e.target.id);
                     autoSizeInput(e.target);
+                    syncSharedPrice(e.target.id);
+                    alchCalculate();
+                    calculate();
+                    gearCalculate();
+                }
+            });
+            document.getElementById('tab-gear').addEventListener(eventType, function(e) {
+                if (e.target.tagName === 'INPUT' && e.target.id) {
+                    updateGSCDisplay(e.target.id);
+                    autoSizeInput(e.target);
+                    syncSharedPrice(e.target.id);
+                    gearCalculate();
+                    calculate();
                     alchCalculate();
                 }
             });
@@ -2189,10 +3109,28 @@
         // 6. Initial calculations
         calculate();
         alchCalculate();
+        gearCalculate();
 
         // 7. Restore last tab and recipe selection
-        switchTab(localStorage.getItem(TAB_STORAGE_KEY) || 'tailoring');
+        switchTab(localStorage.getItem(TAB_STORAGE_KEY) || 'bags');
         alchSelectRecipe(localStorage.getItem(ALCH_RECIPE_KEY) || 'all');
+        gearSelectRecipe(localStorage.getItem(GEAR_RECIPE_KEY) || 'all');
+
+        // 8. Apply hidden recipe state
+        applyHiddenRecipes();
+
+        // 9. Restore collapsed panel state
+        try {
+            var collapsed = JSON.parse(localStorage.getItem(ALCH_COLLAPSED_KEY)) || {};
+            Object.keys(collapsed).forEach(function(panelId) {
+                var h2 = document.querySelector('h2.collapsible[data-panel="' + panelId + '"]');
+                var body = document.querySelector('[data-panel-body="' + panelId + '"]');
+                if (h2 && body) {
+                    h2.classList.add('collapsed');
+                    body.classList.add('collapsed');
+                }
+            });
+        } catch(e) {}
     </script>
 </body>
 </html>
