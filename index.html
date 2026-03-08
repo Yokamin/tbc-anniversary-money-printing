@@ -1455,6 +1455,18 @@
             'Rune Thread': 0.425,
         };
 
+        // Default deposit (listing fee) values for known items.
+        // Bags tab deposits are hardcoded in static HTML.
+        // All others are looked up here during UI generation.
+        const DEPOSIT_DEFAULTS = {
+            // Gear
+            'gear_deposit_spellstrike_pants':  0.6729,
+            'gear_deposit_mystic_spellthread': 0.30,
+            // TX — shared inputs for all motes / all primals in the mote→primal table
+            'tx_deposit_mote':   0.006,  // 60 copper
+            'tx_deposit_primal': 0.06,   // 6 silver
+        };
+
         // ===== TRANSMUTES / DAILIES DATA =====
 
         // All 7 TBC primals and their corresponding motes
@@ -2813,7 +2825,7 @@
             GEAR_RECIPES.forEach(function(r) {
                 var inputId = 'gear_deposit_' + r.id;
                 var productName = r.product || r.name;
-                colRight += gearTableRow(productName + ' (deposit)', inputId, 0, false, null, [r.id]);
+                colRight += gearTableRow(productName + ' (deposit)', inputId, DEPOSIT_DEFAULTS[inputId] || 0, false, null, [r.id]);
             });
             if (vendorItems.length > 0) {
                 vendorItems.forEach(function(item) {
@@ -3241,11 +3253,14 @@
 
             // Deposits & Settings
             colRight += '<div class="panel tx-filterable">' + txCollH2('Deposits & Settings', 'deposits') + '<div class="panel-body" data-panel-body="tx-deposits"><div class="price-table">';
+            // Shared mote & primal deposit inputs (used by the mote→primal table)
+            colRight += txTableRow('All Motes (deposit)', 'tx_deposit_mote', DEPOSIT_DEFAULTS['tx_deposit_mote'] || 0, false, ['mote_primals', 'planar_essence']);
+            colRight += txTableRow('All Primals (deposit)', 'tx_deposit_primal', DEPOSIT_DEFAULTS['tx_deposit_primal'] || 0, false, ['mote_primals']);
             TRANSMUTE_RECIPES.forEach(function(r) {
-                colRight += txTableRow((r.product || r.name) + ' (deposit)', 'tx_deposit_' + r.id, 0, false, [r.id]);
+                colRight += txTableRow((r.product || r.name) + ' (deposit)', 'tx_deposit_' + r.id, DEPOSIT_DEFAULTS['tx_deposit_' + r.id] || 0, false, [r.id]);
             });
             CLOTH_DAILIES.forEach(function(r) {
-                colRight += txTableRow(r.name + ' (deposit)', 'tx_deposit_' + r.id, 0, false, [r.id]);
+                colRight += txTableRow(r.name + ' (deposit)', 'tx_deposit_' + r.id, DEPOSIT_DEFAULTS['tx_deposit_' + r.id] || 0, false, [r.id]);
             });
             colRight += '<div class="price-table-row"><span class="pt-name">AH Cut</span>' +
                 '<div class="price-control"><input type="number" id="tx_ah_cut" value="5" step="0.1">' +
@@ -3270,7 +3285,7 @@
             main += '<div id="tx-view-mote_primals" class="tx-view" style="display:none">' +
                 '<div class="tier-label">Mote \u2192 Primal Conversions</div>' +
                 '<table class="alch-summary">' +
-                    '<thead><tr><th>Primal</th><th>10× Mote Cost</th><th>Primal Price</th><th>Revenue (−AH%)</th><th>Profit</th></tr></thead>' +
+                    '<thead><tr><th>Primal</th><th>10× Mote Cost</th><th>Primal Price</th><th>Revenue (−AH%)</th><th>Deposit</th><th>Profit</th></tr></thead>' +
                     '<tbody id="tx-mote-table-body"></tbody>' +
                 '</table>' +
                 '<div class="tier-label" style="margin-top:16px">Planar Essence Conversion</div>' +
@@ -3389,6 +3404,7 @@
             var summaryRows = [];
 
             // === MOTE → PRIMAL TABLE ===
+            var primalDeposit = txGet('tx_deposit_primal');
             var moteTableBody = '';
             TX_PRIMALS.forEach(function(p) {
                 var moteCost    = txGet('tx_mote_' + p.id) * 10;
@@ -3401,6 +3417,7 @@
                     '<td>' + gold(moteCost) + '</td>' +
                     '<td>' + gold(primalPrice) + '</td>' +
                     '<td>' + gold(revenue) + '</td>' +
+                    '<td style="color:#888">' + gold(primalDeposit) + '</td>' +
                     '<td class="' + cls + '">' + (profit >= 0 ? '+' : '') + gold(profit) + '</td>' +
                 '</tr>';
                 if (moteCost > 0 || primalPrice > 0) {
