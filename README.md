@@ -58,6 +58,7 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
 ### Shared Features
 
 - AH price import: paste Auctionator export data to bulk-update prices
+- **Reset AH Prices** button (top-right of tab bar): zeroes all AH-imported prices across all tabs. Vendor prices (Imbued Vial, Rune Thread), deposit values, and AH cut % are preserved. Useful for spotting stale or broken prices after an import.
 - Lock buttons: prevent specific prices from being overwritten on import
 - Silver nudge buttons (+/- 0.01g) next to mote price inputs
 - Gold/Silver/Copper display next to each price input

@@ -720,6 +720,7 @@
             <button class="tab-btn" data-tab="gear">Tailoring Gear</button>
             <button class="tab-btn" data-tab="alchemy">Alchemy</button>
             <button class="tab-btn" data-tab="transmutes">Transmutes / Dailies</button>
+            <button onclick="resetAHPrices()" style="margin-left:auto;background:none;border:1px solid #5a3a3a;color:#f87171;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:0.85em;" title="Reset all AH-imported prices to 0. Preserves vendor prices, deposits, and AH cut.">Reset AH Prices</button>
         </div>
 
         <div id="tab-bags" class="tab-content">
@@ -1899,6 +1900,29 @@
 
         function sanitizeId(name) {
             return name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+        }
+
+        // ===== RESET AH PRICES =====
+        function resetAHPrices() {
+            if (!confirm('Reset all AH prices to 0?\n\nVendor prices, deposits, and AH cut % will be kept.')) return;
+
+            document.querySelectorAll('input[type=number]').forEach(function(input) {
+                var id = input.id;
+                if (!id) return;
+                // Keep: vendor prices, AH cut settings, deposit inputs, Rune Thread (bags)
+                if (id === 'price_thread') return;
+                if (id.indexOf('_vendor_') !== -1) return;
+                if (id === 'ah_cut' || id.slice(-7) === '_ah_cut') return;
+                if (id.slice(0, 8) === 'deposit_' || id.indexOf('_deposit_') !== -1) return;
+                input.value = 0;
+                updateGSCDisplay(id);
+                autoSizeInput(input);
+            });
+
+            calculate();
+            alchCalculate();
+            gearCalculate();
+            txCalculate();
         }
 
         // ===== TAILORING SAVE / LOAD =====
