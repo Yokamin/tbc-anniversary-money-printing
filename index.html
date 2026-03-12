@@ -709,7 +709,92 @@
         .silver-nudge button:hover {
             color: #dde;
         }
-    </style>
+        /* ===== CONSUMABLES TAB ===== */
+        .cons-columns {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            padding: 4px 0;
+        }
+        .cons-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 0;
+        }
+        .cons-class-card {
+            background: #252540;
+            border-radius: 8px;
+            border: 1px solid #3a3a5c;
+            overflow: hidden;
+        }
+        .cons-class-header {
+            padding: 10px 14px;
+            font-weight: bold;
+            font-size: 1.05em;
+            letter-spacing: 0.4px;
+            border-bottom: 2px solid #3a3a5c;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cons-class-header:hover { opacity: 0.85; }
+        .cons-arrow { font-size: 0.7em; color: #888; transition: transform 0.15s; }
+        .cons-class-card.cons-collapsed .cons-arrow { transform: rotate(-90deg); }
+        .cons-class-card.cons-collapsed .cons-spec-section { display: none; }
+        .cons-class-card.cons-collapsed .cons-class-header { border-bottom-color: transparent; }
+        .cons-spec-section {
+            padding: 10px 14px;
+            border-bottom: 1px solid #2a2a44;
+        }
+        .cons-spec-section:last-child { border-bottom: none; }
+        .cons-spec-name {
+            font-size: 0.78em;
+            text-transform: uppercase;
+            color: #888;
+            letter-spacing: 0.5px;
+            margin-bottom: 7px;
+        }
+        .cons-table { width: 100%; border-collapse: collapse; }
+        .cons-table td { padding: 3px 5px; font-size: 0.85em; vertical-align: middle; }
+        .cons-table tr { border-bottom: 1px solid #1e1e38; }
+        .cons-table tr:last-child { border-bottom: none; }
+        .cons-cat-col { width: 74px; }
+        .cons-cat-badge {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 0.73em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .cons-cat-battle   { background: #1a3060; color: #93c5fd; }
+        .cons-cat-guardian { background: #183020; color: #86efac; }
+        .cons-cat-flask    { background: #2a1848; color: #c4b5fd; }
+        .cons-cat-food     { background: #352200; color: #fcd34d; }
+        .cons-cat-potion   { background: #3a1818; color: #fca5a5; }
+        .cons-cat-oil      { background: #222233; color: #94a3b8; }
+        .cons-item-name { color: #ddd; }
+        .cons-note { color: #888; font-size: 0.82em; }
+        .cons-alt-row .cons-item-name { color: #777; }
+        .cons-alt-row .cons-cat-badge { opacity: 0.6; }
+        .cons-alt-badge {
+            display: inline-block;
+            margin-left: 5px;
+            padding: 0 4px;
+            background: #3a2600;
+            color: #f59e0b;
+            border-radius: 3px;
+            font-size: 0.7em;
+            font-weight: bold;
+            vertical-align: middle;
+        }
+        </style>
 </head>
 <body>
     <div class="container">
@@ -720,6 +805,8 @@
             <button class="tab-btn" data-tab="gear">Tailoring Gear</button>
             <button class="tab-btn" data-tab="alchemy">Alchemy</button>
             <button class="tab-btn" data-tab="transmutes">Transmutes / Dailies</button>
+            <button class="tab-btn" data-tab="cooking">Cooking</button>
+            <button class="tab-btn" data-tab="consumables">Consumables</button>
             <button onclick="resetAHPrices()" style="margin-left:auto;background:none;border:1px solid #5a3a3a;color:#f87171;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:0.85em;" title="Reset all AH-imported prices to 0. Preserves vendor prices, deposits, and AH cut.">Reset AH Prices</button>
         </div>
 
@@ -1166,6 +1253,18 @@
                 <div class="main-area" id="tx-main"></div>
             </div>
         </div>
+
+        <div id="tab-consumables" class="tab-content" style="display:none">
+            <div id="cons-grid-container"></div>
+        </div>
+
+        <div id="tab-cooking" class="tab-content" style="display:none">
+            <div class="alch-layout">
+                <div class="sidebar" id="cook-col-left"></div>
+                <div class="sidebar" id="cook-col-right"></div>
+                <div class="main-area" id="cook-main"></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1378,6 +1477,25 @@
                 ]
             },
             {
+                id: 'fel_mana_potion',
+                name: 'Fel Mana Potion',
+                category: 'potion',
+                ingredients: [
+                    { item: 'Mana Thistle', qty: 1, type: 'ah' },
+                    { item: 'Nightmare Vine', qty: 2, type: 'ah' },
+                    { item: 'Imbued Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+            {
+                id: 'mad_alchemists_potion',
+                name: "Mad Alchemist's Potion",
+                category: 'potion',
+                ingredients: [
+                    { item: 'Ragveil', qty: 2, type: 'ah' },
+                    { item: 'Crystal Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+            {
                 id: 'elixir_major_firepower',
                 name: 'Elixir of Major Firepower',
                 category: 'elixir',
@@ -1385,6 +1503,46 @@
                     { item: 'Mote of Fire', qty: 2, type: 'ah' },
                     { item: 'Ancient Lichen', qty: 1, type: 'ah' },
                     { item: 'Imbued Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+            {
+                id: 'gift_of_arthas',
+                name: 'Gift of Arthas',
+                category: 'elixir',
+                ingredients: [
+                    { item: "Arthas' Tears", qty: 1, type: 'ah' },
+                    { item: 'Blindweed', qty: 1, type: 'ah' },
+                    { item: 'Crystal Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+            {
+                id: 'elixir_demonslaying',
+                name: 'Elixir of Demonslaying',
+                category: 'elixir',
+                ingredients: [
+                    { item: 'Groomsblood', qty: 1, type: 'ah' },
+                    { item: 'Ghost Mushroom', qty: 1, type: 'ah' },
+                    { item: 'Crystal Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+            {
+                id: 'elixir_draenic_wisdom',
+                name: 'Elixir of Draenic Wisdom',
+                category: 'elixir',
+                ingredients: [
+                    { item: 'Felweed', qty: 1, type: 'ah' },
+                    { item: 'Terocone', qty: 1, type: 'ah' },
+                    { item: 'Imbued Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+            {
+                id: 'greater_arcane_elixir',
+                name: 'Greater Arcane Elixir',
+                category: 'elixir',
+                ingredients: [
+                    { item: 'Dreamfoil', qty: 3, type: 'ah' },
+                    { item: 'Mountain Silversage', qty: 1, type: 'ah' },
+                    { item: 'Crystal Vial', qty: 1, type: 'vendor' },
                 ]
             },
             // === Flasks ===
@@ -1443,16 +1601,54 @@
                     { item: 'Imbued Vial', qty: 1, type: 'vendor' },
                 ]
             },
+            {
+                id: 'flask_distilled_wisdom',
+                name: 'Flask of Distilled Wisdom',
+                category: 'flask',
+                ingredients: [
+                    { item: 'Dreamfoil', qty: 7, type: 'ah' },
+                    { item: 'Icecap', qty: 3, type: 'ah' },
+                    { item: 'Black Lotus', qty: 1, type: 'ah' },
+                    { item: 'Crystal Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+            {
+                id: 'flask_supreme_power',
+                name: 'Flask of Supreme Power',
+                category: 'flask',
+                ingredients: [
+                    { item: 'Dreamfoil', qty: 7, type: 'ah' },
+                    { item: 'Mountain Silversage', qty: 3, type: 'ah' },
+                    { item: 'Black Lotus', qty: 1, type: 'ah' },
+                    { item: 'Crystal Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+            // === Misc / Enchanting — tracked here for craft-vs-buy comparison ===
+            {
+                id: 'brilliant_wizard_oil',
+                name: 'Brilliant Wizard Oil',
+                category: 'misc',
+                ingredients: [
+                    { item: 'Large Brilliant Shard', qty: 2, type: 'ah' },
+                    { item: 'Firebloom', qty: 3, type: 'ah' },
+                    { item: 'Imbued Vial', qty: 1, type: 'vendor' },
+                ]
+            },
         ];
 
         const CATEGORY_ORDER = [
             { label: 'Elixirs & Potions', includes: ['elixir', 'potion'] },
             { label: 'Flasks', includes: ['flask'] },
+            { label: 'Misc / Enchanting', includes: ['misc'] },
         ];
 
         const VENDOR_DEFAULTS = {
             'Imbued Vial': 0.34,
             'Rune Thread': 0.425,
+            'Crystal Vial': 0.04,       // used in vanilla alchemy recipes
+            'Soothing Spices': 0.0128,  // 1s 28c — cooking vendor
+            'Goldenbark Apple': 0.017,  // 1s 70c — cooking vendor
+            'Hot Spices': 0.0032,       // 32c — cooking vendor
         };
 
         // Default deposit (listing fee) values for known items.
@@ -1566,6 +1762,309 @@
             'Lesser Planar Essence', 'Greater Planar Essence', 'Bolt of Netherweave',
             'Bolt of Imbued Netherweave', 'Netherweave Bag', 'Imbued Netherweave Bag',
         ];
+
+        // ===== CONSUMABLES REFERENCE DATA =====
+        // Pure reference — no price calculations. cat: Battle|Guardian|Flask|Food|Potion|Oil
+        // alt: true = situational/cheaper alternative. note = shown as grey text + hover title.
+        const CONSUMABLE_DATA = [
+          { cls: 'Druid', color: '#FF7D0A', specs: [
+            { spec: 'Feral Tank', items: [
+              { cat: 'Battle',   name: 'Elixir of Major Agility' },
+              { cat: 'Guardian', name: 'Gift of Arthas' },
+              { cat: 'Food',     name: "Fisherman's Feast / Spicy Crawdad" },
+              { cat: 'Potion',   name: 'Ironshield Potion' },
+              { cat: 'Potion',   name: 'Haste Potion',            alt: true, note: '400 Haste — when armour capped' },
+              { cat: 'Battle',   name: 'Elixir of Demonslaying',  alt: true, note: 'Demons only' },
+              { cat: 'Food',     name: 'Spicy Hot Talbuk',        alt: true, note: '+20 Hit' },
+            ]},
+            { spec: 'Feral DPS', items: [
+              { cat: 'Battle',   name: 'Elixir of Major Agility' },
+              { cat: 'Guardian', name: 'Elixir of Draenic Wisdom' },
+              { cat: 'Food',     name: 'Warp Burger / Grilled Mudfish' },
+              { cat: 'Potion',   name: 'Fel Mana Potion',         note: '3200 mana over 24s; \u2212spell dmg/healing debuff 24s' },
+              { cat: 'Potion',   name: 'Haste Potion' },
+              { cat: 'Potion',   name: 'Super Mana Potion',       note: '1800\u20133000 Mana' },
+              { cat: 'Battle',   name: 'Elixir of Demonslaying',  alt: true, note: 'Demons only' },
+              { cat: 'Flask',    name: 'Flask of Relentless Assault', alt: true, note: 'Persists through death \u2014 cheaper long run' },
+            ]},
+            { spec: 'Balance DPS', items: [
+              { cat: 'Flask',    name: 'Flask of Blinding Light' },
+              { cat: 'Food',     name: 'Blackened Basilisk / Crunchy Serpent / Poached Bluefish' },
+              { cat: 'Potion',   name: 'Super Mana Potion',       note: '1800\u20133000 Mana' },
+              { cat: 'Battle',   name: "Adept's Elixir",          alt: true },
+              { cat: 'Guardian', name: 'Elixir of Draenic Wisdom',alt: true },
+              { cat: 'Potion',   name: "Mad Alchemist's Potion",  alt: true, note: '1650\u20132750 Mana (random)' },
+              { cat: 'Potion',   name: 'Destruction Potion',      alt: true },
+            ]},
+            { spec: 'Resto Heal', items: [
+              { cat: 'Battle',   name: 'Elixir of Healing Power' },
+              { cat: 'Guardian', name: 'Elixir of Draenic Wisdom' },
+              { cat: 'Food',     name: 'Golden Fish Sticks' },
+              { cat: 'Potion',   name: 'Super Mana Potion',       note: '1800\u20133000 Mana' },
+              { cat: 'Battle',   name: 'Elixir of Mastery',       alt: true },
+              { cat: 'Guardian', name: 'Elixir of Major Mageblood',alt: true },
+              { cat: 'Flask',    name: 'Flask of Mighty Restoration', alt: true, note: 'Persists through death \u2014 cheaper long run' },
+              { cat: 'Potion',   name: "Mad Alchemist's Potion",  alt: true, note: '1650\u20132750 Mana (random)' },
+            ]},
+          ]},
+          { cls: 'Hunter', color: '#ABD473', specs: [
+            { spec: 'DPS', items: [
+              { cat: 'Flask',    name: 'Flask of Relentless Assault' },
+              { cat: 'Food',     name: 'Warp Burger / Grilled Mudfish' },
+              { cat: 'Potion',   name: 'Haste Potion' },
+              { cat: 'Battle',   name: 'Elixir of Major Agility',  alt: true },
+              { cat: 'Guardian', name: 'Elixir of Major Mageblood',alt: true },
+              { cat: 'Battle',   name: 'Elixir of Demonslaying',   alt: true, note: 'Demons only' },
+            ]},
+          ]},
+          { cls: 'Mage', color: '#69CCF0', specs: [
+            { spec: 'DPS', items: [
+              { cat: 'Battle',   name: "Adept's Elixir" },
+              { cat: 'Guardian', name: 'Elixir of Draenic Wisdom' },
+              { cat: 'Oil',      name: 'Brilliant Wizard Oil' },
+              { cat: 'Food',     name: 'Blackened Basilisk / Crunchy Serpent / Poached Bluefish' },
+              { cat: 'Potion',   name: 'Super Mana Potion' },
+              { cat: 'Potion',   name: 'Destruction Potion' },
+              { cat: 'Flask',    name: 'Flask of Distilled Wisdom', alt: true },
+              { cat: 'Flask',    name: 'Flask of Supreme Power',    alt: true },
+              { cat: 'Flask',    name: 'Flask of Blinding Light',   alt: true },
+            ]},
+          ]},
+          { cls: 'Paladin', color: '#F58CBA', specs: [
+            { spec: 'Holy', items: [
+              { cat: 'Flask',    name: 'Flask of Distilled Wisdom' },
+              { cat: 'Food',     name: 'Skullfish Soup' },
+              { cat: 'Food',     name: 'Golden Fish Sticks' },
+              { cat: 'Potion',   name: 'Super Mana Potion' },
+              { cat: 'Battle',   name: 'Elixir of Healing Power',  alt: true },
+              { cat: 'Guardian', name: 'Elixir of Draenic Wisdom', alt: true },
+              { cat: 'Flask',    name: 'Flask of Mighty Restoration', alt: true },
+            ]},
+            { spec: 'Tank', items: [
+              { cat: 'Battle',   name: 'Greater Arcane Elixir' },
+              { cat: 'Guardian', name: 'Gift of Arthas' },
+              { cat: 'Food',     name: "Fisherman's Feast / Spicy Crawdad" },
+              { cat: 'Food',     name: 'Blackened Basilisk / Crunchy Serpent / Poached Bluefish' },
+              { cat: 'Potion',   name: 'Ironshield Potion' },
+              { cat: 'Potion',   name: 'Super Mana Potion' },
+              { cat: 'Flask',    name: 'Flask of Blinding Light',  alt: true },
+            ]},
+            { spec: 'DPS', items: [
+              { cat: 'Flask',    name: 'Flask of Relentless Assault' },
+              { cat: 'Food',     name: 'Roasted Clefthoof' },
+              { cat: 'Potion',   name: 'Haste Potion' },
+              { cat: 'Food',     name: 'Smoked Desert Dumplings',  alt: true, note: 'Same as Clefthoof minus spirit' },
+              { cat: 'Guardian', name: 'Elixir of Major Mageblood',alt: true },
+              { cat: 'Battle',   name: 'Elixir of Demonslaying',   alt: true, note: 'Against demons' },
+              { cat: 'Battle',   name: 'Elixir of Major Agility',  alt: true, note: 'Cheap option' },
+            ]},
+          ]},
+          { cls: 'Priest', color: '#f0f0f0', specs: [
+            { spec: 'Healing', items: [
+              { cat: 'Battle',   name: 'Elixir of Healing Power' },
+              { cat: 'Guardian', name: 'Elixir of Draenic Wisdom' },
+              { cat: 'Food',     name: 'Golden Fish Sticks' },
+              { cat: 'Potion',   name: 'Super Mana Potion' },
+            ]},
+            { spec: 'DPS', items: [
+              { cat: 'Flask',    name: 'Flask of Pure Death' },
+              { cat: 'Food',     name: 'Blackened Basilisk / Crunchy Serpent / Poached Bluefish' },
+              { cat: 'Potion',   name: 'Super Mana Potion' },
+              { cat: 'Battle',   name: 'Elixir of Major Shadow Power', alt: true },
+              { cat: 'Guardian', name: 'Elixir of Major Mageblood',    alt: true },
+            ]},
+          ]},
+          { cls: 'Rogue', color: '#FFF569', specs: [
+            { spec: 'DPS', items: [
+              { cat: 'Flask',    name: 'Flask of Relentless Assault' },
+              { cat: 'Food',     name: 'Spicy Hot Talbuk',          note: 'Hit rating' },
+              { cat: 'Food',     name: 'Warp Burger / Grilled Mudfish' },
+              { cat: 'Potion',   name: 'Haste Potion' },
+              { cat: 'Battle',   name: 'Elixir of Major Agility',  alt: true },
+              { cat: 'Battle',   name: 'Elixir of Demonslaying',   alt: true, note: 'Demons only' },
+              { cat: 'Guardian', name: 'Swiftness of Zanza',       alt: true },
+            ]},
+          ]},
+          { cls: 'Shaman', color: '#0070DE', specs: [
+            { spec: 'Elemental', items: [
+              { cat: 'Flask',    name: 'Flask of Blinding Light' },
+              { cat: 'Flask',    name: 'Flask of Supreme Power' },
+              { cat: 'Food',     name: 'Blackened Basilisk / Crunchy Serpent / Poached Bluefish' },
+              { cat: 'Potion',   name: 'Destruction Potion' },
+              { cat: 'Potion',   name: 'Super Mana Potion' },
+              { cat: 'Battle',   name: "Adept's Elixir",           alt: true },
+              { cat: 'Guardian', name: 'Elixir of Draenic Wisdom', alt: true },
+            ]},
+            { spec: 'Enhancement', items: [
+              { cat: 'Flask',    name: 'Flask of Relentless Assault' },
+              { cat: 'Potion',   name: 'Haste Potion' },
+              { cat: 'Food',     name: 'Roasted Clefthoof' },
+              { cat: 'Food',     name: 'Smoked Desert Dumplings',  alt: true, note: 'Same as Clefthoof minus spirit' },
+              { cat: 'Battle',   name: 'Elixir of Major Agility',  alt: true },
+              { cat: 'Battle',   name: 'Elixir of Demonslaying',   alt: true, note: 'Demons only' },
+              { cat: 'Guardian', name: 'Elixir of Draenic Wisdom', alt: true },
+            ]},
+            { spec: 'Resto', items: [
+              { cat: 'Battle',   name: 'Elixir of Healing Power' },
+              { cat: 'Guardian', name: 'Elixir of Draenic Wisdom' },
+              { cat: 'Food',     name: 'Golden Fish Sticks' },
+              { cat: 'Potion',   name: 'Super Mana Potion' },
+              { cat: 'Flask',    name: 'Flask of Distilled Wisdom', alt: true },
+            ]},
+          ]},
+          { cls: 'Warlock', color: '#9482C9', specs: [
+            { spec: 'DPS', items: [
+              { cat: 'Flask',    name: 'Flask of Pure Death' },
+              { cat: 'Flask',    name: 'Flask of Supreme Power' },
+              { cat: 'Battle',   name: 'Elixir of Major Shadow Power' },
+              { cat: 'Battle',   name: 'Elixir of Major Firepower' },
+              { cat: 'Guardian', name: 'Elixir of Draenic Wisdom' },
+              { cat: 'Food',     name: 'Blackened Basilisk / Crunchy Serpent / Poached Bluefish' },
+              { cat: 'Potion',   name: 'Destruction Potion' },
+              { cat: 'Potion',   name: 'Super Mana Potion' },
+            ]},
+          ]},
+          { cls: 'Warrior', color: '#C79C6E', specs: [
+            { spec: 'Tank', items: [
+              { cat: 'Flask',    name: 'Flask of Relentless Assault' },
+              { cat: 'Food',     name: 'Roasted Clefthoof' },
+              { cat: 'Potion',   name: 'Haste Potion' },
+            ]},
+            { spec: 'DPS', items: [
+              { cat: 'Battle',   name: 'Elixir of Major Agility' },
+              { cat: 'Guardian', name: 'Spirit of Zanza' },
+              { cat: 'Guardian', name: 'Gift of Arthas' },
+              { cat: 'Food',     name: "Fisherman's Feast / Spicy Crawdad" },
+              { cat: 'Potion',   name: 'Ironshield Potion' },
+              { cat: 'Flask',    name: 'Flask of Fortification',  alt: true },
+            ]},
+          ]},
+        ];
+
+        // ===== COOKING DATA =====
+        const COOKING_RECIPES = [
+            // === +30 Stamina ===
+            {
+                id: 'fishermans_feast',
+                name: "Fisherman's Feast",
+                category: 'stamina',
+                ingredients: [
+                    { item: 'Huge Spotted Feltail', qty: 1, type: 'ah' },
+                    { item: 'Goldenbark Apple', qty: 5, type: 'vendor' },
+                    { item: 'Soothing Spices', qty: 5, type: 'vendor' },
+                ]
+            },
+            {
+                id: 'spicy_crawdad',
+                name: 'Spicy Crawdad',
+                category: 'stamina',
+                ingredients: [
+                    { item: 'Furious Crawdad', qty: 1, type: 'ah' },
+                ]
+            },
+            // === +20 Agility ===
+            {
+                id: 'warp_burger',
+                name: 'Warp Burger',
+                category: 'agility',
+                ingredients: [
+                    { item: 'Warped Flesh', qty: 1, type: 'ah' },
+                ]
+            },
+            {
+                id: 'grilled_mudfish',
+                name: 'Grilled Mudfish',
+                category: 'agility',
+                ingredients: [
+                    { item: "Figluster's Mudfish", qty: 1, type: 'ah' },
+                ]
+            },
+            // === +20 Strength ===
+            {
+                id: 'roasted_clefthoof',
+                name: 'Roasted Clefthoof',
+                category: 'strength',
+                ingredients: [
+                    { item: 'Clefthoof Meat', qty: 1, type: 'ah' },
+                ]
+            },
+            {
+                id: 'smoked_desert_dumplings',
+                name: 'Smoked Desert Dumplings',
+                category: 'strength',
+                ingredients: [
+                    { item: 'Sandworm Meat', qty: 1, type: 'ah' },
+                    { item: 'Soothing Spices', qty: 1, type: 'vendor' },
+                ]
+            },
+            // === +20 Hit Rating ===
+            {
+                id: 'spicy_hot_talbuk',
+                name: 'Spicy Hot Talbuk',
+                category: 'hit',
+                ingredients: [
+                    { item: 'Talbuk Venison', qty: 1, type: 'ah' },
+                    { item: 'Hot Spices', qty: 1, type: 'vendor' },
+                ]
+            },
+            // === +23 Spell Power ===
+            {
+                id: 'blackened_basilisk',
+                name: 'Blackened Basilisk',
+                category: 'spellpower',
+                ingredients: [
+                    { item: "Chunk o'Basilisk", qty: 1, type: 'ah' },
+                ]
+            },
+            {
+                id: 'crunchy_serpent',
+                name: 'Crunchy Serpent',
+                category: 'spellpower',
+                ingredients: [
+                    { item: 'Serpent Flesh', qty: 1, type: 'ah' },
+                ]
+            },
+            {
+                id: 'poached_bluefish',
+                name: 'Poached Bluefish',
+                category: 'spellpower',
+                ingredients: [
+                    { item: 'Icefin Bluefish', qty: 1, type: 'ah' },
+                ]
+            },
+            // === +44 Heal Power / +22 Spell / +6 Spirit ===
+            {
+                id: 'golden_fish_sticks',
+                name: 'Golden Fish Sticks',
+                category: 'healspirit',
+                ingredients: [
+                    { item: 'Golden Darter', qty: 1, type: 'ah' },
+                ]
+            },
+            // === +20 Spell Crit ===
+            {
+                id: 'skullfish_soup',
+                name: 'Skullfish Soup',
+                category: 'spellcrit',
+                ingredients: [
+                    { item: 'Crescent-Tail Skullfish', qty: 1, type: 'ah' },
+                ]
+            },
+        ];
+
+        const COOKING_CATEGORY_ORDER = [
+            { label: '+30 Stamina', includes: ['stamina'] },
+            { label: '+20 Agility', includes: ['agility'] },
+            { label: '+20 Strength', includes: ['strength'] },
+            { label: '+20 Hit Rating', includes: ['hit'] },
+            { label: '+23 Spell Power', includes: ['spellpower'] },
+            { label: '+44 Heal Power / +22 Spell / +6 Spirit', includes: ['healspirit'] },
+            { label: '+20 Spell Crit', includes: ['spellcrit'] },
+        ];
+
+        const COOK_STORAGE_KEY = 'tbc_cook_calculator';
+        const COOK_LOCKS_KEY = 'tbc_cook_locks';
+        const COOK_RECIPE_KEY = 'tbc_cook_selected_recipe';
 
         const GEAR_STORAGE_KEY = 'tbc_gear_calculator';
         const GEAR_LOCKS_KEY = 'tbc_gear_locks';
@@ -3699,6 +4198,7 @@
                 if (recipe.category === 'elixir') return name.startsWith('Elixir ') ? name : 'Elixir - ' + name;
                 if (recipe.category === 'potion') return 'Potion - ' + name;
                 if (recipe.category === 'flask')  return name.startsWith('Flask ')  ? name : 'Flask - ' + name;
+                if (recipe.category === 'misc')   return name;
                 return name;
             }
 
@@ -3721,9 +4221,9 @@
 
             // 3.x Alchemy
             var alchAll = [];
-            ['elixir', 'potion', 'flask'].forEach(function(cat, idx) {
-                var sub     = ['3.1', '3.2', '3.3'][idx];
-                var allLbl  = ['ALL ELIXIRS', 'ALL POTIONS', 'ALL FLASKS'][idx];
+            ['elixir', 'potion', 'flask', 'misc'].forEach(function(cat, idx) {
+                var sub     = ['3.1', '3.2', '3.3', '3.4'][idx];
+                var allLbl  = ['ALL ELIXIRS', 'ALL POTIONS', 'ALL FLASKS', 'ALL MISC'][idx];
                 var catItems = [];
                 ALCHEMY_RECIPES.filter(function(r) { return r.category === cat; }).forEach(function(r) {
                     var items = [r.product || r.name];
@@ -3787,11 +4287,348 @@
             lines.push(formatList('4.3 ALL CLOTH DAILIES', clothAll));
             lines.push(formatList('4.0 ALL TRANSMUTES/DAILIES', txAll));
 
+            // 5.x Cooking
+            var cookAll = [];
+            COOKING_RECIPES.forEach(function(r) {
+                var items = [r.name];
+                r.ingredients.forEach(function(ing) {
+                    if (ing.type !== 'vendor') items.push(ing.item);
+                });
+                items.forEach(function(i) { cookAll.push(i); });
+                lines.push(formatList('5.1 ' + r.name, items));
+            });
+            lines.push(formatList('5.0 ALL COOKING', cookAll));
+
             var output = lines.filter(function(l) { return l; }).join('\n');
             var textarea = document.getElementById('tx_export_output');
             if (textarea) textarea.value = output;
             var status = document.getElementById('tx_export_status');
             if (status) status.textContent = 'Generated ' + lines.filter(function(l){return l;}).length + ' lists.';
+        }
+
+        // ===== COOKING: UI GENERATION =====
+
+        const cookNameToInput = {};
+
+        function cookInit() {
+            var ahItemsSet = {};
+            var vendorItemsSet = {};
+            var itemToRecipes = {};
+
+            COOKING_RECIPES.forEach(function(r) {
+                r.ingredients.forEach(function(ing) {
+                    if (ing.type === 'ah') ahItemsSet[ing.item] = true;
+                    else if (ing.type === 'vendor') vendorItemsSet[ing.item] = true;
+                    if (!itemToRecipes[ing.item]) itemToRecipes[ing.item] = [];
+                    itemToRecipes[ing.item].push(r.id);
+                });
+            });
+
+            var allAhItems  = Object.keys(ahItemsSet).sort();
+            var vendorItems = Object.keys(vendorItemsSet).sort();
+
+            function cookTableRow(label, inputId, defVal, hasLock, recipeIds) {
+                var attr     = recipeIds ? ' data-recipes="' + recipeIds.join(',') + '"' : '';
+                var lockHTML = hasLock ? '<button class="lock-btn" data-input="' + inputId + '" data-locks-key="' + COOK_LOCKS_KEY + '">&#x1f513;</button>' : '';
+                return '<div class="price-table-row"' + attr + '>' +
+                    '<span class="pt-name">' + label + '</span>' + lockHTML +
+                    '<div class="price-control"><input type="number" id="' + inputId + '" value="' + (defVal || 0) + '" step="0.0001"></div>' +
+                    '<div class="gsc-group" data-input="' + inputId + '"><span class="gsc-val gold">0g</span><span class="gsc-val silver">0s</span><span class="gsc-val copper">0c</span></div>' +
+                '</div>';
+            }
+
+            function cookCollH2(label, panelId) {
+                return '<h2 class="collapsible" data-panel="cook-' + panelId + '">' + label + '<span class="collapse-arrow">&#9660;</span></h2>';
+            }
+
+            // Recipe dropdown
+            var ddHtml = '<div class="recipe-dropdown-wrapper">' +
+                '<div class="recipe-dropdown" id="cook-recipe-dropdown">' +
+                '<button class="recipe-dropdown-trigger" id="cook-recipe-dropdown-trigger">' +
+                    '<span id="cook-recipe-dropdown-label">All (Profit Overview)</span>' +
+                    '<span class="dd-arrow">&#9660;</span>' +
+                '</button>' +
+                '<div class="recipe-dropdown-menu">';
+            ddHtml += '<div class="recipe-item active" data-recipe="all">All (Profit Overview)</div>';
+            COOKING_CATEGORY_ORDER.forEach(function(cat) {
+                var recipes = COOKING_RECIPES.filter(function(r) { return cat.includes.indexOf(r.category) !== -1; });
+                if (recipes.length === 0) return;
+                ddHtml += '<div class="recipe-category">' + cat.label + '</div>';
+                recipes.forEach(function(r) {
+                    ddHtml += '<div class="recipe-item" data-recipe="' + r.id + '">' + r.name + '</div>';
+                });
+            });
+            ddHtml += '</div></div></div>';
+
+            // === LEFT COLUMN ===
+            var colLeft = ddHtml;
+            colLeft += '<div class="panel import-panel">' +
+                '<h2>Import AH Prices</h2>' +
+                '<textarea id="cook_ah_import" placeholder="Paste AH export data here..."></textarea>' +
+                '<button class="import-btn" onclick="cookImportPrices()">Update Prices</button>' +
+                '<div id="cook_import_status" style="font-size:0.8em;margin-top:6px;min-height:1.2em;"></div>' +
+            '</div>';
+
+            colLeft += '<div class="panel cook-filterable">' + cookCollH2('AH Ingredients', 'ah-mats') + '<div class="panel-body" data-panel-body="cook-ah-mats"><div class="price-table">';
+            allAhItems.forEach(function(item) {
+                var inputId = 'cook_mat_' + sanitizeId(item);
+                cookNameToInput[item] = inputId;
+                colLeft += cookTableRow(item, inputId, 0, true, itemToRecipes[item]);
+            });
+            colLeft += '</div></div></div>';
+
+            colLeft += '<div class="panel cook-filterable">' + cookCollH2('Vendor Items', 'vendor-mats') + '<div class="panel-body" data-panel-body="cook-vendor-mats"><div class="price-table">';
+            vendorItems.forEach(function(item) {
+                var inputId = 'cook_vendor_' + sanitizeId(item);
+                var defVal  = VENDOR_DEFAULTS[item] || 0;
+                cookNameToInput[item] = inputId;
+                colLeft += cookTableRow(item + ' (vendor)', inputId, defVal, false, itemToRecipes[item]);
+            });
+            colLeft += '</div></div></div>';
+
+            document.getElementById('cook-col-left').innerHTML = colLeft;
+
+            // === RIGHT COLUMN ===
+            var colRight = '';
+            colRight += '<div class="panel cook-filterable">' + cookCollH2('Product Sale Prices', 'sale-prices') + '<div class="panel-body" data-panel-body="cook-sale-prices"><div class="price-table">';
+            COOKING_RECIPES.forEach(function(r) {
+                var inputId = 'cook_sale_' + r.id;
+                cookNameToInput[r.name] = inputId;
+                colRight += cookTableRow(r.name, inputId, 0, true, [r.id]);
+            });
+            colRight += '</div></div></div>';
+
+            colRight += '<div class="panel cook-filterable">' + cookCollH2('Deposits & Settings', 'deposits') + '<div class="panel-body" data-panel-body="cook-deposits"><div class="price-table">';
+            COOKING_RECIPES.forEach(function(r) {
+                colRight += cookTableRow(r.name + ' (deposit)', 'cook_deposit_' + r.id, 0, false, [r.id]);
+            });
+            colRight += '<div class="price-table-row"><span class="pt-name">AH Cut</span>' +
+                '<div class="price-control"><input type="number" id="cook_ah_cut" value="5" step="0.1">' +
+                '<span style="color:#888;font-size:0.82em;margin-left:2px;">%</span></div></div>';
+            colRight += '</div></div></div>';
+
+            document.getElementById('cook-col-right').innerHTML = colRight;
+
+            // === MAIN AREA ===
+            var main = '<div id="cook-view-all">' +
+                '<div class="tier-label">Profit Overview</div>' +
+                '<table class="alch-summary">' +
+                    '<thead><tr><th>Recipe</th><th>Craft Cost</th><th>Sale Price</th><th>Profit</th></tr></thead>' +
+                    '<tbody id="cook-summary-body"></tbody>' +
+                '</table>' +
+            '</div>';
+
+            COOKING_RECIPES.forEach(function(r) {
+                main += '<div id="cook-view-' + r.id + '" class="cook-view" style="display:none">';
+                main += '<div class="card"><h3>' + r.name + '</h3>';
+                main += '<div class="sourcing"><div class="sourcing-title">Ingredients</div>';
+                r.ingredients.forEach(function(ing) {
+                    var baseId = 'cook_' + r.id + '_ing_' + sanitizeId(ing.item);
+                    var cls = ing.type === 'vendor' ? ' style="color:#aaa"' : '';
+                    main += '<div class="sourcing-row fixed"><span>' + ing.qty + 'x ' + ing.item + (ing.type === 'vendor' ? ' <span style="color:#888;font-size:0.8em">(vendor)</span>' : '') + '</span><span class="cost" id="' + baseId + '"' + cls + '>-</span></div>';
+                });
+                main += '</div>';
+                main += '<div class="card-row"><span class="label">Craft cost</span><span class="value" id="cook_' + r.id + '_craft_cost">-</span></div>';
+                main += '<div class="card-row"><span class="label">Sale price</span><span class="value" id="cook_' + r.id + '_sale_display">-</span></div>';
+                main += '<div class="card-row"><span class="label">AH cut</span><span class="value" id="cook_' + r.id + '_ah_cut_display">-</span></div>';
+                main += '<div class="card-row highlight"><span class="label">Net profit</span><span class="value" id="cook_' + r.id + '_profit">-</span></div>';
+                main += '<div class="deposit-note" id="cook_' + r.id + '_deposit_note">-</div>';
+                main += '</div></div>';
+            });
+
+            document.getElementById('cook-main').innerHTML = main;
+        }
+
+        // ===== COOKING: CALCULATE =====
+        function cookCalculate() {
+            var ahCutEl = document.getElementById('cook_ah_cut');
+            if (!ahCutEl) return;
+            var ahCutPct = parseFloat(ahCutEl.value) / 100 || 0.05;
+            var results = [];
+
+            COOKING_RECIPES.forEach(function(r) {
+                var craftCost = 0;
+                r.ingredients.forEach(function(ing) {
+                    var baseId = 'cook_' + r.id + '_ing_' + sanitizeId(ing.item);
+                    var price = ing.type === 'vendor'
+                        ? (parseFloat(document.getElementById('cook_vendor_' + sanitizeId(ing.item)) ? document.getElementById('cook_vendor_' + sanitizeId(ing.item)).value : 0) || 0)
+                        : (parseFloat(document.getElementById('cook_mat_' + sanitizeId(ing.item)) ? document.getElementById('cook_mat_' + sanitizeId(ing.item)).value : 0) || 0);
+                    var ingCost = price * ing.qty;
+                    craftCost += ingCost;
+                    var costEl = document.getElementById(baseId);
+                    if (costEl) costEl.textContent = gold(ingCost);
+                });
+
+                var saleEl    = document.getElementById('cook_sale_' + r.id);
+                var salePrice = saleEl ? (parseFloat(saleEl.value) || 0) : 0;
+                var ahCut     = salePrice * ahCutPct;
+                var deposit   = parseFloat((document.getElementById('cook_deposit_' + r.id) || {}).value) || 0;
+                var profit    = salePrice - ahCut - craftCost;
+
+                var el = function(id) { return document.getElementById(id); };
+                var craftEl   = el('cook_' + r.id + '_craft_cost');    if (craftEl)   craftEl.textContent   = gold(craftCost);
+                var saleDEl   = el('cook_' + r.id + '_sale_display');  if (saleDEl)   saleDEl.textContent   = gold(salePrice);
+                var cutEl     = el('cook_' + r.id + '_ah_cut_display');if (cutEl)     cutEl.textContent     = gold(ahCut);
+                var profitEl  = el('cook_' + r.id + '_profit');
+                if (profitEl) profitEl.innerHTML = '<span class="' + profitClass(profit) + '">' + (profit >= 0 ? '+' : '') + gold(profit) + '</span>';
+                var depEl     = el('cook_' + r.id + '_deposit_note');  if (depEl) depEl.textContent = 'Deposit: ' + gold(deposit) + ' (lost if unsold)';
+
+                results.push({ recipe: r, craftCost: craftCost, salePrice: salePrice, profit: profit });
+            });
+
+            results.sort(function(a, b) { return b.profit - a.profit; });
+            var tbody = '';
+            results.forEach(function(r) {
+                var cls = profitClass(r.profit);
+                tbody += '<tr class="cook-summary-row" data-recipe="' + r.recipe.id + '">' +
+                    '<td>' + r.recipe.name + '</td><td>' + gold(r.craftCost) + '</td>' +
+                    '<td>' + gold(r.salePrice) + '</td>' +
+                    '<td class="' + cls + '">' + (r.profit >= 0 ? '+' : '') + gold(r.profit) + '</td></tr>';
+            });
+            var summaryBody = document.getElementById('cook-summary-body');
+            if (summaryBody) summaryBody.innerHTML = tbody;
+
+            cookSaveToStorage();
+        }
+
+        // ===== COOKING: SELECT =====
+        function cookSelectRecipe(recipeId) {
+            var dropdown = document.getElementById('cook-recipe-dropdown');
+            var label    = document.getElementById('cook-recipe-dropdown-label');
+            document.querySelectorAll('#cook-recipe-dropdown .recipe-item').forEach(function(el) {
+                var isActive = el.dataset.recipe === recipeId;
+                el.classList.toggle('active', isActive);
+                if (isActive && label) label.textContent = el.textContent;
+            });
+            if (dropdown) dropdown.classList.remove('open');
+
+            var allView = document.getElementById('cook-view-all');
+            if (allView) allView.style.display = recipeId === 'all' ? '' : 'none';
+            document.querySelectorAll('.cook-view').forEach(function(v) {
+                v.style.display = v.id === 'cook-view-' + recipeId ? '' : 'none';
+            });
+
+            var cookTab = document.getElementById('tab-cooking');
+            cookTab.querySelectorAll('.price-table-row[data-recipes]').forEach(function(row) {
+                if (recipeId === 'all') { row.style.display = 'flex'; return; }
+                row.style.display = row.dataset.recipes.split(',').indexOf(recipeId) !== -1 ? 'flex' : 'none';
+            });
+            cookTab.querySelectorAll('.cook-filterable').forEach(function(panel) {
+                var anyVisible = false;
+                panel.querySelectorAll('.price-table-row[data-recipes]').forEach(function(row) {
+                    if (row.style.display !== 'none') anyVisible = true;
+                });
+                panel.style.display = anyVisible ? '' : 'none';
+            });
+
+            localStorage.setItem(COOK_RECIPE_KEY, recipeId);
+        }
+
+        // ===== COOKING: IMPORT =====
+        function cookImportPrices() {
+            var textarea = document.getElementById('cook_ah_import');
+            var status   = document.getElementById('cook_import_status');
+            var text     = textarea.value.trim();
+            if (!text) { status.textContent = 'Paste AH data first'; status.style.color = '#f87171'; return; }
+
+            var locks = getLocks(COOK_LOCKS_KEY);
+            var lines = text.split('\n');
+            var updated = 0, skipped = 0, skippedNames = [];
+
+            for (var i = 0; i < lines.length; i++) {
+                var match = lines[i].match(/^"?(\d+)"?,\s*"([^"]+)"/);
+                if (!match) continue;
+                var copperPrice = parseInt(match[1]);
+                var name        = match[2];
+                var inputId     = cookNameToInput[name] || cookNameToInput[name.replace(/\s*\(\d+\)$/, '')];
+                if (!inputId) continue;
+                if (locks[inputId]) { skipped++; skippedNames.push(name); continue; }
+                var goldPrice = Math.round(copperPrice) / 10000;
+                var input = document.getElementById(inputId);
+                if (input) { input.value = goldPrice; updateGSCDisplay(inputId); autoSizeInput(input); updated++; }
+            }
+
+            cookCalculate();
+            var msg = 'Updated ' + updated + ' price' + (updated !== 1 ? 's' : '');
+            if (skipped > 0) msg += ', ' + skipped + ' locked (' + skippedNames.join(', ') + ')';
+            status.textContent = msg;
+            status.style.color = '#4ade80';
+        }
+
+        // ===== COOKING: SAVE / LOAD =====
+        function cookSaveToStorage() {
+            var data = {};
+            document.querySelectorAll('#tab-cooking input').forEach(function(input) {
+                if (input.id) data[input.id] = input.value;
+            });
+            localStorage.setItem(COOK_STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function cookLoadFromStorage() {
+            var stored = localStorage.getItem(COOK_STORAGE_KEY);
+            if (stored) {
+                try {
+                    var data = JSON.parse(stored);
+                    Object.keys(data).forEach(function(id) {
+                        var input = document.getElementById(id);
+                        if (input && input.closest('#tab-cooking')) input.value = data[id];
+                    });
+                } catch(e) { console.error('Failed to load cooking data:', e); }
+            }
+        }
+
+        // ===== CONSUMABLES: UI GENERATION =====
+        function consumablesInit() {
+            var catClass = {
+                'Battle': 'cons-cat-battle', 'Guardian': 'cons-cat-guardian',
+                'Flask': 'cons-cat-flask', 'Food': 'cons-cat-food',
+                'Potion': 'cons-cat-potion', 'Oil': 'cons-cat-oil',
+            };
+
+            function buildCard(cls) {
+                var html = '<div class="cons-class-card">';
+                html += '<div class="cons-class-header" style="color:' + cls.color + '">' + cls.cls + '<span class="cons-arrow">&#9660;</span></div>';
+                cls.specs.forEach(function(spec) {
+                    html += '<div class="cons-spec-section">';
+                    html += '<div class="cons-spec-name">' + spec.spec + '</div>';
+                    html += '<table class="cons-table">';
+                    spec.items.forEach(function(item) {
+                        var rowCls  = item.alt ? ' class="cons-alt-row"' : '';
+                        var badge   = catClass[item.cat] || 'cons-cat-oil';
+                        var titleAt = item.note ? ' title="' + item.note.replace(/"/g, '&quot;') + '"' : '';
+                        html += '<tr' + rowCls + '>';
+                        html += '<td class="cons-cat-col"><span class="cons-cat-badge ' + badge + '">' + item.cat + '</span></td>';
+                        html += '<td' + titleAt + '><span class="cons-item-name">' + item.name + '</span>';
+                        if (item.alt)  html += '<span class="cons-alt-badge">ALT</span>';
+                        if (item.note) html += ' <span class="cons-note">' + item.note + '</span>';
+                        html += '</td></tr>';
+                    });
+                    html += '</table></div>';
+                });
+                html += '</div>';
+                return html;
+            }
+
+            // Fixed column assignment — edit these arrays to reorder.
+            var colOrder = [
+                ['Mage', 'Warlock', 'Hunter', 'Rogue', 'Priest'],
+                ['Shaman', 'Paladin'],
+                ['Warrior', 'Druid'],
+            ];
+            var dataByClass = {};
+            CONSUMABLE_DATA.forEach(function(cls) { dataByClass[cls.cls] = cls; });
+            var cols = colOrder.map(function(names) {
+                return names.map(function(n) { return dataByClass[n]; }).filter(Boolean);
+            });
+
+            var html = '<div class="cons-columns">';
+            cols.forEach(function(col) {
+                html += '<div class="cons-column">';
+                col.forEach(function(cls) { html += buildCard(cls); });
+                html += '</div>';
+            });
+            html += '</div>';
+            document.getElementById('cons-grid-container').innerHTML = html;
         }
 
         // ===== TAB SWITCHING =====
@@ -3816,11 +4653,14 @@
         alchInit();
         gearInit();
         txInit();
+        consumablesInit();
+        cookInit();
 
         // 3. Load saved data
         alchLoadFromStorage();
         gearLoadFromStorage();
         txLoadFromStorage();
+        cookLoadFromStorage();
 
         // 3b. Sync shared prices across tabs
         syncAllSharedPrices();
@@ -3829,6 +4669,13 @@
 
         // GSC button clicks + lock button clicks + recipe item clicks
         document.addEventListener('click', function(e) {
+            // Consumables class header toggle
+            var consHeader = e.target.closest('.cons-class-header');
+            if (consHeader) {
+                consHeader.closest('.cons-class-card').classList.toggle('cons-collapsed');
+                return;
+            }
+
             // Tree craftable expand/collapse
             var craftableNode = e.target.closest('.tree-craftable');
             if (craftableNode) {
@@ -3926,6 +4773,8 @@
                     txSelectRecipe(recipeItem.dataset.recipe);
                 } else if (recipeItem.closest('#tab-gear')) {
                     gearSelectRecipe(recipeItem.dataset.recipe);
+                } else if (recipeItem.closest('#tab-cooking')) {
+                    cookSelectRecipe(recipeItem.dataset.recipe);
                 } else {
                     alchSelectRecipe(recipeItem.dataset.recipe);
                 }
@@ -3937,16 +4786,20 @@
             if (alchDropdown && !alchDropdown.contains(e.target)) alchDropdown.classList.remove('open');
             var gearDropdown = document.getElementById('gear-recipe-dropdown');
             if (gearDropdown && !gearDropdown.contains(e.target)) gearDropdown.classList.remove('open');
-            var txDropdown = document.getElementById('tx-recipe-dropdown');
+            var txDropdown   = document.getElementById('tx-recipe-dropdown');
             if (txDropdown && !txDropdown.contains(e.target)) txDropdown.classList.remove('open');
+            var cookDropdown = document.getElementById('cook-recipe-dropdown');
+            if (cookDropdown && !cookDropdown.contains(e.target)) cookDropdown.classList.remove('open');
 
             // Summary table rows
-            var summaryRow = e.target.closest('.alch-summary-row, .gear-summary-row, .tx-summary-row');
+            var summaryRow = e.target.closest('.alch-summary-row, .gear-summary-row, .tx-summary-row, .cook-summary-row');
             if (summaryRow) {
                 if (summaryRow.closest('#tab-transmutes')) {
                     txSelectRecipe(summaryRow.dataset.recipe);
                 } else if (summaryRow.closest('#tab-gear')) {
                     gearSelectRecipe(summaryRow.dataset.recipe);
+                } else if (summaryRow.closest('#tab-cooking')) {
+                    cookSelectRecipe(summaryRow.dataset.recipe);
                 } else {
                     alchSelectRecipe(summaryRow.dataset.recipe);
                 }
@@ -4022,6 +4875,13 @@
                     gearCalculate();
                 }
             });
+            document.getElementById('tab-cooking').addEventListener(eventType, function(e) {
+                if (e.target.tagName === 'INPUT' && e.target.id) {
+                    updateGSCDisplay(e.target.id);
+                    autoSizeInput(e.target);
+                    cookCalculate();
+                }
+            });
         });
 
         // 5. Update all displays
@@ -4034,12 +4894,14 @@
         alchCalculate();
         gearCalculate();
         txCalculate();
+        cookCalculate();
 
         // 7. Restore last tab and recipe selection
         switchTab(localStorage.getItem(TAB_STORAGE_KEY) || 'bags');
         alchSelectRecipe(localStorage.getItem(ALCH_RECIPE_KEY) || 'all');
         gearSelectRecipe(localStorage.getItem(GEAR_RECIPE_KEY) || 'all');
         txSelectRecipe(localStorage.getItem(TX_RECIPE_KEY) || 'all');
+        cookSelectRecipe(localStorage.getItem(COOK_RECIPE_KEY) || 'all');
 
         // 8. Apply hidden recipe state
         applyHiddenRecipes();

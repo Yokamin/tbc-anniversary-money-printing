@@ -1,6 +1,6 @@
 # TBC Crafting Calculator
 
-## Version: 1.2
+## Version: 1.4
 
 Single-page HTML app for calculating crafting profitability in WoW TBC Anniversary.
 
@@ -30,9 +30,10 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
 **Alchemy**
 - Dynamically generated UI from recipe data array
 - Recipes tracked:
-  - Elixirs: Healing Power, Major Agility, Major Shadow Power, Major Defense, Major Mageblood, Adept's Elixir, Mastery, Major Fortitude, Major Strength, Onslaught, Major Firepower
-  - Potions: Volatile Healing, Super Mana, Haste, Destruction, Ironshield, Heroic, Insane Strength, Super Rejuvenation
-  - Flasks: Fortification, Mighty Restoration, Relentless Assault, Pure Death, Blinding Light
+  - Elixirs: Healing Power, Major Agility, Major Shadow Power, Major Defense, Major Mageblood, Adept's Elixir, Mastery, Major Fortitude, Major Strength, Onslaught, Major Firepower, Gift of Arthas, Elixir of Demonslaying, Elixir of Draenic Wisdom, Greater Arcane Elixir
+  - Potions: Volatile Healing, Super Mana, Haste, Destruction, Ironshield, Heroic, Insane Strength, Super Rejuvenation, Fel Mana, Mad Alchemist's
+  - Flasks: Fortification, Mighty Restoration, Relentless Assault, Pure Death, Blinding Light, Distilled Wisdom, Supreme Power
+  - Misc / Enchanting: Brilliant Wizard Oil (craft-vs-buy comparison, crafted by Enchanter)
 - Dropdown to view individual recipe details or "All (Profit Overview)" summary table
 - Summary table sorted by profit (best first)
 - Manage recipes modal: hide/show recipes you haven't unlocked
@@ -69,6 +70,25 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
 - Tab and recipe selection remembered across sessions
 - Shared price sync: updating a material in one tab auto-updates it in all other tabs
   - Synced: Netherweave Cloth, Arcane Dust, Bolt of Netherweave, Bolt of Imbued Netherweave, Rune Thread, Lesser/Greater Planar Essence, Mote/Primal of Fire, Earth, Mana, Shadow
+
+**Cooking**
+- Dynamically generated UI from recipe data array, same structure as Alchemy
+- Recipes tracked by buff category:
+  - +30 Stamina: Fisherman's Feast, Spicy Crawdad
+  - +20 Agility: Warp Burger, Grilled Mudfish
+  - +20 Strength: Roasted Clefthoof, Smoked Desert Dumplings
+  - +20 Hit Rating: Spicy Hot Talbuk
+  - +23 Spell Power: Blackened Basilisk, Crunchy Serpent, Poached Bluefish
+  - +44 Heal Power / +22 Spell / +6 Spirit: Golden Fish Sticks
+  - +20 Spell Crit: Skullfish Soup
+- Vendor items (Soothing Spices, Goldenbark Apple, Hot Spices) pre-filled with vendor prices
+
+**Consumables** *(reference only — no price calculations)*
+- Class/spec consumable cheat sheet for all 9 TBC classes
+- Categories: Battle Elixir, Guardian Elixir, Flask, Food, Potion, Oil — colour-coded badges
+- Primary consumables shown clearly; situational alternatives marked with **ALT** badge
+- Notes shown inline (e.g. "Demons only", "400 Haste — when armour capped")
+- WoWhead tooltip integration planned for a future update
 
 ### Auctionator Buy-List Export
 
