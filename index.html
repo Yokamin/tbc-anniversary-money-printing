@@ -794,11 +794,194 @@
             font-weight: bold;
             vertical-align: middle;
         }
+        /* ===== HEADER ROW with cooldown bar ===== */
+        .header-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            position: relative;
+        }
+        .header-row h1 {
+            flex: 1;
+            text-align: center;
+            margin-bottom: 0;
+        }
+        .cooldown-bar {
+            position: absolute;
+            left: 0;
+            display: flex;
+            gap: 18px;
+        }
+        .cd-item { display: flex; flex-direction: column; align-items: flex-start; }
+        .cd-label { font-size: 0.65em; text-transform: uppercase; color: #666; letter-spacing: 0.4px; }
+        .cd-time { font-size: 0.78em; font-weight: bold; color: #888; }
+        .cd-ready { color: #4ade80 !important; }
+
+        /* ===== GLOBAL TOOLBAR ===== */
+        .global-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 16px;
+            background: #252540;
+            border: 1px solid #3a3a5c;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .toolbar-section {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+        }
+        .toolbar-import { flex: 1; border-right: 1px solid #3a3a5c; }
+        .toolbar-export { flex: 0.75; border-right: 1px solid #3a3a5c; }
+        .toolbar-reset  { padding: 7px 8px; }
+        .toolbar-input {
+            flex: 1;
+            min-width: 0;
+            background: #1a1a2e;
+            border: 1px solid #3a3a5c;
+            border-radius: 4px;
+            color: #eee;
+            padding: 4px 8px;
+            font-size: 0.82em;
+            height: 28px;
+            resize: none;
+            overflow: hidden;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .toolbar-btn {
+            background: #3a3a5c;
+            border: 1px solid #555;
+            color: #eee;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            white-space: nowrap;
+            height: 28px;
+        }
+        .toolbar-btn:hover { background: #4a4a6c; }
+        .toolbar-reset-btn {
+            background: none;
+            border: 1px solid #5a3a3a;
+            color: #f87171;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.76em;
+            height: 26px;
+        }
+        .toolbar-reset-btn:hover { background: #3a1a1a; }
+        .toolbar-status { font-size: 0.75em; color: #4ade80; white-space: nowrap; min-width: 80px; }
+
+        /* ===== COOLDOWN POPUP ===== */
+        #cd-popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.78);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        #cd-popup-overlay.cd-open { display: flex; }
+        #cd-popup-box {
+            background: #252540;
+            border: 2px solid #4ade80;
+            border-radius: 10px;
+            padding: 28px 36px;
+            text-align: center;
+            max-width: 360px;
+            width: 90%;
+        }
+        #cd-popup-msg {
+            font-size: 1.05em;
+            color: #eee;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        #cd-popup-ok {
+            background: #4ade80;
+            color: #1a1a2e;
+            border: none;
+            padding: 8px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+        #cd-popup-ok:hover { background: #22c55e; }
+
+        /* ===== COOLDOWN TRACKER (in TX tab) ===== */
+        .cd-tracker-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .cd-tracker-field {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .cd-tracker-field input::-webkit-inner-spin-button,
+        .cd-tracker-field input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .cd-tracker-field input { -moz-appearance: textfield; }
+        .cd-tracker-field input {
+            width: 54px;
+            background: #1a1a2e;
+            border: 1px solid #3a3a5c;
+            border-radius: 3px;
+            color: #eee;
+            padding: 3px 5px;
+            font-size: 0.82em;
+            text-align: center;
+        }
+        .cd-tracker-field span { font-size: 0.75em; color: #666; }
+        .cd-tracker-label { font-size: 0.78em; color: #aaa; margin-bottom: 5px; margin-top: 8px; }
+        .cd-tracker-label:first-child { margin-top: 0; }
+        .cd-craft-btn {
+            background: #2a3a2a;
+            border: 1px solid #4ade80;
+            color: #4ade80;
+            padding: 3px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.76em;
+            white-space: nowrap;
+        }
+        .cd-craft-btn:hover { background: #1a4a1a; }
+        .cd-set-btn {
+            background: #3a3a5c;
+            border: 1px solid #555;
+            color: #eee;
+            padding: 3px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.76em;
+        }
+        .cd-set-btn:hover { background: #4a4a6c; }
         </style>
 </head>
 <body>
     <div class="container">
-        <h1>TBC Crafting Calculator</h1>
+        <div class="header-row">
+            <div class="cooldown-bar">
+                <div class="cd-item">
+                    <span class="cd-label">Cloth Dailies</span>
+                    <span class="cd-time" id="cd-cloth-time">--</span>
+                </div>
+                <div class="cd-item">
+                    <span class="cd-label">Transmute</span>
+                    <span class="cd-time" id="cd-transmute-time">--</span>
+                </div>
+            </div>
+            <h1>TBC Crafting Calculator</h1>
+        </div>
 
         <div class="tab-bar">
             <button class="tab-btn active" data-tab="bags">Bags</button>
@@ -807,19 +990,36 @@
             <button class="tab-btn" data-tab="transmutes">Transmutes / Dailies</button>
             <button class="tab-btn" data-tab="cooking">Cooking</button>
             <button class="tab-btn" data-tab="consumables">Consumables</button>
-            <button onclick="resetAHPrices()" style="margin-left:auto;background:none;border:1px solid #5a3a3a;color:#f87171;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:0.85em;" title="Reset all AH-imported prices to 0. Preserves vendor prices, deposits, and AH cut.">Reset AH Prices</button>
+        </div>
+
+        <!-- Global toolbar: import / export / reset -->
+        <div class="global-toolbar">
+            <div class="toolbar-section toolbar-import">
+                <textarea id="global_import_input" class="toolbar-input" placeholder="Paste Auctionator data to update all prices..." rows="1"></textarea>
+                <button class="toolbar-btn" onclick="globalImportPrices()">Update Prices</button>
+                <span id="global_import_status" class="toolbar-status"></span>
+            </div>
+            <div class="toolbar-section toolbar-export">
+                <button class="toolbar-btn" onclick="globalExport()">Export Lists</button>
+                <textarea id="global_export_output" class="toolbar-input" readonly placeholder="Click Export Lists..." rows="1"></textarea>
+                <button class="toolbar-btn" onclick="globalCopyExport()">Copy</button>
+            </div>
+            <div class="toolbar-section toolbar-reset">
+                <button class="toolbar-reset-btn" onclick="resetAHPrices()" title="Reset all AH-imported prices to 0. Preserves vendor prices, deposits and AH cut.">&#8635; Reset Prices</button>
+            </div>
+        </div>
+
+        <!-- Cooldown ready popup — only dismissable via OK button -->
+        <div id="cd-popup-overlay">
+            <div id="cd-popup-box">
+                <div id="cd-popup-msg"></div>
+                <button id="cd-popup-ok" onclick="cdDismissPopup()">OK</button>
+            </div>
         </div>
 
         <div id="tab-bags" class="tab-content">
         <div class="layout">
             <div class="sidebar">
-                <div class="panel import-panel">
-                    <h2>Import AH Prices</h2>
-                    <textarea id="ah_import" placeholder="Paste AH export data here..."></textarea>
-                    <button class="import-btn" onclick="importPrices()">Update Prices</button>
-                    <div id="import_status" style="font-size: 0.8em; margin-top: 6px; min-height: 1.2em;"></div>
-                </div>
-
                 <div class="panel">
                     <h2>Raw Materials</h2>
                     <div class="price-table">
@@ -2413,6 +2613,162 @@
             return name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
         }
 
+        // ===== GLOBAL IMPORT =====
+        function globalImportPrices() {
+            var textarea = document.getElementById('global_import_input');
+            var status   = document.getElementById('global_import_status');
+            var text     = textarea.value.trim();
+            if (!text) { status.textContent = 'Paste data first'; status.style.color = '#f87171'; return; }
+
+            function getLocksKey(id) {
+                if (id.startsWith('alch_')) return ALCH_LOCKS_KEY;
+                if (id.startsWith('gear_')) return GEAR_LOCKS_KEY;
+                if (id.startsWith('tx_'))   return TX_LOCKS_KEY;
+                if (id.startsWith('cook_')) return COOK_LOCKS_KEY;
+                return LOCKS_KEY;
+            }
+
+            var lines   = text.split('\n');
+            var updated = 0, skipped = 0;
+
+            for (var i = 0; i < lines.length; i++) {
+                var match = lines[i].match(/^"?(\d+)"?,\s*"([^"]+)"/);
+                if (!match) continue;
+                var copperPrice = parseInt(match[1]);
+                var name        = match[2];
+                var clean       = name.replace(/\s*\(\d+\)$/, '');
+                var inputId     = NAME_TO_INPUT[name]      || NAME_TO_INPUT[clean]      ||
+                                  alchNameToInput[name]    || alchNameToInput[clean]    ||
+                                  gearNameToInput[name]    || gearNameToInput[clean]    ||
+                                  txNameToInput[name]      || txNameToInput[clean]      ||
+                                  cookNameToInput[name]    || cookNameToInput[clean];
+                if (!inputId) continue;
+                var locks = getLocks(getLocksKey(inputId));
+                if (locks[inputId]) { skipped++; continue; }
+                var goldPrice = Math.round(copperPrice) / 10000;
+                var input = document.getElementById(inputId);
+                if (input) { input.value = goldPrice; updateGSCDisplay(inputId); autoSizeInput(input); updated++; }
+            }
+
+            syncAllSharedPrices();
+            calculate(); alchCalculate(); gearCalculate(); txCalculate(); cookCalculate();
+
+            var msg = 'Updated ' + updated + ' price' + (updated !== 1 ? 's' : '');
+            if (skipped > 0) msg += ', ' + skipped + ' locked';
+            status.textContent = msg;
+            status.style.color = updated > 0 ? '#4ade80' : '#f87171';
+        }
+
+        // ===== GLOBAL EXPORT =====
+        function globalExport() {
+            txGenerateExport();
+        }
+
+        function globalCopyExport() {
+            var t = document.getElementById('global_export_output');
+            if (!t || !t.value) return;
+            t.select();
+            document.execCommand('copy');
+            var btn = document.querySelector('.toolbar-export .toolbar-btn:last-of-type');
+            if (btn) { var orig = btn.textContent; btn.textContent = 'Copied!'; setTimeout(function() { btn.textContent = orig; }, 1500); }
+        }
+
+        // ===== COOLDOWN TRACKER =====
+        var CD_KEY = 'tbc_cooldowns';
+        var CD_DURATIONS = {
+            cloth:     (3 * 24 * 60 + 20) * 60 * 1000,  // 3d 20h
+            transmute: 24 * 60 * 60 * 1000               // 1d
+        };
+
+        function cdLoad() {
+            try { return JSON.parse(localStorage.getItem(CD_KEY)) || {}; } catch(e) { return {}; }
+        }
+
+        function cdSave(data) { localStorage.setItem(CD_KEY, JSON.stringify(data)); }
+
+        function cdUpdate(type) {
+            var days  = parseInt((document.getElementById('cd_' + type + '_days')  || {value:0}).value) || 0;
+            var hours = parseInt((document.getElementById('cd_' + type + '_hours') || {value:0}).value) || 0;
+            var mins  = parseInt((document.getElementById('cd_' + type + '_mins')  || {value:0}).value) || 0;
+            var ms    = ((days * 24 + hours) * 60 + mins) * 60 * 1000;
+            var data  = cdLoad();
+            data[type + 'Expiry']    = Date.now() + ms;
+            delete data[type + 'Dismissed'];
+            cdSave(data);
+            cdRefresh();
+        }
+
+        function cdJustCrafted(type) {
+            var data = cdLoad();
+            data[type + 'Expiry']    = Date.now() + CD_DURATIONS[type];
+            delete data[type + 'Dismissed'];
+            cdSave(data);
+            cdRefresh();
+        }
+
+        function cdRefresh() {
+            var data     = cdLoad();
+            var now      = Date.now();
+            var readyNames = [];
+
+            ['cloth', 'transmute'].forEach(function(type) {
+                var expiry = data[type + 'Expiry'];
+                var el     = document.getElementById('cd-' + type + '-time');
+                if (!el) return;
+
+                if (!expiry) { el.textContent = '--'; el.className = 'cd-time'; return; }
+
+                var remaining = expiry - now;
+                if (remaining <= 0) {
+                    el.textContent = 'Ready!';
+                    el.className   = 'cd-time cd-ready';
+                    // Queue for popup if not already dismissed for this expiry
+                    if (data[type + 'Dismissed'] !== expiry) readyNames.push(type);
+                } else {
+                    var d = Math.floor(remaining / 86400000);
+                    var h = Math.floor((remaining % 86400000) / 3600000);
+                    var m = Math.floor((remaining % 3600000)  / 60000);
+                    var s = Math.floor((remaining % 60000)    / 1000);
+                    el.textContent = (d > 0 ? d + 'd ' : '') + h + 'h ' + m + 'm ' + s + 's';
+                    el.className   = 'cd-time';
+                }
+            });
+
+            if (readyNames.length > 0) {
+                var overlay = document.getElementById('cd-popup-overlay');
+                if (overlay && !overlay.classList.contains('cd-open')) {
+                    var clothEl = document.getElementById('cd-cloth-time');
+                    var txEl    = document.getElementById('cd-transmute-time');
+                    var msg     = document.getElementById('cd-popup-msg');
+                    if (msg) {
+                        msg.innerHTML =
+                            '<div style="font-size:1.3em;color:#4ade80;margin-bottom:12px">&#9711; Cooldown Ready!</div>' +
+                            '<div>Cloth Dailies: <strong>' + (clothEl ? clothEl.textContent : '--') + '</strong></div>' +
+                            '<div>Transmute: <strong>' + (txEl ? txEl.textContent : '--') + '</strong></div>';
+                    }
+                    overlay.classList.add('cd-open');
+                }
+            }
+        }
+
+        function cdDismissPopup() {
+            var data = cdLoad();
+            var now  = Date.now();
+            ['cloth', 'transmute'].forEach(function(type) {
+                if (data[type + 'Expiry'] && data[type + 'Expiry'] <= now) {
+                    data[type + 'Dismissed'] = data[type + 'Expiry'];
+                }
+            });
+            cdSave(data);
+            var overlay = document.getElementById('cd-popup-overlay');
+            if (overlay) overlay.classList.remove('cd-open');
+        }
+
+        function cdInit() {
+            cdRefresh();
+            setInterval(cdRefresh, 1000);
+        }
+
         // ===== RESET AH PRICES =====
         function resetAHPrices() {
             if (!confirm('Reset all AH prices to 0?\n\nVendor prices, deposits, and AH cut % will be kept.')) return;
@@ -2871,13 +3227,6 @@
             var colLeft = '';
             colLeft += buildRecipeDropdownHTML();
 
-            // Import panel
-            colLeft += '<div class="panel import-panel">' +
-                '<h2>Import AH Prices</h2>' +
-                '<textarea id="alch_ah_import" placeholder="Paste AH export data here..."></textarea>' +
-                '<button class="import-btn" onclick="alchImportPrices()">Update Prices</button>' +
-                '<div id="alch_import_status" style="font-size: 0.8em; margin-top: 6px; min-height: 1.2em;"></div>' +
-            '</div>';
 
             // AH Materials (herbs, etc.)
             colLeft += '<div class="panel alch-filterable">' + collapsibleH2('AH Materials', 'ah-mats') + '<div class="panel-body" data-panel-body="ah-mats"><div class="price-table">';
@@ -3292,12 +3641,6 @@
             // === LEFT COLUMN: AH Materials + Import ===
             var colLeft = '';
             colLeft += buildGearRecipeDropdownHTML();
-            colLeft += '<div class="panel import-panel">' +
-                '<h2>Import AH Prices</h2>' +
-                '<textarea id="gear_ah_import" placeholder="Paste AH export data here..."></textarea>' +
-                '<button class="import-btn" onclick="gearImportPrices()">Update Prices</button>' +
-                '<div id="gear_import_status" style="font-size: 0.8em; margin-top: 6px; min-height: 1.2em;"></div>' +
-            '</div>';
 
             if (allAhItems.length > 0) {
                 colLeft += '<div class="panel gear-filterable">' + gearCollapsibleH2('AH Materials', 'ah-mats') + '<div class="panel-body" data-panel-body="gear-ah-mats"><div class="price-table">';
@@ -3665,11 +4008,25 @@
             // === LEFT COLUMN ===
             var colLeft = buildTxDropdownHTML();
 
-            colLeft += '<div class="panel import-panel">' +
-                '<h2>Import AH Prices</h2>' +
-                '<textarea id="tx_ah_import" placeholder="Paste AH export data here..."></textarea>' +
-                '<button class="import-btn" onclick="txImportPrices()">Update Prices</button>' +
-                '<div id="tx_import_status" style="font-size:0.8em;margin-top:6px;min-height:1.2em;"></div>' +
+
+            // Cooldown Tracker panel (not filterable — always visible)
+            colLeft += '<div class="panel">' +
+                '<h2>Cooldown Tracker</h2>' +
+                '<div class="cd-tracker-label">Cloth Dailies (3d 20h)</div>' +
+                '<div class="cd-tracker-row">' +
+                    '<div class="cd-tracker-field"><input type="number" id="cd_cloth_days" value="0" min="0" max="4"><span>d</span></div>' +
+                    '<div class="cd-tracker-field"><input type="number" id="cd_cloth_hours" value="0" min="0" max="23"><span>h</span></div>' +
+                    '<div class="cd-tracker-field"><input type="number" id="cd_cloth_mins" value="0" min="0" max="59"><span>m</span></div>' +
+                    '<button class="cd-set-btn" onclick="cdUpdate(\'cloth\')">Set</button>' +
+                    '<button class="cd-craft-btn" onclick="cdJustCrafted(\'cloth\')">Just Crafted!</button>' +
+                '</div>' +
+                '<div class="cd-tracker-label" style="border-top:1px solid #2a2a44;padding-top:8px;margin-top:4px">Transmute (1d)</div>' +
+                '<div class="cd-tracker-row">' +
+                    '<div class="cd-tracker-field"><input type="number" id="cd_transmute_hours" value="0" min="0" max="23"><span>h</span></div>' +
+                    '<div class="cd-tracker-field"><input type="number" id="cd_transmute_mins" value="0" min="0" max="59"><span>m</span></div>' +
+                    '<button class="cd-set-btn" onclick="cdUpdate(\'transmute\')">Set</button>' +
+                    '<button class="cd-craft-btn" onclick="cdJustCrafted(\'transmute\')">Just Crafted!</button>' +
+                '</div>' +
             '</div>';
 
             // Mote Prices panel (with nudge)
@@ -3710,15 +4067,6 @@
             });
             colLeft += '</div></div></div>';
 
-            // Export panel
-            colLeft += '<div class="panel">' +
-                '<h2>Auctionator Export</h2>' +
-                '<div style="font-size:0.78em;color:#888;margin-bottom:8px;">Generates buy-list text for all tracked recipes. Paste into Auctionator in-game.</div>' +
-                '<button class="import-btn" onclick="txGenerateExport()">Generate Lists</button>' +
-                '<textarea id="tx_export_output" style="margin-top:8px;height:80px;font-size:0.72em;" readonly placeholder="Click Generate to build export..."></textarea>' +
-                '<button class="import-btn" style="margin-top:4px;" onclick="(function(){var t=document.getElementById(\'tx_export_output\');t.select();document.execCommand(\'copy\');document.getElementById(\'tx_export_status\').textContent=\'Copied!\';})()">Copy</button>' +
-                '<div id="tx_export_status" style="font-size:0.8em;margin-top:4px;min-height:1.2em;color:#4ade80;"></div>' +
-            '</div>';
 
             document.getElementById('tx-col-left').innerHTML = colLeft;
 
@@ -4300,10 +4648,8 @@
             lines.push(formatList('5.0 ALL COOKING', cookAll));
 
             var output = lines.filter(function(l) { return l; }).join('\n');
-            var textarea = document.getElementById('tx_export_output');
+            var textarea = document.getElementById('global_export_output');
             if (textarea) textarea.value = output;
-            var status = document.getElementById('tx_export_status');
-            if (status) status.textContent = 'Generated ' + lines.filter(function(l){return l;}).length + ' lists.';
         }
 
         // ===== COOKING: UI GENERATION =====
@@ -4362,12 +4708,6 @@
 
             // === LEFT COLUMN ===
             var colLeft = ddHtml;
-            colLeft += '<div class="panel import-panel">' +
-                '<h2>Import AH Prices</h2>' +
-                '<textarea id="cook_ah_import" placeholder="Paste AH export data here..."></textarea>' +
-                '<button class="import-btn" onclick="cookImportPrices()">Update Prices</button>' +
-                '<div id="cook_import_status" style="font-size:0.8em;margin-top:6px;min-height:1.2em;"></div>' +
-            '</div>';
 
             colLeft += '<div class="panel cook-filterable">' + cookCollH2('AH Ingredients', 'ah-mats') + '<div class="panel-body" data-panel-body="cook-ah-mats"><div class="price-table">';
             allAhItems.forEach(function(item) {
@@ -4655,6 +4995,7 @@
         txInit();
         consumablesInit();
         cookInit();
+        cdInit();
 
         // 3. Load saved data
         alchLoadFromStorage();
