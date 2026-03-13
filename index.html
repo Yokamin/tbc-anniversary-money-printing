@@ -2857,8 +2857,10 @@
                 var locks = getLocks(getLocksKey(inputId));
                 if (locks[inputId]) { skipped++; continue; }
                 var goldPrice = Math.round(copperPrice) / 10000;
+                var iName = AH_INPUT_TO_NAME[inputId] || clean;
+                priceTimestamps[iName] = batchTime;
                 var input = document.getElementById(inputId);
-                if (input) { input.value = goldPrice; updateGSCDisplay(inputId); autoSizeInput(input); var iName = AH_INPUT_TO_NAME[inputId]; if (iName) priceTimestamps[iName] = batchTime; updated++; }
+                if (input) { input.value = goldPrice; updateGSCDisplay(inputId); autoSizeInput(input); updated++; }
             }
 
             lastImportBatchTime = batchTime;
@@ -5488,21 +5490,23 @@
         autoSizeAllInputs();
         updateAllLockDisplays();
 
-        // 6. Initial calculations
+        // 6. Load staleness data and build AH input map before first calculate
+        try { priceTimestamps = JSON.parse(localStorage.getItem(PRICE_TIMESTAMPS_KEY) || '{}'); } catch(e) { priceTimestamps = {}; }
+        lastImportBatchTime = parseInt(localStorage.getItem(LAST_IMPORT_BATCH_KEY) || '0') || 0;
+        buildAhInputMap();
+
+        // 7. Initial calculations (summary row dots use timestamps loaded above)
         calculate();
         alchCalculate();
         gearCalculate();
         txCalculate();
         cookCalculate();
 
-        // 7. Restore last tab and recipe selection
-        switchTab(localStorage.getItem(TAB_STORAGE_KEY) || 'bags');
-        // Load price timestamps from localStorage
-        try { priceTimestamps = JSON.parse(localStorage.getItem(PRICE_TIMESTAMPS_KEY) || '{}'); } catch(e) { priceTimestamps = {}; }
-        lastImportBatchTime = parseInt(localStorage.getItem(LAST_IMPORT_BATCH_KEY) || '0') || 0;
-        // Build AH input map and inject staleness dots
-        buildAhInputMap();
+        // 8. Inject price-row staleness dots (after DOM is fully built by init + calculate)
         injectStalenessDotsToRows();
+
+        // 9. Restore last tab and recipe selection
+        switchTab(localStorage.getItem(TAB_STORAGE_KEY) || 'bags');
         // Periodic staleness refresh (every 30s)
         setInterval(function() {
             updateStalenessDotsOnRows();
