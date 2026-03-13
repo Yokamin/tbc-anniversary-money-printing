@@ -1,6 +1,6 @@
 # TBC Crafting Calculator
 
-## Version: 1.4
+## Version: 1.5
 
 Single-page HTML app for calculating crafting profitability in WoW TBC Anniversary.
 
@@ -31,7 +31,7 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
 - Dynamically generated UI from recipe data array
 - Recipes tracked:
   - Elixirs: Healing Power, Major Agility, Major Shadow Power, Major Defense, Major Mageblood, Adept's Elixir, Mastery, Major Fortitude, Major Strength, Onslaught, Major Firepower, Gift of Arthas, Elixir of Demonslaying, Elixir of Draenic Wisdom, Greater Arcane Elixir
-  - Potions: Volatile Healing, Super Mana, Haste, Destruction, Ironshield, Heroic, Insane Strength, Super Rejuvenation, Fel Mana, Mad Alchemist's
+  - Potions: Volatile Healing, Super Mana, Unstable Mana, Haste, Destruction, Ironshield, Heroic, Insane Strength, Super Rejuvenation, Fel Mana, Mad Alchemist's
   - Flasks: Fortification, Mighty Restoration, Relentless Assault, Pure Death, Blinding Light, Distilled Wisdom, Supreme Power
   - Misc / Enchanting: Brilliant Wizard Oil (craft-vs-buy comparison, crafted by Enchanter)
 - Dropdown to view individual recipe details or "All (Profit Overview)" summary table
@@ -58,8 +58,19 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
 
 ### Shared Features
 
-- AH price import: paste Auctionator export data to bulk-update prices
-- **Reset AH Prices** button (top-right of tab bar): zeroes all AH-imported prices across all tabs. Vendor prices (Imbued Vial, Rune Thread), deposit values, and AH cut % are preserved. Useful for spotting stale or broken prices after an import.
+- AH price import: paste Auctionator export data to bulk-update prices. **Reset** button clears the import field; **Reset** button on the export field clears the output.
+- **Reset AH Prices** button (top-right of tab bar): zeroes all AH-imported prices across all tabs. Vendor prices (Imbued Vial, Rune Thread), deposit values, and AH cut % are preserved.
+- **Price staleness indicators**: colored dots next to every AH price input and in profit overview rows, showing how recently each price was imported:
+  - 🔵 Blue — updated in the most recent import batch
+  - 🟢 Green — < 5 min ago
+  - 🟡 Yellow — 5–30 min ago
+  - 🟠 Orange — 30–60 min ago
+  - 🔴 Red — > 1 hr ago
+  - ⚫ Grey — never imported
+  - Profit overview rows show the **worst** staleness across all AH ingredients + sale price
+  - Netherweave Cloth is exempt (always locked at a fixed price; excluded from staleness tracking)
+  - Dots update on import and refresh automatically every 30 seconds
+- **Back button** on recipe dropdowns: "← All" appears when viewing a specific recipe, returning to the profit overview without using the dropdown
 - Lock buttons: prevent specific prices from being overwritten on import
 - Silver nudge buttons (+/- 0.01g) next to mote price inputs
 - Gold/Silver/Copper display next to each price input
@@ -76,7 +87,7 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
 - Recipes tracked by buff category:
   - +30 Stamina: Fisherman's Feast, Spicy Crawdad
   - +20 Agility: Warp Burger, Grilled Mudfish
-  - +20 Strength: Roasted Clefthoof, Smoked Desert Dumplings
+  - +20 Strength: Roasted Clefthoof, Smoked Desert Dumplings ⚠ (worse option — see tooltip in profit overview)
   - +20 Hit Rating: Spicy Hot Talbuk
   - +23 Spell Power: Blackened Basilisk, Crunchy Serpent, Poached Bluefish
   - +44 Heal Power / +22 Spell / +6 Spirit: Golden Fish Sticks
@@ -96,9 +107,11 @@ The Transmutes / Dailies tab includes an in-app export generator. Click "Generat
 
 | Prefix | Category |
 |--------|----------|
+| `0.0`  | **Everything** — all AH items across all tabs, deduplicated |
 | `1.x`  | Bags |
 | `2.x`  | Tailoring Gear |
 | `3.x`  | Alchemy (3.1=Elixirs, 3.2=Potions, 3.3=Flasks) |
 | `4.x`  | Transmutes/Dailies (4.1=Mote→Primals, 4.2=Transmutes, 4.3=Cloth) |
+| `5.x`  | Cooking |
 
 See `DECISIONS.md` for full naming conventions and design rationale.

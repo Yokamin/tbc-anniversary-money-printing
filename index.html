@@ -452,6 +452,16 @@
             border-bottom: 1px solid #2a2a44;
             gap: 6px;
         }
+        .staleness-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            align-self: center;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
         .price-table-row:last-child { border-bottom: none; }
         .price-table-row .pt-name {
             flex: 1;
@@ -571,6 +581,24 @@
             align-items: center;
         }
         .recipe-manage-btn:hover {
+            border-color: #ffd700;
+            color: #ffd700;
+        }
+        .recipe-back-btn {
+            background: #1a1a2e;
+            border: 1px solid #3a3a5c;
+            border-radius: 4px;
+            color: #aaa;
+            font-size: 0.8em;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            cursor: pointer;
+            padding: 0 10px;
+            white-space: nowrap;
+            transition: border-color 0.15s, color 0.15s;
+            display: flex;
+            align-items: center;
+        }
+        .recipe-back-btn:hover {
             border-color: #ffd700;
             color: #ffd700;
         }
@@ -864,6 +892,8 @@
             height: 28px;
         }
         .toolbar-btn:hover { background: #4a4a6c; }
+        .toolbar-btn.toolbar-btn-reset { background: #252535; color: #888; border-color: #444; }
+        .toolbar-btn.toolbar-btn-reset:hover { background: #2f2f48; color: #bbb; border-color: #666; }
         .toolbar-reset-btn {
             background: none;
             border: 1px solid #5a3a3a;
@@ -996,12 +1026,14 @@
         <div class="global-toolbar">
             <div class="toolbar-section toolbar-import">
                 <textarea id="global_import_input" class="toolbar-input" placeholder="Paste Auctionator data to update all prices..." rows="1"></textarea>
+                <button class="toolbar-btn toolbar-btn-reset" onclick="document.getElementById('global_import_input').value=''" title="Clear import field">Reset</button>
                 <button class="toolbar-btn" onclick="globalImportPrices()">Update Prices</button>
                 <span id="global_import_status" class="toolbar-status"></span>
             </div>
             <div class="toolbar-section toolbar-export">
                 <button class="toolbar-btn" onclick="globalExport()">Export Lists</button>
                 <textarea id="global_export_output" class="toolbar-input" readonly placeholder="Click Export Lists..." rows="1"></textarea>
+                <button class="toolbar-btn toolbar-btn-reset" onclick="document.getElementById('global_export_output').value=''" title="Clear export field">Reset</button>
                 <button class="toolbar-btn" onclick="globalCopyExport()">Copy</button>
             </div>
             <div class="toolbar-section toolbar-reset">
@@ -1478,6 +1510,174 @@
         const ALCH_HIDDEN_KEY = 'tbc_alchemy_hidden_recipes';
         const ALCH_COLLAPSED_KEY = 'tbc_alchemy_collapsed_panels';
 
+        // ===== PRICE STALENESS TRACKING =====
+        const PRICE_TIMESTAMPS_KEY = 'tbc_price_timestamps';
+        const LAST_IMPORT_BATCH_KEY = 'tbc_last_import_batch';
+        var priceTimestamps = {};
+        var lastImportBatchTime = 0;
+        var AH_INPUT_TO_NAME = {};
+        var STALENESS_EXEMPT_ITEMS = new Set(['Netherweave Cloth']);
+        var STALENESS_COLOR_ORDER = ['#888','#f87171','#fb923c','#fbbf24','#4ade80','#60a5fa'];
+
+        function getStalenessColor(inputId) {
+            var itemName = AH_INPUT_TO_NAME[inputId];
+            var ts = itemName ? priceTimestamps[itemName] : undefined;
+            if (ts === undefined || ts === null) return '#888';
+            if (lastImportBatchTime > 0 && ts >= lastImportBatchTime) return '#60a5fa';
+            var age = Date.now() - ts;
+            if (age < 5 * 60 * 1000)  return '#4ade80';
+            if (age < 30 * 60 * 1000) return '#fbbf24';
+            if (age < 60 * 60 * 1000) return '#fb923c';
+            return '#f87171';
+        }
+
+        function getWorstStalenessColor(inputIds) {
+            if (!inputIds || inputIds.length === 0) return null;
+            var worstIdx = STALENESS_COLOR_ORDER.length;
+            inputIds.forEach(function(id) {
+                var color = getStalenessColor(id);
+                var idx = STALENESS_COLOR_ORDER.indexOf(color);
+                if (idx !== -1 && idx < worstIdx) worstIdx = idx;
+            });
+            return worstIdx < STALENESS_COLOR_ORDER.length ? STALENESS_COLOR_ORDER[worstIdx] : null;
+        }
+
+        function stalenessDotHtml(inputIds) {
+            var color = getWorstStalenessColor(inputIds);
+            if (!color) return '';
+            return '<span class="staleness-dot" style="background:' + color + '" aria-hidden="true"></span>';
+        }
+
+        function buildAhInputMap() {
+            var nonAhPattern = /^(alch_vendor_|alch_deposit_|gear_vendor_|gear_deposit_|cook_vendor_|cook_deposit_|tx_deposit_)/;
+            var allMaps = [NAME_TO_INPUT, alchNameToInput, gearNameToInput, txNameToInput, cookNameToInput];
+            allMaps.forEach(function(map) {
+                for (var name in map) {
+                    var id = map[name];
+                    if (!id || nonAhPattern.test(id) || id.indexOf('_ah_cut') !== -1) continue;
+                    AH_INPUT_TO_NAME[id] = name;
+                }
+            });
+        }
+
+        function injectStalenessDotsToRows() {
+            document.querySelectorAll('.price-table-row').forEach(function(row) {
+                if (row.querySelector('.staleness-dot')) return;
+                var input = row.querySelector('.price-control input[type="number"]');
+                if (!input) return;
+                var inputId = input.id;
+                var itemName = AH_INPUT_TO_NAME[inputId];
+                if (!itemName || STALENESS_EXEMPT_ITEMS.has(itemName)) return;
+                var ptName = row.querySelector('.pt-name');
+                if (!ptName) return;
+                var dot = document.createElement('span');
+                dot.className = 'staleness-dot';
+                dot.setAttribute('data-staleness-input', inputId);
+                row.insertBefore(dot, ptName);
+            });
+            updateStalenessDotsOnRows();
+        }
+
+        function updateStalenessDotsOnRows() {
+            document.querySelectorAll('[data-staleness-input]').forEach(function(dot) {
+                dot.style.background = getStalenessColor(dot.getAttribute('data-staleness-input'));
+            });
+        }
+
+        function getAlchRecipeStalenessInputs(r) {
+            var ids = [];
+            var productId = 'alch_sale_' + r.id;
+            if (AH_INPUT_TO_NAME[productId]) ids.push(productId);
+            r.ingredients.forEach(function(ing) {
+                if (STALENESS_EXEMPT_ITEMS.has(ing.item)) return;
+                var id = alchNameToInput[ing.item];
+                if (id && AH_INPUT_TO_NAME[id]) ids.push(id);
+                if (ing.craftFrom && ing.craftFrom.item && !STALENESS_EXEMPT_ITEMS.has(ing.craftFrom.item)) {
+                    var cfId = alchNameToInput[ing.craftFrom.item];
+                    if (cfId && AH_INPUT_TO_NAME[cfId]) ids.push(cfId);
+                }
+            });
+            return ids;
+        }
+
+        function getGearRecipeStalenessInputs(r) {
+            var ids = [];
+            var productId = 'gear_sale_' + r.id;
+            if (AH_INPUT_TO_NAME[productId]) ids.push(productId);
+            r.ingredients.forEach(function(ing) {
+                if (ing.type === 'bop' || ing.type === 'vendor') return;
+                if (STALENESS_EXEMPT_ITEMS.has(ing.item)) return;
+                var id = gearNameToInput[ing.item];
+                if (id && AH_INPUT_TO_NAME[id]) ids.push(id);
+                if (ing.craftFrom) {
+                    if (ing.craftFrom.item && !STALENESS_EXEMPT_ITEMS.has(ing.craftFrom.item)) {
+                        var cfId = gearNameToInput[ing.craftFrom.item];
+                        if (cfId && AH_INPUT_TO_NAME[cfId]) ids.push(cfId);
+                    }
+                    if (ing.craftFrom.mats) {
+                        ing.craftFrom.mats.forEach(function(mat) {
+                            if (mat.type === 'vendor' || STALENESS_EXEMPT_ITEMS.has(mat.item)) return;
+                            var matId = gearNameToInput[mat.item];
+                            if (matId && AH_INPUT_TO_NAME[matId]) ids.push(matId);
+                        });
+                    }
+                }
+            });
+            return ids;
+        }
+
+        function getTxStalenessInputs(recipeId, primalId) {
+            var ids = [];
+            if (recipeId === 'mote_primals') {
+                if (primalId) {
+                    ids.push('tx_mote_' + primalId);
+                    ids.push('tx_primal_' + primalId);
+                } else {
+                    TX_PRIMALS.forEach(function(p) { ids.push('tx_mote_' + p.id); ids.push('tx_primal_' + p.id); });
+                }
+            } else if (recipeId === 'planar_essence') {
+                ids.push('tx_lesser_planar');
+                ids.push('tx_greater_planar');
+            } else {
+                var saleId = 'tx_sale_' + recipeId;
+                if (AH_INPUT_TO_NAME[saleId]) ids.push(saleId);
+                var recipe = null;
+                for (var i = 0; i < TRANSMUTE_RECIPES.length; i++) { if (TRANSMUTE_RECIPES[i].id === recipeId) { recipe = TRANSMUTE_RECIPES[i]; break; } }
+                if (!recipe) { for (var i = 0; i < CLOTH_DAILIES.length; i++) { if (CLOTH_DAILIES[i].id === recipeId) { recipe = CLOTH_DAILIES[i]; break; } } }
+                if (recipe) {
+                    recipe.ingredients.forEach(function(ing) {
+                        if (STALENESS_EXEMPT_ITEMS.has(ing.item)) return;
+                        if (ing.type === 'primal') {
+                            var p = null;
+                            for (var j = 0; j < TX_PRIMALS.length; j++) { if (TX_PRIMALS[j].id === ing.primalId) { p = TX_PRIMALS[j]; break; } }
+                            if (p) { ids.push('tx_mote_' + p.id); ids.push('tx_primal_' + p.id); }
+                        } else if (ing.type === 'gem') {
+                            var gId = 'tx_gem_' + sanitizeId(ing.item);
+                            if (AH_INPUT_TO_NAME[gId]) ids.push(gId);
+                        } else if (ing.type === 'imbued_bolt') {
+                            ids.push('tx_imbued_bolt'); ids.push('tx_bolt_nw'); ids.push('tx_dust');
+                        } else if (ing.type === 'ah') {
+                            var id = txNameToInput[ing.item];
+                            if (id && AH_INPUT_TO_NAME[id]) ids.push(id);
+                        }
+                    });
+                }
+            }
+            return ids;
+        }
+
+        function getCookRecipeStalenessInputs(r) {
+            var ids = [];
+            var saleId = 'cook_sale_' + r.id;
+            if (AH_INPUT_TO_NAME[saleId]) ids.push(saleId);
+            r.ingredients.forEach(function(ing) {
+                if (ing.type === 'vendor' || STALENESS_EXEMPT_ITEMS.has(ing.item)) return;
+                var id = cookNameToInput[ing.item];
+                if (id && AH_INPUT_TO_NAME[id]) ids.push(id);
+            });
+            return ids;
+        }
+
         // ===== TAILORING NAME MAP =====
         const NAME_TO_INPUT = {
             'Netherweave Cloth': 'price_cloth',
@@ -1613,6 +1813,16 @@
                 ingredients: [
                     { item: 'Felweed', qty: 1, type: 'ah' },
                     { item: 'Dreaming Glory', qty: 2, type: 'ah' },
+                    { item: 'Imbued Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+            {
+                id: 'unstable_mana_potion',
+                name: 'Unstable Mana Potion',
+                category: 'potion',
+                ingredients: [
+                    { item: 'Felweed', qty: 1, type: 'ah' },
+                    { item: 'Ragveil', qty: 2, type: 'ah' },
                     { item: 'Imbued Vial', qty: 1, type: 'vendor' },
                 ]
             },
@@ -2619,6 +2829,7 @@
             var status   = document.getElementById('global_import_status');
             var text     = textarea.value.trim();
             if (!text) { status.textContent = 'Paste data first'; status.style.color = '#f87171'; return; }
+            var batchTime = Date.now();
 
             function getLocksKey(id) {
                 if (id.startsWith('alch_')) return ALCH_LOCKS_KEY;
@@ -2647,11 +2858,15 @@
                 if (locks[inputId]) { skipped++; continue; }
                 var goldPrice = Math.round(copperPrice) / 10000;
                 var input = document.getElementById(inputId);
-                if (input) { input.value = goldPrice; updateGSCDisplay(inputId); autoSizeInput(input); updated++; }
+                if (input) { input.value = goldPrice; updateGSCDisplay(inputId); autoSizeInput(input); var iName = AH_INPUT_TO_NAME[inputId]; if (iName) priceTimestamps[iName] = batchTime; updated++; }
             }
 
+            lastImportBatchTime = batchTime;
+            localStorage.setItem(PRICE_TIMESTAMPS_KEY, JSON.stringify(priceTimestamps));
+            localStorage.setItem(LAST_IMPORT_BATCH_KEY, String(batchTime));
             syncAllSharedPrices();
             calculate(); alchCalculate(); gearCalculate(); txCalculate(); cookCalculate();
+            updateStalenessDotsOnRows();
 
             var msg = 'Updated ' + updated + ' price' + (updated !== 1 ? 's' : '');
             if (skipped > 0) msg += ', ' + skipped + ' locked';
@@ -2669,7 +2884,7 @@
             if (!t || !t.value) return;
             t.select();
             document.execCommand('copy');
-            var btn = document.querySelector('.toolbar-export .toolbar-btn:last-of-type');
+            var btn = document.querySelector('.toolbar-export .toolbar-btn:not(.toolbar-btn-reset):last-of-type');
             if (btn) { var orig = btn.textContent; btn.textContent = 'Copied!'; setTimeout(function() { btn.textContent = orig; }, 1500); }
         }
 
@@ -3090,6 +3305,7 @@
 
             html += '</div></div>' +
                 '<button class="recipe-manage-btn" id="recipe-manage-btn" title="Manage unlocked recipes">&#9881;</button>' +
+                '<button class="recipe-back-btn" id="alch-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
                 '</div>';
             return html;
         }
@@ -3460,7 +3676,7 @@
             visibleResults.forEach(function(r) {
                 var cls = profitClass(r.profit);
                 tbody += '<tr class="alch-summary-row" data-recipe="' + r.recipe.id + '">' +
-                    '<td>' + r.recipe.name + '</td>' +
+                    '<td>' + stalenessDotHtml(getAlchRecipeStalenessInputs(r.recipe)) + r.recipe.name + '</td>' +
                     '<td>' + gold(r.craftCost) + '</td>' +
                     '<td>' + gold(r.salePrice) + '</td>' +
                     '<td class="' + cls + '">' + (r.profit >= 0 ? '+' : '') + gold(r.profit) + '</td>' +
@@ -3483,6 +3699,8 @@
                 if (isActive && label) label.textContent = el.textContent;
             });
             if (dropdown) dropdown.classList.remove('open');
+            var backBtn = document.getElementById('alch-recipe-back');
+            if (backBtn) backBtn.style.display = recipeId === 'all' ? 'none' : '';
 
             // Show/hide views
             var allView = document.getElementById('alch-view-all');
@@ -3535,7 +3753,9 @@
                     html += '<div class="recipe-item" data-recipe="' + r.id + '">' + r.name + '</div>';
                 });
             });
-            html += '</div></div></div>';
+            html += '</div></div>' +
+                '<button class="recipe-back-btn" id="gear-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
+                '</div>';
             return html;
         }
 
@@ -3848,7 +4068,7 @@
             results.forEach(function(r) {
                 var cls = profitClass(r.profit);
                 tbody += '<tr class="gear-summary-row" data-recipe="' + r.recipe.id + '">' +
-                    '<td>' + r.recipe.name + '</td><td>' + gold(r.craftCost) + '</td>' +
+                    '<td>' + stalenessDotHtml(getGearRecipeStalenessInputs(r.recipe)) + r.recipe.name + '</td><td>' + gold(r.craftCost) + '</td>' +
                     '<td>' + gold(r.salePrice) + '</td>' +
                     '<td class="' + cls + '">' + (r.profit >= 0 ? '+' : '') + gold(r.profit) + '</td></tr>';
             });
@@ -3868,6 +4088,8 @@
                 if (isActive && label) label.textContent = el.textContent;
             });
             if (dropdown) dropdown.classList.remove('open');
+            var backBtn = document.getElementById('gear-recipe-back');
+            if (backBtn) backBtn.style.display = recipeId === 'all' ? 'none' : '';
 
             var allView = document.getElementById('gear-view-all');
             if (allView) allView.style.display = recipeId === 'all' ? '' : 'none';
@@ -4001,7 +4223,9 @@
                 CLOTH_DAILIES.forEach(function(r) {
                     html += '<div class="recipe-item" data-recipe="' + r.id + '">' + r.name + (r.yieldQty > 1 ? ' \u00d7' + r.yieldQty : '') + '</div>';
                 });
-                html += '</div></div></div>';
+                html += '</div></div>' +
+                    '<button class="recipe-back-btn" id="tx-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
+                    '</div>';
                 return html;
             }
 
@@ -4260,7 +4484,7 @@
                 var profit      = revenue - moteCost;
                 var cls         = profitClass(profit);
                 moteTableBody += '<tr class="tx-summary-row" data-recipe="mote_primals">' +
-                    '<td>' + p.primal + '</td>' +
+                    '<td>' + stalenessDotHtml(getTxStalenessInputs('mote_primals', p.id)) + p.primal + '</td>' +
                     '<td>' + gold(moteCost) + '</td>' +
                     '<td>' + gold(primalPrice) + '</td>' +
                     '<td>' + gold(revenue) + '</td>' +
@@ -4268,7 +4492,7 @@
                     '<td class="' + cls + '">' + (profit >= 0 ? '+' : '') + gold(profit) + '</td>' +
                 '</tr>';
                 if (moteCost > 0 || primalPrice > 0) {
-                    summaryRows.push({ label: p.primal, cost: moteCost, revenue: revenue, profit: profit, recipeId: 'mote_primals' });
+                    summaryRows.push({ label: p.primal, cost: moteCost, revenue: revenue, profit: profit, recipeId: 'mote_primals', primalId: p.id });
                 }
             });
             var moteEl = document.getElementById('tx-mote-table-body');
@@ -4286,7 +4510,7 @@
             txSet('tx_planar_profit', '<span class="' + profitClass(planarProf) + '">' + (planarProf >= 0 ? '+' : '') + gold(planarProf) + '</span>');
 
             var planarBody = '<tr class="tx-summary-row" data-recipe="planar_essence">' +
-                '<td>3\u00d7 Lesser \u2192 Greater Planar</td>' +
+                '<td>' + stalenessDotHtml(getTxStalenessInputs('planar_essence')) + '3\u00d7 Lesser \u2192 Greater Planar</td>' +
                 '<td>' + gold(lesserCost) + '</td>' +
                 '<td>' + gold(greaterSell) + '</td>' +
                 '<td>' + gold(planarRev) + '</td>' +
@@ -4415,7 +4639,7 @@
             summaryRows.forEach(function(row) {
                 var cls = profitClass(row.profit);
                 tbody += '<tr class="tx-summary-row" data-recipe="' + row.recipeId + '">' +
-                    '<td>' + row.label + '</td>' +
+                    '<td>' + stalenessDotHtml(getTxStalenessInputs(row.recipeId, row.primalId)) + row.label + '</td>' +
                     '<td>' + gold(row.cost) + '</td>' +
                     '<td>' + gold(row.revenue) + '</td>' +
                     '<td class="' + cls + '">' + (row.profit >= 0 ? '+' : '') + gold(row.profit) + '</td>' +
@@ -4437,6 +4661,8 @@
                 if (isActive && label) label.textContent = el.textContent;
             });
             if (dropdown) dropdown.classList.remove('open');
+            var backBtn = document.getElementById('tx-recipe-back');
+            if (backBtn) backBtn.style.display = recipeId === 'all' ? 'none' : '';
 
             var allView = document.getElementById('tx-view-all');
             if (allView) allView.style.display = recipeId === 'all' ? '' : 'none';
@@ -4647,6 +4873,15 @@
             });
             lines.push(formatList('5.0 ALL COOKING', cookAll));
 
+            // 0.0 EVERYTHING (all AH items across all tabs, no dupes)
+            var everythingItems = [];
+            BAGS_EXPORT_ITEMS.forEach(function(i) { everythingItems.push(i); });
+            tailAll.forEach(function(i) { everythingItems.push(i); });
+            alchAll.forEach(function(i) { everythingItems.push(i); });
+            txAll.forEach(function(i) { everythingItems.push(i); });
+            cookAll.forEach(function(i) { everythingItems.push(i); });
+            lines.unshift(formatList('0.0 EVERYTHING', everythingItems));
+
             var output = lines.filter(function(l) { return l; }).join('\n');
             var textarea = document.getElementById('global_export_output');
             if (textarea) textarea.value = output;
@@ -4704,7 +4939,9 @@
                     ddHtml += '<div class="recipe-item" data-recipe="' + r.id + '">' + r.name + '</div>';
                 });
             });
-            ddHtml += '</div></div></div>';
+            ddHtml += '</div></div>' +
+                '<button class="recipe-back-btn" id="cook-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
+                '</div>';
 
             // === LEFT COLUMN ===
             var colLeft = ddHtml;
@@ -4820,8 +5057,12 @@
             var tbody = '';
             results.forEach(function(r) {
                 var cls = profitClass(r.profit);
+                var nameHtml = stalenessDotHtml(getCookRecipeStalenessInputs(r.recipe)) + r.recipe.name;
+                if (r.recipe.id === 'smoked_desert_dumplings') {
+                    nameHtml += ' <span style="color:#f87171;cursor:help;" title="Worse version of Roasted Clefthoof — provides the same buff without Spirit, but is typically more expensive and far less traded">(!)</span>';
+                }
                 tbody += '<tr class="cook-summary-row" data-recipe="' + r.recipe.id + '">' +
-                    '<td>' + r.recipe.name + '</td><td>' + gold(r.craftCost) + '</td>' +
+                    '<td>' + nameHtml + '</td><td>' + gold(r.craftCost) + '</td>' +
                     '<td>' + gold(r.salePrice) + '</td>' +
                     '<td class="' + cls + '">' + (r.profit >= 0 ? '+' : '') + gold(r.profit) + '</td></tr>';
             });
@@ -4841,6 +5082,8 @@
                 if (isActive && label) label.textContent = el.textContent;
             });
             if (dropdown) dropdown.classList.remove('open');
+            var backBtn = document.getElementById('cook-recipe-back');
+            if (backBtn) backBtn.style.display = recipeId === 'all' ? 'none' : '';
 
             var allView = document.getElementById('cook-view-all');
             if (allView) allView.style.display = recipeId === 'all' ? '' : 'none';
@@ -5099,6 +5342,21 @@
                 return;
             }
 
+            // Recipe back button
+            var backBtn = e.target.closest('.recipe-back-btn');
+            if (backBtn) {
+                if (backBtn.closest('#tab-transmutes')) {
+                    txSelectRecipe('all');
+                } else if (backBtn.closest('#tab-gear')) {
+                    gearSelectRecipe('all');
+                } else if (backBtn.closest('#tab-cooking')) {
+                    cookSelectRecipe('all');
+                } else {
+                    alchSelectRecipe('all');
+                }
+                return;
+            }
+
             // Recipe dropdown trigger
             var ddTrigger = e.target.closest('.recipe-dropdown-trigger');
             if (ddTrigger) {
@@ -5239,6 +5497,18 @@
 
         // 7. Restore last tab and recipe selection
         switchTab(localStorage.getItem(TAB_STORAGE_KEY) || 'bags');
+        // Load price timestamps from localStorage
+        try { priceTimestamps = JSON.parse(localStorage.getItem(PRICE_TIMESTAMPS_KEY) || '{}'); } catch(e) { priceTimestamps = {}; }
+        lastImportBatchTime = parseInt(localStorage.getItem(LAST_IMPORT_BATCH_KEY) || '0') || 0;
+        // Build AH input map and inject staleness dots
+        buildAhInputMap();
+        injectStalenessDotsToRows();
+        // Periodic staleness refresh (every 30s)
+        setInterval(function() {
+            updateStalenessDotsOnRows();
+            calculate(); alchCalculate(); gearCalculate(); txCalculate(); cookCalculate();
+        }, 30000);
+
         alchSelectRecipe(localStorage.getItem(ALCH_RECIPE_KEY) || 'all');
         gearSelectRecipe(localStorage.getItem(GEAR_RECIPE_KEY) || 'all');
         txSelectRecipe(localStorage.getItem(TX_RECIPE_KEY) || 'all');

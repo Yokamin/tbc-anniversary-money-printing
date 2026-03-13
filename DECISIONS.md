@@ -15,10 +15,12 @@ The number prefix controls alphabetical sort order in Auctionator (where lists a
 
 | Prefix | Tab / Category |
 |--------|---------------|
+| `0.0`  | **Everything** — all AH items from all tabs, deduplicated (sorts first in Auctionator) |
 | `1.x`  | Bags |
 | `2.x`  | Tailoring Gear |
 | `3.x`  | Alchemy (elixirs, potions, flasks) |
 | `4.x`  | Transmutes / Dailies |
+| `5.x`  | Cooking |
 
 Sub-numbers within each category:
 - `.0` = category-wide ALL list (sorts first within the category)
@@ -78,6 +80,28 @@ Primal Nether is Bind on Pickup — it cannot be bought or sold on the AH. In th
 ## Shared Price Sync
 
 Items that appear across multiple tabs are synced via `SHARED_PRICE_GROUPS` in the JS. When one input is updated, the others auto-update. Key synced items: Netherweave Cloth, Arcane Dust, Bolts of Netherweave, Motes of Fire/Earth (still in Alchemy for Elixir of Firepower and Ironshield Potion), Mote/Primal of Mana/Shadow/Fire/Earth between Gear and Transmutes tabs.
+
+---
+
+## Price Staleness Tracking
+
+Each AH price input shows a colored dot indicating how recently that price was imported via "Update Prices". Dots are keyed by **item name** (not inputId) so items shared across tabs (e.g. Arcane Dust in Bags, Gear, TX) all reflect the same timestamp.
+
+Color thresholds: Blue = most recent import batch → Green < 5 min → Yellow 5–30 min → Orange 30–60 min → Red > 1 hr → Grey = never imported.
+
+Only `globalImportPrices()` updates timestamps. Manual field edits do not.
+
+Locked items retain their last-imported timestamp; since imports skip locked prices, the timestamp stops updating when the lock is applied — the dot will age normally and turn red/orange over time.
+
+**Netherweave Cloth soft-lock**: Netherweave Cloth is exempt from staleness tracking entirely — no dot is shown, and it is never counted when computing worst-staleness for profit overview rows. Rationale: the price is always locked at ~15s (manual floor price) and importing it would mislead the staleness indicator. It behaves like a vendor item for staleness purposes only.
+
+Profit overview rows show the **worst** (oldest) staleness color across all AH ingredients and the product sale price. Vendor items and BOP items are excluded from this calculation.
+
+---
+
+## Recipe Dropdown Back Button
+
+All tabs with a recipe dropdown ("All / specific recipe" selector) include a "← All" button that appears only when a specific recipe is selected. It returns to the profit overview without opening the dropdown. The button is hidden in the "All" state.
 
 ---
 
