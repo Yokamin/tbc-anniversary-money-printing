@@ -99,6 +99,27 @@ Profit overview rows show the **worst** (oldest) staleness color across all AH i
 
 ---
 
+## Profit Overview Table Columns
+
+All 4 profit overview tables (Alchemy, Gear, TX, Cooking) share the same column set:
+- **Recipe / Item** — with staleness dot
+- **Craft Cost / Cost** — total ingredient cost
+- **Sale Price / Revenue** — after AH cut
+- **Profit** — colored green/red
+- **Margin** — profit % of craft cost; shows `—` when craft cost ≤ 0
+- **Daily Sold** — TSM note, free-text, persisted per recipe to localStorage
+- **Avg Price** — TSM note, free-text, persisted per recipe to localStorage
+
+### Sort Toggle
+Each profit overview has Gold / % Margin sort buttons. Clicking switches sort order for that tab only. Sort state is in-memory only (resets to Gold on page reload — intentional, as gold profit is the primary decision metric).
+
+### TSM Note Columns (Daily Sold / Avg Price)
+`type="number"` inputs (Daily Sold: 0–9999, Avg Price: gold). Have no `id` attribute so they never trigger the recalculate event handlers. Save on every keystroke to `tbc_alch_tsm` / `tbc_gear_tsm` / `tbc_tx_tsm` / `tbc_cook_tsm` in localStorage. Pre-populated from localStorage on every calculate() call. A focused-input guard prevents tbody rebuild while a TSM input is active (avoids cursor-jump during typing).
+
+Avg Price shows a live g/s/c colour preview to the right of the input. Both fields show a "last updated" age indicator (e.g. "3d ago") to the right; timestamps stored per-field as `dailyTs` / `avgPriceTs` alongside the value in the TSM localStorage object.
+
+---
+
 ## Recipe Dropdown Back Button
 
 All tabs with a recipe dropdown ("All / specific recipe" selector) include a "← All" button that appears only when a specific recipe is selected. It returns to the profit overview without opening the dropdown. The button is hidden in the "All" state.
@@ -130,6 +151,25 @@ Default: **5%**. This is the standard faction AH fee in TBC. Adjustable per-tab 
 - `type: 'ah'` → AH item; may have `craftFrom: { item, qty }` (mote alt) or `craftFrom: { mats: [...] }` (full craft chain)
 - `type: 'vendor'` → vendor price
 - `type: 'bop'` → BOP item
+
+---
+
+## Bags Tab: Best Use of Netherweave Cloth
+
+The card formerly called "Bandage Vendor Alternative" is now **"Best Use: Netherweave Cloth"**. It shows **profit per cloth** for all 6 uses of Netherweave Cloth:
+
+| Option | Formula |
+|--------|---------|
+| Vendor (bandage) | `0.15 − cloth` (2 cloth → 30s fixed) |
+| Sell raw cloth | `cloth × (1 − AH%) − cloth` (always ≈ −AH fee) |
+| Bolt of NW | `(boltAH × (1 − AH%)) / 6 − cloth` |
+| Bolt of Imbued NW | `(imbuedBoltAH × (1 − AH%) − 2×Dust) / 18 − cloth` |
+| NW Bag | `(bagSale × (1 − AH%) − Thread) / 24 − cloth` |
+| Imbued Bag | `(bagSale × (1 − AH%) − Dust×8 − Silk×2 − greaterBest) / 72 − cloth` |
+
+The metric is consistent: "if you buy cloth at market price and convert it using each method, how much profit do you make per cloth?" Non-cloth material costs are deducted from revenue before dividing by cloth count. Verdict sorts all 6 and highlights the winner.
+
+NW Bag and Imbued Bag profit rows also show a Margin % (profit / optimal cost).
 
 ---
 

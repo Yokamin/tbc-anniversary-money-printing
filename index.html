@@ -14,7 +14,7 @@
             line-height: 1.5;
         }
         .container {
-            max-width: 1600px;
+            max-width: none;
             margin: auto;
         }
         h1 {
@@ -711,6 +711,39 @@
         }
         .alch-summary-row, .gear-summary-row, .tx-summary-row, .cook-summary-row { cursor: pointer; }
         .alch-summary-row:hover, .gear-summary-row:hover, .tx-summary-row:hover, .cook-summary-row:hover { background: #2a2a44; }
+        .sort-toggle { display: inline-flex; gap: 4px; margin-left: 10px; vertical-align: middle; }
+        .sort-btn {
+            font-size: 0.72em;
+            padding: 2px 8px;
+            background: #2a2a44;
+            border: 1px solid #3a3a5c;
+            border-radius: 3px;
+            color: #888;
+            cursor: pointer;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+        .sort-btn.active { background: #3a3a6c; border-color: #7c6fcd; color: #eee; }
+        .sort-btn:hover:not(.active) { border-color: #5a5a8c; color: #ccc; }
+        .tsm-wrap { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+        .tsm-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #3a3a5c;
+            color: #bbb;
+            font-size: 0.85em;
+            padding: 1px 3px;
+            text-align: center;
+            font-family: 'Consolas', monospace;
+            flex-shrink: 0;
+        }
+        .tsm-input:focus { outline: none; border-bottom-color: #7c6fcd; color: #eee; }
+        .tsm-input::placeholder { color: #555; }
+        .tsm-input::-webkit-inner-spin-button, .tsm-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+        .tsm-input[type=number] { -moz-appearance: textfield; }
+        .tsm-daily { width: 58px; }
+        .tsm-price { width: 80px; }
+        .tsm-gsc-preview { font-size: 0.72em; line-height: 1; }
+        .tsm-age { font-size: 0.68em; color: #555; line-height: 1; }
         .silver-nudge-wrap {
             position: relative;
         }
@@ -1294,6 +1327,10 @@
                             <span class="label">Net profit (optimal)</span>
                             <span class="value" id="nbd_profit_optimal">-</span>
                         </div>
+                        <div class="card-row">
+                            <span class="label">Margin</span>
+                            <span class="value" id="nbd_margin">-</span>
+                        </div>
                         <div class="deposit-note" id="nbd_deposit_note">-</div>
                     </div>
                 </div>
@@ -1421,34 +1458,43 @@
                             <span class="label">Net profit (optimal)</span>
                             <span class="value" id="bd_profit_optimal">-</span>
                         </div>
+                        <div class="card-row">
+                            <span class="label">Margin</span>
+                            <span class="value" id="bd_margin">-</span>
+                        </div>
                         <div class="deposit-note" id="bd_deposit_note">-</div>
                     </div>
                 </div>
                 </div><!-- end crafting-trees -->
                 <div class="crafting-side">
                     <div class="card" id="card_bandage">
-                        <h3>Bandage Vendor Alternative</h3>
-                        <div class="sourcing">
-                            <div class="sourcing-title">Heavy Netherweave Bandage</div>
-                            <div class="sourcing-row fixed">
-                                <span>2x Cloth → 1x Bandage</span>
-                                <span class="cost">30s vendor</span>
-                            </div>
-                        </div>
-                        <div class="card-row" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #3a3a5c;">
+                        <h3>Best Use: Netherweave Cloth</h3>
+                        <div class="card-row" style="margin-top: 4px; padding-top: 4px; border-top: 1px solid #3a3a5c;">
                             <span class="label">Profit per cloth</span>
-                            <span class="value" style="color: #888; font-size: 0.8em;">revenue − cloth cost</span>
+                            <span class="value" style="color: #888; font-size: 0.8em;">return − cloth cost</span>
                         </div>
                         <div class="card-row">
-                            <span class="label">Bandages <span style="color:#888; font-size:0.8em;">(vendor, no AH fee)</span></span>
+                            <span class="label">Vendor <span style="color:#888;font-size:0.8em;">(bandage, 2 cloth → 30s)</span></span>
                             <span class="value" id="band_per_cloth">-</span>
                         </div>
                         <div class="card-row">
-                            <span class="label">NW Bag (24 cloth)</span>
+                            <span class="label">Sell raw cloth <span style="color:#888;font-size:0.8em;">(−AH%)</span></span>
+                            <span class="value" id="band_raw_per_cloth">-</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="label">Bolt of Netherweave <span style="color:#888;font-size:0.8em;">(6 cloth)</span></span>
+                            <span class="value" id="band_bolt_per_cloth">-</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="label">Bolt of Imbued NW <span style="color:#888;font-size:0.8em;">(18 cloth + 2 Dust)</span></span>
+                            <span class="value" id="band_ibolt_per_cloth">-</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="label">NW Bag <span style="color:#888;font-size:0.8em;">(24 cloth + Thread)</span></span>
                             <span class="value" id="band_nw_per_cloth">-</span>
                         </div>
                         <div class="card-row">
-                            <span class="label">Imbued Bag (72 cloth)</span>
+                            <span class="label">Imbued Bag <span style="color:#888;font-size:0.8em;">(72 cloth + Dust/Silk/Essence)</span></span>
                             <span class="value" id="band_ib_per_cloth">-</span>
                         </div>
                         <div class="card-row highlight">
@@ -1510,6 +1556,16 @@
         const ALCH_HIDDEN_KEY = 'tbc_alchemy_hidden_recipes';
         const ALCH_COLLAPSED_KEY = 'tbc_alchemy_collapsed_panels';
 
+        // ===== TSM NOTES =====
+        const ALCH_TSM_KEY = 'tbc_alch_tsm';
+        const GEAR_TSM_KEY = 'tbc_gear_tsm';
+        const TX_TSM_KEY = 'tbc_tx_tsm';
+        const COOK_TSM_KEY = 'tbc_cook_tsm';
+        var alchTsm = {}, gearTsm = {}, txTsm = {}, cookTsm = {};
+
+        // ===== SORT STATE =====
+        var alchSortBy = 'profit', gearSortBy = 'profit', txSortBy = 'profit', cookSortBy = 'profit';
+
         // ===== PRICE STALENESS TRACKING =====
         const PRICE_TIMESTAMPS_KEY = 'tbc_price_timestamps';
         const LAST_IMPORT_BATCH_KEY = 'tbc_last_import_batch';
@@ -1546,6 +1602,84 @@
             var color = getWorstStalenessColor(inputIds);
             if (!color) return '';
             return '<span class="staleness-dot" style="background:' + color + '" aria-hidden="true"></span>';
+        }
+
+        // ===== PROFIT % / SORT / TSM HELPERS =====
+        function profitPctStr(profit, craftCost) {
+            if (!craftCost || craftCost <= 0) return '—';
+            return (profit / craftCost * 100).toFixed(1) + '%';
+        }
+
+        function tsmAge(ts) {
+            if (!ts) return '';
+            var age = Date.now() - ts;
+            if (age < 60000) return 'just now';
+            if (age < 3600000) return Math.floor(age / 60000) + 'm ago';
+            if (age < 86400000) return Math.floor(age / 3600000) + 'h ago';
+            if (age < 604800000) return Math.floor(age / 86400000) + 'd ago';
+            return Math.floor(age / 604800000) + 'w ago';
+        }
+
+        function tsmGscHtml(val) {
+            var gsc = toGSC(val);
+            var h = '';
+            if (gsc.g > 0) h += '<span style="color:#ffd700">' + gsc.g + 'g</span> ';
+            if (gsc.s > 0 || gsc.g > 0) h += '<span style="color:#c0c0c0">' + gsc.s + 's</span> ';
+            h += '<span style="color:#cd7f32">' + gsc.c + 'c</span>';
+            return h;
+        }
+
+        function tsmInputHtml(tsmObj, recipeId, field, tsmTab) {
+            var data = tsmObj[recipeId] || {};
+            var val = (data[field] || '').replace(/"/g, '&quot;');
+            var ts = data[field + 'Ts'] || 0;
+            var ageHtml = '<span class="tsm-age" data-ts="' + ts + '">' + (ts ? tsmAge(ts) : '') + '</span>';
+            var attrs = ' data-tsm-tab="' + tsmTab + '" data-tsm-recipe="' + recipeId + '" data-tsm-field="' + field + '" tabindex="-1"';
+            if (field === 'daily') {
+                return '<div class="tsm-wrap"><input type="number" class="tsm-input tsm-daily" min="0" max="9999" step="1" value="' + val + '" placeholder="—"' + attrs + '>' + ageHtml + '</div>';
+            } else {
+                var numVal = parseFloat(data[field] || '0') || 0;
+                var gscHtml = '<span class="tsm-gsc-preview">' + (numVal > 0 ? tsmGscHtml(numVal) : '') + '</span>';
+                return '<div class="tsm-wrap"><input type="number" class="tsm-input tsm-price" min="0" step="0.0001" value="' + val + '" placeholder="—"' + attrs + '>' + gscHtml + ageHtml + '</div>';
+            }
+        }
+
+        function saveTsmField(tsmObj, storageKey, recipeId, field, value) {
+            if (!tsmObj[recipeId]) tsmObj[recipeId] = {};
+            tsmObj[recipeId][field] = value;
+            tsmObj[recipeId][field + 'Ts'] = Date.now();
+            try { localStorage.setItem(storageKey, JSON.stringify(tsmObj)); } catch(e) {}
+        }
+
+        function setSortBy(tab, by) {
+            if (tab === 'alch') { alchSortBy = by; alchCalculate(); }
+            else if (tab === 'gear') { gearSortBy = by; gearCalculate(); }
+            else if (tab === 'tx') { txSortBy = by; txCalculate(); }
+            else if (tab === 'cook') { cookSortBy = by; cookCalculate(); }
+            updateSortToggle(tab);
+        }
+
+        function updateSortToggle(tab) {
+            var sortBy = tab === 'alch' ? alchSortBy : tab === 'gear' ? gearSortBy : tab === 'tx' ? txSortBy : cookSortBy;
+            ['profit', 'pct'].forEach(function(by) {
+                var btn = document.getElementById(tab + '-sort-' + by);
+                if (btn) btn.classList.toggle('active', sortBy === by);
+            });
+        }
+
+        function sortResults(arr, sortBy, profitKey, costKey) {
+            profitKey = profitKey || 'profit';
+            costKey = costKey || 'craftCost';
+            arr.sort(function(a, b) {
+                if (sortBy === 'pct') {
+                    var ca = a[costKey], cb = b[costKey];
+                    if (ca <= 0 && cb <= 0) return b[profitKey] - a[profitKey];
+                    if (ca <= 0) return 1;
+                    if (cb <= 0) return -1;
+                    return (b[profitKey] / cb) - (a[profitKey] / ca);
+                }
+                return b[profitKey] - a[profitKey];
+            });
         }
 
         function buildAhInputMap() {
@@ -3119,6 +3253,8 @@
             document.getElementById('nbd_ah_cut').textContent = gold(nbdAHCut);
             document.getElementById('nbd_profit_optimal').innerHTML =
                 '<span class="' + profitClass(nbdProfitOptimal) + '">' + (nbdProfitOptimal >= 0 ? '+' : '') + gold(nbdProfitOptimal) + '</span>';
+            document.getElementById('nbd_margin').innerHTML = nbtOptimalCost > 0
+                ? '<span class="' + profitClass(nbdProfitOptimal) + '">' + (nbdProfitOptimal / nbtOptimalCost * 100).toFixed(1) + '%</span>' : '—';
             document.getElementById('nbd_deposit_note').textContent = 'Deposit: ' + gold(depositNwBag) + ' (lost if unsold)';
 
             // === IMBUED BAG CRAFTING TREE ===
@@ -3170,33 +3306,42 @@
             document.getElementById('bd_ah_cut').textContent = gold(bdAHCut);
             document.getElementById('bd_profit_optimal').innerHTML =
                 '<span class="' + profitClass(bdProfitOptimal) + '">' + (bdProfitOptimal >= 0 ? '+' : '') + gold(bdProfitOptimal) + '</span>';
+            document.getElementById('bd_margin').innerHTML = bdOptimalCost > 0
+                ? '<span class="' + profitClass(bdProfitOptimal) + '">' + (bdProfitOptimal / bdOptimalCost * 100).toFixed(1) + '%</span>' : '—';
             document.getElementById('bd_deposit_note').textContent = 'Deposit: ' + gold(depositImbuedBag) + ' (lost if unsold)';
 
-            // === BANDAGE VENDOR ALTERNATIVE ===
-            // Profit per cloth = revenue per cloth - cloth cost
-            const bandageProfitPerCloth = 0.15 - cloth; // 30s per bandage / 2 cloth - cost
-            // NW Bag: profit per cloth = (sale - AH cut - thread) / 24 - cloth cost
-            const nwProfitPerCloth = (nwBagSale - (nwBagSale * ahCutPct) - thread) / 24 - cloth;
-            // Imbued Bag: profit per cloth = (sale - AH cut - non-cloth costs) / 72 - cloth cost
+            // === BEST USE: NETHERWEAVE CLOTH ===
+            // Profit per cloth = (revenue - non-cloth costs) / cloth_used - cloth_cost
+            const bandageProfitPerCloth = 0.15 - cloth; // 2 cloth → 1 bandage @ 30s vendor
+            const rawClothProfitPerCloth = cloth * (1 - ahCutPct) - cloth; // sell raw (-AH fee only)
+            const boltProfitPerCloth = (boltAH * (1 - ahCutPct)) / 6 - cloth; // 6 cloth per bolt
+            const iboltProfitPerCloth = (imbuedBoltAH * (1 - ahCutPct) - dust * 2) / 18 - cloth; // 18 cloth + 2 dust
+            const nwProfitPerCloth = (nwBagSale * (1 - ahCutPct) - thread) / 24 - cloth;
             const ibOtherCosts = (dust * 8) + (silk * 2) + greaterBest;
-            const ibProfitPerCloth = (imbuedBagSale - (imbuedBagSale * ahCutPct) - ibOtherCosts) / 72 - cloth;
+            const ibProfitPerCloth = (imbuedBagSale * (1 - ahCutPct) - ibOtherCosts) / 72 - cloth;
 
-            document.getElementById('band_per_cloth').innerHTML =
-                '<span class="' + profitClass(bandageProfitPerCloth) + '">' + (bandageProfitPerCloth >= 0 ? '+' : '') + gold(bandageProfitPerCloth) + '</span>';
-            document.getElementById('band_nw_per_cloth').innerHTML =
-                '<span class="' + profitClass(nwProfitPerCloth) + '">' + (nwProfitPerCloth >= 0 ? '+' : '') + gold(nwProfitPerCloth) + '</span>';
-            document.getElementById('band_ib_per_cloth').innerHTML =
-                '<span class="' + profitClass(ibProfitPerCloth) + '">' + (ibProfitPerCloth >= 0 ? '+' : '') + gold(ibProfitPerCloth) + '</span>';
+            function bandSpan(val) {
+                return '<span class="' + profitClass(val) + '">' + (val >= 0 ? '+' : '') + gold(val) + '</span>';
+            }
+            document.getElementById('band_per_cloth').innerHTML      = bandSpan(bandageProfitPerCloth);
+            document.getElementById('band_raw_per_cloth').innerHTML   = bandSpan(rawClothProfitPerCloth);
+            document.getElementById('band_bolt_per_cloth').innerHTML  = bandSpan(boltProfitPerCloth);
+            document.getElementById('band_ibolt_per_cloth').innerHTML = bandSpan(iboltProfitPerCloth);
+            document.getElementById('band_nw_per_cloth').innerHTML    = bandSpan(nwProfitPerCloth);
+            document.getElementById('band_ib_per_cloth').innerHTML    = bandSpan(ibProfitPerCloth);
 
             // Verdict
-            var options = [
-                { name: 'Bandages', val: bandageProfitPerCloth },
-                { name: 'NW Bag', val: nwProfitPerCloth },
-                { name: 'Imbued Bag', val: ibProfitPerCloth }
+            var clothOptions = [
+                { name: 'Vendor (bandage)', val: bandageProfitPerCloth },
+                { name: 'Sell raw cloth',   val: rawClothProfitPerCloth },
+                { name: 'Bolt of NW',       val: boltProfitPerCloth },
+                { name: 'Bolt of Imbued NW',val: iboltProfitPerCloth },
+                { name: 'NW Bag',           val: nwProfitPerCloth },
+                { name: 'Imbued Bag',       val: ibProfitPerCloth }
             ];
-            options.sort(function(a, b) { return b.val - a.val; });
+            clothOptions.sort(function(a, b) { return b.val - a.val; });
             var verdictEl = document.getElementById('band_verdict');
-            verdictEl.innerHTML = '<span class="profit">' + options[0].name + '</span> <span style="color:#888; font-size:0.85em;">(' + (options[0].val >= 0 ? '+' : '') + gold(options[0].val) + '/cloth)</span>';
+            verdictEl.innerHTML = '<span class="profit">' + clothOptions[0].name + '</span> <span style="color:#888; font-size:0.85em;">(' + (clothOptions[0].val >= 0 ? '+' : '') + gold(clothOptions[0].val) + '/cloth)</span>';
 
             saveToStorage();
         }
@@ -3314,13 +3459,19 @@
 
         function buildAllViewHTML() {
             return '<div id="alch-view-all">' +
-                '<div class="tier-label">Profit Overview</div>' +
+                '<div class="tier-label">Profit Overview <span class="sort-toggle">' +
+                    '<button id="alch-sort-profit" class="sort-btn active" onclick="setSortBy(\'alch\',\'profit\')">Gold</button>' +
+                    '<button id="alch-sort-pct" class="sort-btn" onclick="setSortBy(\'alch\',\'pct\')">% Margin</button>' +
+                '</span></div>' +
                 '<table class="alch-summary">' +
                     '<thead><tr>' +
                         '<th>Recipe</th>' +
                         '<th>Craft Cost</th>' +
                         '<th>Sale Price</th>' +
                         '<th>Profit</th>' +
+                        '<th>Margin</th>' +
+                        '<th style="color:#a78bfa">Daily Sold</th>' +
+                        '<th style="color:#a78bfa">Avg Price</th>' +
                     '</tr></thead>' +
                     '<tbody id="alch-summary-body"></tbody>' +
                 '</table>' +
@@ -3673,19 +3824,25 @@
             // Update "All" summary view, sorted by profit (best first), excluding hidden recipes
             var hidden = getHiddenRecipes();
             var visibleResults = results.filter(function(r) { return !hidden[r.recipe.id]; });
-            visibleResults.sort(function(a, b) { return b.profit - a.profit; });
+            sortResults(visibleResults, alchSortBy);
             var tbody = '';
             visibleResults.forEach(function(r) {
                 var cls = profitClass(r.profit);
+                var pct = profitPctStr(r.profit, r.craftCost);
                 tbody += '<tr class="alch-summary-row" data-recipe="' + r.recipe.id + '">' +
                     '<td>' + stalenessDotHtml(getAlchRecipeStalenessInputs(r.recipe)) + r.recipe.name + '</td>' +
                     '<td>' + gold(r.craftCost) + '</td>' +
                     '<td>' + gold(r.salePrice) + '</td>' +
                     '<td class="' + cls + '">' + (r.profit >= 0 ? '+' : '') + gold(r.profit) + '</td>' +
+                    '<td class="' + cls + '">' + pct + '</td>' +
+                    '<td onclick="event.stopPropagation()">' + tsmInputHtml(alchTsm, r.recipe.id, 'daily', 'alch') + '</td>' +
+                    '<td onclick="event.stopPropagation()">' + tsmInputHtml(alchTsm, r.recipe.id, 'avgPrice', 'alch') + '</td>' +
                 '</tr>';
             });
             var summaryBody = document.getElementById('alch-summary-body');
-            if (summaryBody) summaryBody.innerHTML = tbody;
+            if (summaryBody && !(summaryBody.contains(document.activeElement) && document.activeElement.classList.contains('tsm-input'))) {
+                summaryBody.innerHTML = tbody;
+            }
 
             alchSaveToStorage();
         }
@@ -3763,9 +3920,12 @@
 
         function buildGearAllViewHTML() {
             return '<div id="gear-view-all">' +
-                '<div class="tier-label">Profit Overview</div>' +
+                '<div class="tier-label">Profit Overview <span class="sort-toggle">' +
+                    '<button id="gear-sort-profit" class="sort-btn active" onclick="setSortBy(\'gear\',\'profit\')">Gold</button>' +
+                    '<button id="gear-sort-pct" class="sort-btn" onclick="setSortBy(\'gear\',\'pct\')">% Margin</button>' +
+                '</span></div>' +
                 '<table class="gear-summary">' +
-                    '<thead><tr><th>Recipe</th><th>Craft Cost</th><th>Sale Price</th><th>Profit</th></tr></thead>' +
+                    '<thead><tr><th>Recipe</th><th>Craft Cost</th><th>Sale Price</th><th>Profit</th><th>Margin</th><th style="color:#a78bfa">Daily Sold</th><th style="color:#a78bfa">Avg Price</th></tr></thead>' +
                     '<tbody id="gear-summary-body"></tbody>' +
                 '</table>' +
             '</div>';
@@ -4065,17 +4225,25 @@
                 results.push({ recipe: r, craftCost: craftCost, salePrice: salePrice, profit: profit });
             });
 
-            results.sort(function(a, b) { return b.profit - a.profit; });
+            sortResults(results, gearSortBy);
             var tbody = '';
             results.forEach(function(r) {
                 var cls = profitClass(r.profit);
+                var pct = profitPctStr(r.profit, r.craftCost);
                 tbody += '<tr class="gear-summary-row" data-recipe="' + r.recipe.id + '">' +
-                    '<td>' + stalenessDotHtml(getGearRecipeStalenessInputs(r.recipe)) + r.recipe.name + '</td><td>' + gold(r.craftCost) + '</td>' +
+                    '<td>' + stalenessDotHtml(getGearRecipeStalenessInputs(r.recipe)) + r.recipe.name + '</td>' +
+                    '<td>' + gold(r.craftCost) + '</td>' +
                     '<td>' + gold(r.salePrice) + '</td>' +
-                    '<td class="' + cls + '">' + (r.profit >= 0 ? '+' : '') + gold(r.profit) + '</td></tr>';
+                    '<td class="' + cls + '">' + (r.profit >= 0 ? '+' : '') + gold(r.profit) + '</td>' +
+                    '<td class="' + cls + '">' + pct + '</td>' +
+                    '<td onclick="event.stopPropagation()">' + tsmInputHtml(gearTsm, r.recipe.id, 'daily', 'gear') + '</td>' +
+                    '<td onclick="event.stopPropagation()">' + tsmInputHtml(gearTsm, r.recipe.id, 'avgPrice', 'gear') + '</td>' +
+                '</tr>';
             });
             var summaryBody = document.getElementById('gear-summary-body');
-            if (summaryBody) summaryBody.innerHTML = tbody;
+            if (summaryBody && !(summaryBody.contains(document.activeElement) && document.activeElement.classList.contains('tsm-input'))) {
+                summaryBody.innerHTML = tbody;
+            }
 
             gearSaveToStorage();
         }
@@ -4347,9 +4515,12 @@
 
             // All overview
             main += '<div id="tx-view-all">' +
-                '<div class="tier-label">Profit Overview</div>' +
+                '<div class="tier-label">Profit Overview <span class="sort-toggle">' +
+                    '<button id="tx-sort-profit" class="sort-btn active" onclick="setSortBy(\'tx\',\'profit\')">Gold</button>' +
+                    '<button id="tx-sort-pct" class="sort-btn" onclick="setSortBy(\'tx\',\'pct\')">% Margin</button>' +
+                '</span></div>' +
                 '<table class="alch-summary">' +
-                    '<thead><tr><th>Item / Recipe</th><th>Cost</th><th>Revenue</th><th>Profit</th></tr></thead>' +
+                    '<thead><tr><th>Item / Recipe</th><th>Cost</th><th>Revenue</th><th>Profit</th><th>Margin</th><th style="color:#a78bfa">Daily Sold</th><th style="color:#a78bfa">Avg Price</th></tr></thead>' +
                     '<tbody id="tx-summary-body"></tbody>' +
                 '</table>' +
             '</div>';
@@ -4636,19 +4807,25 @@
             });
 
             // === SUMMARY TABLE ===
-            summaryRows.sort(function(a, b) { return b.profit - a.profit; });
+            sortResults(summaryRows, txSortBy, 'profit', 'cost');
             var tbody = '';
             summaryRows.forEach(function(row) {
                 var cls = profitClass(row.profit);
+                var pct = profitPctStr(row.profit, row.cost);
                 tbody += '<tr class="tx-summary-row" data-recipe="' + row.recipeId + '">' +
                     '<td>' + stalenessDotHtml(getTxStalenessInputs(row.recipeId, row.primalId)) + row.label + '</td>' +
                     '<td>' + gold(row.cost) + '</td>' +
                     '<td>' + gold(row.revenue) + '</td>' +
                     '<td class="' + cls + '">' + (row.profit >= 0 ? '+' : '') + gold(row.profit) + '</td>' +
+                    '<td class="' + cls + '">' + pct + '</td>' +
+                    '<td onclick="event.stopPropagation()">' + tsmInputHtml(txTsm, row.recipeId, 'daily', 'tx') + '</td>' +
+                    '<td onclick="event.stopPropagation()">' + tsmInputHtml(txTsm, row.recipeId, 'avgPrice', 'tx') + '</td>' +
                 '</tr>';
             });
             var summaryBody = document.getElementById('tx-summary-body');
-            if (summaryBody) summaryBody.innerHTML = tbody;
+            if (summaryBody && !(summaryBody.contains(document.activeElement) && document.activeElement.classList.contains('tsm-input'))) {
+                summaryBody.innerHTML = tbody;
+            }
 
             txSaveToStorage();
         }
@@ -4990,9 +5167,12 @@
 
             // === MAIN AREA ===
             var main = '<div id="cook-view-all">' +
-                '<div class="tier-label">Profit Overview</div>' +
+                '<div class="tier-label">Profit Overview <span class="sort-toggle">' +
+                    '<button id="cook-sort-profit" class="sort-btn active" onclick="setSortBy(\'cook\',\'profit\')">Gold</button>' +
+                    '<button id="cook-sort-pct" class="sort-btn" onclick="setSortBy(\'cook\',\'pct\')">% Margin</button>' +
+                '</span></div>' +
                 '<table class="alch-summary">' +
-                    '<thead><tr><th>Recipe</th><th>Craft Cost</th><th>Sale Price</th><th>Profit</th></tr></thead>' +
+                    '<thead><tr><th>Recipe</th><th>Craft Cost</th><th>Sale Price</th><th>Profit</th><th>Margin</th><th style="color:#a78bfa">Daily Sold</th><th style="color:#a78bfa">Avg Price</th></tr></thead>' +
                     '<tbody id="cook-summary-body"></tbody>' +
                 '</table>' +
             '</div>';
@@ -5055,21 +5235,29 @@
                 results.push({ recipe: r, craftCost: craftCost, salePrice: salePrice, profit: profit });
             });
 
-            results.sort(function(a, b) { return b.profit - a.profit; });
+            sortResults(results, cookSortBy);
             var tbody = '';
             results.forEach(function(r) {
                 var cls = profitClass(r.profit);
+                var pct = profitPctStr(r.profit, r.craftCost);
                 var nameHtml = stalenessDotHtml(getCookRecipeStalenessInputs(r.recipe)) + r.recipe.name;
                 if (r.recipe.id === 'smoked_desert_dumplings') {
                     nameHtml += ' <span style="color:#f87171;cursor:help;" title="Worse version of Roasted Clefthoof — provides the same buff without Spirit, but is typically more expensive and far less traded">(!)</span>';
                 }
                 tbody += '<tr class="cook-summary-row" data-recipe="' + r.recipe.id + '">' +
-                    '<td>' + nameHtml + '</td><td>' + gold(r.craftCost) + '</td>' +
+                    '<td>' + nameHtml + '</td>' +
+                    '<td>' + gold(r.craftCost) + '</td>' +
                     '<td>' + gold(r.salePrice) + '</td>' +
-                    '<td class="' + cls + '">' + (r.profit >= 0 ? '+' : '') + gold(r.profit) + '</td></tr>';
+                    '<td class="' + cls + '">' + (r.profit >= 0 ? '+' : '') + gold(r.profit) + '</td>' +
+                    '<td class="' + cls + '">' + pct + '</td>' +
+                    '<td onclick="event.stopPropagation()">' + tsmInputHtml(cookTsm, r.recipe.id, 'daily', 'cook') + '</td>' +
+                    '<td onclick="event.stopPropagation()">' + tsmInputHtml(cookTsm, r.recipe.id, 'avgPrice', 'cook') + '</td>' +
+                '</tr>';
             });
             var summaryBody = document.getElementById('cook-summary-body');
-            if (summaryBody) summaryBody.innerHTML = tbody;
+            if (summaryBody && !(summaryBody.contains(document.activeElement) && document.activeElement.classList.contains('tsm-input'))) {
+                summaryBody.innerHTML = tbody;
+            }
 
             cookSaveToStorage();
         }
@@ -5430,6 +5618,28 @@
             }
         });
 
+        // TSM note input save handler (inputs have no id, so won't trigger calculate)
+        document.addEventListener('input', function(e) {
+            if (e.target.classList && e.target.classList.contains('tsm-input') && e.target.dataset.tsmRecipe) {
+                var tab = e.target.dataset.tsmTab, recipe = e.target.dataset.tsmRecipe, field = e.target.dataset.tsmField, val = e.target.value;
+                if (tab === 'alch') saveTsmField(alchTsm, ALCH_TSM_KEY, recipe, field, val);
+                else if (tab === 'gear') saveTsmField(gearTsm, GEAR_TSM_KEY, recipe, field, val);
+                else if (tab === 'tx') saveTsmField(txTsm, TX_TSM_KEY, recipe, field, val);
+                else if (tab === 'cook') saveTsmField(cookTsm, COOK_TSM_KEY, recipe, field, val);
+                // Update gsc preview for avg price
+                if (field === 'avgPrice') {
+                    var gscEl = e.target.nextElementSibling;
+                    if (gscEl && gscEl.classList.contains('tsm-gsc-preview')) {
+                        var numVal = parseFloat(val) || 0;
+                        gscEl.innerHTML = numVal > 0 ? tsmGscHtml(numVal) : '';
+                    }
+                }
+                // Update age display
+                var ageEl = e.target.closest('td').querySelector('.tsm-age');
+                if (ageEl) { ageEl.dataset.ts = Date.now(); ageEl.textContent = 'just now'; }
+            }
+        });
+
         // Input change handlers (scoped per tab)
         ['input', 'change', 'keyup'].forEach(function(eventType) {
             document.getElementById('tab-bags').addEventListener(eventType, function(e) {
@@ -5490,9 +5700,13 @@
         autoSizeAllInputs();
         updateAllLockDisplays();
 
-        // 6. Load staleness data and build AH input map before first calculate
+        // 6. Load staleness data, TSM notes, and build AH input map before first calculate
         try { priceTimestamps = JSON.parse(localStorage.getItem(PRICE_TIMESTAMPS_KEY) || '{}'); } catch(e) { priceTimestamps = {}; }
         lastImportBatchTime = parseInt(localStorage.getItem(LAST_IMPORT_BATCH_KEY) || '0') || 0;
+        try { alchTsm = JSON.parse(localStorage.getItem(ALCH_TSM_KEY) || '{}'); } catch(e) { alchTsm = {}; }
+        try { gearTsm = JSON.parse(localStorage.getItem(GEAR_TSM_KEY) || '{}'); } catch(e) { gearTsm = {}; }
+        try { txTsm = JSON.parse(localStorage.getItem(TX_TSM_KEY) || '{}'); } catch(e) { txTsm = {}; }
+        try { cookTsm = JSON.parse(localStorage.getItem(COOK_TSM_KEY) || '{}'); } catch(e) { cookTsm = {}; }
         buildAhInputMap();
 
         // 7. Initial calculations (summary row dots use timestamps loaded above)

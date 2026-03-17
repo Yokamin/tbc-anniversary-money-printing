@@ -1,6 +1,6 @@
 # TBC Crafting Calculator
 
-## Version: 1.5
+## Version: 1.6
 
 Single-page HTML app for calculating crafting profitability in WoW TBC Anniversary.
 
@@ -12,6 +12,8 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
 - Tier 2: Bolt of Imbued Netherweave (3x Bolt + 2x Arcane Dust)
 - Final Products: Netherweave Bag, Imbued Netherweave Bag
 - Smart sourcing: automatically picks cheapest option at each tier and cascades up
+- Margin % shown on NW Bag and Imbued Bag profit rows
+- **Best Use: Netherweave Cloth** card — profit per cloth for all 6 uses: Vendor (bandage), Sell raw, Bolt of NW, Bolt of Imbued NW, NW Bag, Imbued Bag — verdict shows the best option
 
 **Tailoring Gear**
 - Dynamically generated UI from recipe data array
@@ -60,6 +62,10 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
 
 - AH price import: paste Auctionator export data to bulk-update prices. **Reset** button clears the import field; **Reset** button on the export field clears the output.
 - **Reset AH Prices** button (top-right of tab bar): zeroes all AH-imported prices across all tabs. Vendor prices (Imbued Vial, Rune Thread), deposit values, and AH cut % are preserved.
+- **Wider layout**: no max-width constraint — uses full browser width
+- **Profit % (Margin) column**: all profit overview tables show margin % alongside gold profit
+- **Sort toggle**: each profit overview has Gold / % Margin sort buttons in the header
+- **TSM notes columns**: "Daily Sold" (0–9999) and "Avg Price" (gold) editable per-recipe in all profit overview tables; Avg Price shows a live g/s/c colour preview; both fields show a "last updated" age indicator; persisted to localStorage per field with timestamp
 - **Price staleness indicators**: colored dots next to every AH price input and in profit overview rows, showing how recently each price was imported:
   - 🔵 Blue — updated in the most recent import batch
   - 🟢 Green — < 5 min ago
