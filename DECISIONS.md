@@ -58,6 +58,7 @@ To ensure subcategory `ALL` always sorts before individual items, items use a ca
 
 | Tab | Contents |
 |-----|----------|
+| **Everything** | Default first tab. Combined profit overview of all craftable items across all tabs. |
 | Bags | Static crafting tree for Netherweave bags. Hardcoded HTML + JS (`calculate()`) |
 | Tailoring Gear | Dynamic UI from `GEAR_RECIPES` array |
 | Alchemy | Dynamic UI from `ALCHEMY_RECIPES` array — elixirs, potions, flasks ONLY |
@@ -170,6 +171,90 @@ The card formerly called "Bandage Vendor Alternative" is now **"Best Use: Nether
 The metric is consistent: "if you buy cloth at market price and convert it using each method, how much profit do you make per cloth?" Non-cloth material costs are deducted from revenue before dividing by cloth count. Verdict sorts all 6 and highlights the winner.
 
 NW Bag and Imbued Bag profit rows also show a Margin % (profit / optimal cost).
+
+---
+
+## Everything Tab
+
+The Everything tab is the default landing tab. It provides a combined profit overview of all craftable items across all tabs in one place, without switching between tabs.
+
+### Views
+- **Flat List** — all items sorted together by profit or margin
+- **By Section** — items grouped by tab with section headers, same sort within each section
+
+### Data flow
+Each per-tab `calculate()` function populates a global result array after its own rendering:
+- `bagsResults` — populated at end of `calculate()` (Bags tab)
+- `gearResults` — populated at end of `gearCalculate()`
+- `alchResults` — already existed; read directly
+- `txSummaryRows` — `txCalculate()` assigns `txSummaryRows = []; var summaryRows = txSummaryRows;` so all existing `.push()` calls populate the global
+- `cookResults` — populated at end of `cookCalculate()`
+
+`evCalculate()` reads these globals directly — no tight coupling back to each tab.
+
+### Filter popup
+3-level checkbox tree: tab → category → individual recipe. Stored in `tbc_ev_hidden` as `{tab_X: true, cat_X: true, item_X: true}`. An item is visible only if none of its parent chain is hidden. State persists across reloads.
+
+### TSM columns (read-only)
+Daily Sold / Avg Price shown in the Everything table pull from the per-tab TSM localStorage keys (`tbc_alch_tsm`, `tbc_gear_tsm`, etc.) — same data as the editable columns in each tab, displayed read-only here.
+
+### Sort state
+Stored in `tbc_ev_sort` (gold/margin). View state stored in `tbc_ev_view`. Both persist across reloads.
+
+---
+
+## Ingredient Search
+
+Global toolbar "🔍 Ingredients" button opens a floating modal. Type any ingredient name to live-search across all recipes in all tabs.
+
+### Index structure
+`ingSearchIndex` is built lazily on first open (to avoid startup cost):
+```
+ingSearchIndex[itemName.toLowerCase()] = {
+    displayName: string,
+    recipes: [{ recipeId, recipeName, tab, tabLabel, qty, viaItem? }]
+}
+```
+Covers ALCHEMY_RECIPES, GEAR_RECIPES, COOKING_RECIPES, TRANSMUTE_RECIPES, CLOTH_DAILIES, and hardcoded Bags ingredients.
+
+### Navigation
+`ingGotoRecipe(tab, recipeId)` switches to the correct tab and calls the tab-specific select function (`alchSelectRecipe`, `gearSelectRecipe`, `txSelectRecipe`, `cookSelectRecipe`). Bags tab navigates to `tab-bags` only (no per-recipe selector).
+
+---
+
+## Alchemy Batch Proc Toggle
+
+The Alchemy profit overview has a ×1 / ×100 / ×1000 toggle in the header. Setting persists to `tbc_alch_batch`.
+
+### Math
+- **×1**: columns show per-craft Cost, Sale Price, Profit (unchanged from before)
+- **×N (N > 1)**: `Total Cost = craftCost × N`; `Total Revenue = salePrice × (1 − AHcut) × N × (1 + procRate/100)` for non-transmutes; transmutes excluded from proc bonus (proc multiplier = 1)
+- `Total Profit = Total Revenue − Total Cost`
+- Margin % reflects procs in batch mode
+- Sorting in batch mode uses `_batchProfit` / `_batchCost` temp properties (not stored permanently on result objects)
+
+### Transmute exclusion
+Transmutes have no proc mechanic. When batch mode is active, transmute rows are scaled by N but receive no proc multiplier.
+
+---
+
+## Alchemy Inline Proc Card
+
+When viewing a specific recipe detail in the Alchemy tab (non-transmute only), a "Proc Calculator" card is rendered below the ingredient breakdown. It mirrors the modal proc calculator but is always visible — no need to open a popup.
+
+The shared `renderProcResultsHTML(crafts, procRate, craftCost, revenuePerUnit)` helper generates the breakdown HTML for both the popup modal and the inline card, keeping the math consistent.
+
+---
+
+## Manage Recipes Modal (Alchemy)
+
+The manage-recipes modal uses a wider layout with:
+- Purple category header rows (`recipe-manage-cat`) with All / None quick-select buttons per category
+- Items indented 30px under their category
+- Scrollable inner body (`recipe-manage-scroll`) with fixed modal height, so long lists don't overflow the viewport
+- × close button in the header (alongside the title)
+
+`toggleManageCat(categoryStr, doHide)` handles the All/None per-category buttons, toggling all recipes in those categories at once and updating checkboxes live.
 
 ---
 

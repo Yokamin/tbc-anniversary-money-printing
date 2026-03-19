@@ -615,69 +615,185 @@
             display: flex;
         }
         .recipe-manage-modal {
-            background: #252540;
+            background: #1e1e35;
             border: 1px solid #3a3a5c;
             border-radius: 8px;
-            padding: 20px;
-            max-width: 400px;
+            padding: 0;
+            max-width: 480px;
             width: 90%;
             max-height: 80vh;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
             box-shadow: 0 12px 40px rgba(0,0,0,0.5);
         }
-        .recipe-manage-modal h2 {
-            font-size: 1em;
-            color: #ffd700;
-            margin-bottom: 4px;
+        .recipe-manage-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px 12px;
+            border-bottom: 1px solid #2a2a44;
+            flex-shrink: 0;
         }
+        .recipe-manage-modal h2 {
+            font-size: 0.95em;
+            color: #ffd700;
+            margin: 0;
+        }
+        .recipe-manage-close {
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 0 4px;
+            line-height: 1;
+            font-family: inherit;
+        }
+        .recipe-manage-close:hover { color: #fff; }
         .recipe-manage-hint {
             font-size: 0.8em;
-            color: #888;
-            margin-bottom: 12px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #3a3a5c;
+            color: #777;
+            padding: 10px 18px;
+            border-bottom: 1px solid #2a2a44;
+            flex-shrink: 0;
+        }
+        .recipe-manage-cat-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 18px 5px;
+            margin-top: 4px;
         }
         .recipe-manage-cat {
-            font-size: 0.75em;
+            font-size: 0.76em;
             text-transform: uppercase;
-            color: #666;
-            padding: 10px 0 4px;
-            letter-spacing: 0.5px;
+            color: #a78bfa;
+            letter-spacing: 0.6px;
+            font-weight: bold;
         }
+        .recipe-manage-cat-btns { display: flex; gap: 5px; }
+        .recipe-manage-cat-btn {
+            background: #1a1a30;
+            border: 1px solid #3a3a5c;
+            color: #888;
+            font-size: 0.72em;
+            padding: 2px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .recipe-manage-cat-btn:hover { color: #ccc; border-color: #5a5a8c; }
         .recipe-manage-item {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 5px 0;
-            font-size: 0.9em;
+            padding: 4px 18px 4px 30px;
+            font-size: 0.87em;
             color: #ccc;
             cursor: pointer;
         }
-        .recipe-manage-item:hover {
-            color: #fff;
-        }
+        .recipe-manage-item:hover { color: #fff; background: #1a1a30; }
         .recipe-manage-item input[type="checkbox"] {
-            accent-color: #ffd700;
-            width: 16px;
-            height: 16px;
+            accent-color: #a78bfa;
+            width: 14px;
+            height: 14px;
             cursor: pointer;
+            flex-shrink: 0;
         }
-        .recipe-manage-close {
-            width: 100%;
-            margin-top: 15px;
-            padding: 8px;
-            background: #3a3a5c;
-            border: none;
+        .recipe-manage-scroll { overflow-y: auto; flex: 1; padding-bottom: 12px; }
+        .proc-btn {
+            font-size: 0.68em;
+            padding: 1px 5px;
+            background: #2a1848;
+            border: 1px solid #5a3a8c;
+            border-radius: 3px;
+            color: #c4b5fd;
+            cursor: pointer;
+            margin-left: 6px;
+            vertical-align: middle;
+            line-height: 1.5;
+            font-family: inherit;
+        }
+        .proc-btn:hover { background: #3a2858; border-color: #7c6fcd; }
+        .proc-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 1100;
+            justify-content: center;
+            align-items: center;
+        }
+        .proc-overlay.open { display: flex; }
+        .proc-modal {
+            background: #1e1e38;
+            border: 1px solid #4a3a7c;
+            border-radius: 8px;
+            width: 560px;
+            max-width: 95vw;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.7);
+            overflow: hidden;
+        }
+        .proc-modal-hdr {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 13px 18px 11px;
+            border-bottom: 1px solid #3a3a5c;
+            background: #252540;
+        }
+        .proc-modal-title { font-size: 0.9em; color: #c4b5fd; font-weight: bold; }
+        .proc-modal-close-btn {
+            background: none; border: none; color: #666; font-size: 1.3em;
+            cursor: pointer; padding: 0 2px; line-height: 1;
+        }
+        .proc-modal-close-btn:hover { color: #fff; }
+        .proc-modal-body { padding: 16px 18px; }
+        .proc-input-row {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+        }
+        .proc-input-row label { font-size: 0.82em; color: #aaa; min-width: 72px; }
+        .proc-input-row input[type=number] {
+            background: #252540;
+            border: 1px solid #3a3a5c;
             border-radius: 4px;
-            color: #ccc;
+            color: #eee;
+            padding: 4px 8px;
+            font-size: 0.88em;
+            font-family: 'Consolas', monospace;
+            -moz-appearance: textfield;
+        }
+        .proc-input-row input[type=number]::-webkit-inner-spin-button,
+        .proc-input-row input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+        .proc-input-row input[type=number]:focus { outline: none; border-color: #7c6fcd; }
+        #proc-crafts { width: 90px; }
+        #proc-rate-input { width: 60px; }
+        [id^="proc-il-crafts-"] { width: 90px; }
+        .proc-stepper-wrap { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+        .proc-step-btn {
+            font-size: 0.75em;
+            padding: 3px 7px;
+            background: #252540;
+            border: 1px solid #3a3a5c;
+            border-radius: 3px;
+            color: #aaa;
             cursor: pointer;
-            font-size: 0.9em;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-family: 'Consolas', monospace;
+            line-height: 1.3;
         }
-        .recipe-manage-close:hover {
-            background: #4a4a6c;
-            color: #fff;
+        .proc-step-btn:hover { background: #2a2a50; border-color: #5a5a8c; color: #eee; }
+        .proc-reset-btn { color: #888; margin-left: 4px; font-family: inherit; font-size: 0.75em; }
+        .proc-il-rate-label { font-size: 0.7em; color: #a78bfa; font-weight: normal; margin-left: 6px; }
+        .proc-divider { border: none; border-top: 1px solid #2a2a44; margin: 10px 0; }
+        .proc-row {
+            display: flex; justify-content: space-between; align-items: baseline;
+            padding: 3px 0; font-size: 0.87em;
         }
+        .proc-row-lbl { color: #777; }
+        .proc-row-val { font-family: 'Consolas', monospace; color: #ccc; }
+        .proc-row.hl { background: #252540; border-radius: 4px; padding: 6px 10px; margin: 3px -10px; }
+        .proc-row.hl .proc-row-lbl { color: #aaa; }
+        .proc-row.hl .proc-row-val { color: #eee; }
         .recipe-item.recipe-hidden {
             display: none !important;
         }
@@ -1028,6 +1144,63 @@
             font-size: 0.76em;
         }
         .cd-set-btn:hover { background: #4a4a6c; }
+        /* ===== EVERYTHING TAB ===== */
+        .ev-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+        .ev-filter-btn { background: #1a1a30; border: 1px solid #3a3a5c; color: #a78bfa; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 0.82em; font-family: inherit; }
+        .ev-filter-btn:hover { background: #2a2a50; border-color: #7c6fcd; }
+        .ev-filter-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: flex-start; justify-content: center; padding-top: 60px; }
+        .ev-filter-overlay.open { display: flex; }
+        .ev-filter-modal { background: #1a1a2e; border: 1px solid #3a3a5c; border-radius: 8px; width: 440px; max-height: 75vh; display: flex; flex-direction: column; }
+        .ev-filter-hdr { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #2a2a44; }
+        .ev-filter-title { font-size: 0.9em; color: #c4b5fd; font-weight: bold; }
+        .ev-filter-close-btn { background: none; border: none; color: #aaa; cursor: pointer; font-size: 1.1em; padding: 0 4px; }
+        .ev-filter-close-btn:hover { color: #fff; }
+        .ev-filter-body { padding: 12px 16px; overflow-y: auto; flex: 1; }
+        .ev-filter-footer { padding: 10px 16px; border-top: 1px solid #2a2a44; display: flex; justify-content: flex-end; }
+        .ev-filter-reset-btn { background: #1a1a30; border: 1px solid #3a3a5c; color: #888; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 0.82em; font-family: inherit; }
+        .ev-filter-reset-btn:hover { color: #ccc; border-color: #5a5a8c; }
+        .ev-ftree-tab { margin-bottom: 10px; }
+        .ev-ftree-tab > label { display: flex; align-items: center; gap: 7px; color: #c4b5fd; font-weight: bold; font-size: 0.88em; cursor: pointer; }
+        .ev-ftree-cats { margin-left: 18px; margin-top: 5px; }
+        .ev-ftree-cat { margin-bottom: 5px; }
+        .ev-ftree-cat > label { display: flex; align-items: center; gap: 7px; color: #aaa; font-size: 0.84em; cursor: pointer; }
+        .ev-ftree-items { margin-left: 18px; margin-top: 3px; }
+        .ev-ftree-item label { display: flex; align-items: center; gap: 7px; color: #777; font-size: 0.81em; cursor: pointer; padding: 1px 0; }
+        .ev-ftree-item label:hover { color: #ccc; }
+        .ev-tab-badge { display: inline-block; font-size: 0.68em; padding: 1px 5px; border-radius: 3px; margin-left: 5px; vertical-align: middle; color: #777; background: #16162a; border: 1px solid #2a2a44; white-space: nowrap; }
+        .ev-section-hdr td { background: #1a1a35; color: #a78bfa; font-size: 0.78em; font-weight: bold; text-transform: uppercase; letter-spacing: 0.6px; padding: 7px 10px; border-top: 2px solid #3a3a5c; }
+        .ev-sort-btn, .ev-view-btn { /* inherit sort-btn styles */ }
+
+        /* ===== INGREDIENT SEARCH ===== */
+        .is-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.55); z-index: 2000; align-items: flex-start; justify-content: center; padding-top: 80px; }
+        .is-overlay.open { display: flex; }
+        .is-modal { background: #1a1a2e; border: 1px solid #3a3a5c; border-radius: 8px; width: 560px; max-height: 72vh; display: flex; flex-direction: column; }
+        .is-hdr { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #2a2a44; flex-shrink: 0; }
+        .is-title { font-size: 0.9em; color: #c4b5fd; font-weight: bold; }
+        .is-close-btn { background: none; border: none; color: #aaa; cursor: pointer; font-size: 1.2em; padding: 0 4px; line-height: 1; }
+        .is-close-btn:hover { color: #fff; }
+        .is-search-row { padding: 12px 16px; border-bottom: 1px solid #2a2a44; flex-shrink: 0; }
+        .is-search-row input { width: 100%; background: #0e0e1a; border: 1px solid #3a3a5c; border-radius: 4px; color: #eee; padding: 7px 10px; font-size: 0.9em; font-family: inherit; box-sizing: border-box; }
+        .is-search-row input:focus { outline: none; border-color: #7c6fcd; }
+        .is-results { overflow-y: auto; flex: 1; padding: 8px 0; }
+        .is-empty { color: #555; font-size: 0.84em; padding: 16px 18px; }
+        .is-item-group { margin-bottom: 2px; }
+        .is-recipe-row { border-bottom: 1px solid #1e1e35; cursor: pointer; }
+        .is-recipe-row:hover .is-recipe-hdr { background: #1e1e38; }
+        .is-recipe-hdr { display: flex; align-items: center; gap: 8px; padding: 7px 18px; }
+        .is-recipe-name { color: #ddd; font-size: 0.86em; flex: 1; }
+        .is-qty { color: #888; font-size: 0.8em; white-space: nowrap; }
+        .is-profit { font-size: 0.82em; white-space: nowrap; font-family: 'Consolas', monospace; }
+        .is-arrow { color: #555; font-size: 0.75em; margin-left: 2px; transition: transform 0.15s; }
+        .is-recipe-row.open .is-arrow { transform: rotate(90deg); }
+        .is-recipe-detail { display: none; padding: 8px 18px 10px 28px; background: #141428; border-bottom: 1px solid #1e1e35; }
+        .is-recipe-row.open .is-recipe-detail { display: block; }
+        .is-detail-ings { font-size: 0.8em; color: #888; margin-bottom: 6px; line-height: 1.7; }
+        .is-detail-ings span { color: #bbb; }
+        .is-detail-stats { display: flex; gap: 16px; font-size: 0.8em; color: #888; margin-bottom: 7px; }
+        .is-detail-stats b { color: #ccc; }
+        .is-goto-btn { background: #1a1a30; border: 1px solid #3a3a5c; color: #a78bfa; padding: 3px 10px; border-radius: 4px; cursor: pointer; font-size: 0.78em; font-family: inherit; }
+        .is-goto-btn:hover { background: #2a2a50; border-color: #7c6fcd; }
         </style>
 </head>
 <body>
@@ -1047,7 +1220,8 @@
         </div>
 
         <div class="tab-bar">
-            <button class="tab-btn active" data-tab="bags">Bags</button>
+            <button class="tab-btn" data-tab="everything">Everything</button>
+            <button class="tab-btn" data-tab="bags">Bags</button>
             <button class="tab-btn" data-tab="gear">Tailoring Gear</button>
             <button class="tab-btn" data-tab="alchemy">Alchemy</button>
             <button class="tab-btn" data-tab="transmutes">Transmutes / Dailies</button>
@@ -1069,6 +1243,9 @@
                 <button class="toolbar-btn toolbar-btn-reset" onclick="document.getElementById('global_export_output').value=''" title="Clear export field">Reset</button>
                 <button class="toolbar-btn" onclick="globalCopyExport()">Copy</button>
             </div>
+            <div class="toolbar-section" style="padding: 7px 8px;">
+                <button class="toolbar-btn" onclick="openIngSearch()" title="Search for an ingredient to see which recipes use it">&#128269; Ingredients</button>
+            </div>
             <div class="toolbar-section toolbar-reset">
                 <button class="toolbar-reset-btn" onclick="resetAHPrices()" title="Reset all AH-imported prices to 0. Preserves vendor prices, deposits and AH cut.">&#8635; Reset Prices</button>
             </div>
@@ -1079,6 +1256,50 @@
             <div id="cd-popup-box">
                 <div id="cd-popup-msg"></div>
                 <button id="cd-popup-ok" onclick="cdDismissPopup()">OK</button>
+            </div>
+        </div>
+
+        <!-- Ingredient Search modal -->
+        <div class="is-overlay" id="is-overlay">
+            <div class="is-modal">
+                <div class="is-hdr">
+                    <span class="is-title">Ingredient Search</span>
+                    <button class="is-close-btn" onclick="closeIngSearch()">&times;</button>
+                </div>
+                <div class="is-search-row">
+                    <input type="text" id="is-input" placeholder="Type an ingredient name..." oninput="runIngSearch()" autocomplete="off">
+                </div>
+                <div class="is-results" id="is-results">
+                    <div class="is-empty">Type an ingredient name to find which recipes use it.</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-everything" class="tab-content" style="display:none">
+            <div style="padding: 16px 20px;">
+                <div class="ev-toolbar">
+                    <div class="sort-toggle">
+                        <button class="sort-btn ev-sort-btn active" data-sort="profit" onclick="setEvSort('profit')">Gold</button>
+                        <button class="sort-btn ev-sort-btn" data-sort="pct" onclick="setEvSort('pct')">% Margin</button>
+                    </div>
+                    <div class="sort-toggle">
+                        <button class="sort-btn ev-view-btn active" data-view="flat" onclick="setEvView('flat')">Flat List</button>
+                        <button class="sort-btn ev-view-btn" data-view="sections" onclick="setEvView('sections')">By Section</button>
+                    </div>
+                    <button class="ev-filter-btn" onclick="openEvFilter()">&#9965; Filter</button>
+                </div>
+                <table class="alch-summary">
+                    <thead><tr>
+                        <th>Recipe</th>
+                        <th>Craft Cost</th>
+                        <th>Revenue</th>
+                        <th>Profit</th>
+                        <th>Margin</th>
+                        <th style="color:#a78bfa">Daily Sold</th>
+                        <th style="color:#a78bfa">Avg Price</th>
+                    </tr></thead>
+                    <tbody id="ev-body"></tbody>
+                </table>
             </div>
         </div>
 
@@ -1562,6 +1783,23 @@
         const TX_TSM_KEY = 'tbc_tx_tsm';
         const COOK_TSM_KEY = 'tbc_cook_tsm';
         var alchTsm = {}, gearTsm = {}, txTsm = {}, cookTsm = {};
+        const ALCH_PROC_KEY = 'tbc_alch_proc_rate';
+        const ALCH_BATCH_KEY = 'tbc_alch_batch';
+        const EV_SORT_KEY = 'tbc_ev_sort';
+        const EV_VIEW_KEY = 'tbc_ev_view';
+        const EV_HIDDEN_KEY = 'tbc_ev_hidden';
+        var alchProcRate = 20;
+        var alchBatchSize = 1;
+        var alchResults = [];
+        var gearResults = [];
+        var txSummaryRows = [];
+        var cookResults = [];
+        var bagsResults = [];
+        var evSortBy = 'profit';
+        var evView = 'flat';
+        var evHidden = {};
+        var evSections = [];
+        var procModalRecipeId = null;
 
         // ===== SORT STATE =====
         var alchSortBy = 'profit', gearSortBy = 'profit', txSortBy = 'profit', cookSortBy = 'profit';
@@ -1680,6 +1918,620 @@
                 }
                 return b[profitKey] - a[profitKey];
             });
+        }
+
+        function procStep(delta) {
+            var inp = document.getElementById('proc-crafts');
+            if (!inp) return;
+            inp.value = Math.max(1, (parseInt(inp.value) || 100) + delta);
+            procModalUpdate();
+        }
+
+        function procResetCrafts() {
+            var inp = document.getElementById('proc-crafts');
+            if (inp) inp.value = 100;
+            procModalUpdate();
+        }
+
+        function openProcModal(recipeId) {
+            procModalRecipeId = recipeId;
+            var r = ALCHEMY_RECIPES.find(function(x) { return x.id === recipeId; });
+            var titleEl = document.getElementById('proc-modal-title');
+            if (titleEl && r) titleEl.textContent = r.name;
+            var rateInput = document.getElementById('proc-rate-input');
+            if (rateInput) rateInput.value = alchProcRate;
+            var overlay = document.getElementById('proc-overlay');
+            if (overlay) overlay.classList.add('open');
+            procModalUpdate();
+        }
+
+        function closeProcModal() {
+            var overlay = document.getElementById('proc-overlay');
+            if (overlay) overlay.classList.remove('open');
+            procModalRecipeId = null;
+        }
+
+        function saveProcRate() {
+            var inp = document.getElementById('proc-rate-input');
+            alchProcRate = parseFloat((inp || {}).value) || 20;
+            localStorage.setItem(ALCH_PROC_KEY, alchProcRate);
+            procModalUpdate();
+            ALCHEMY_RECIPES.forEach(function(r) {
+                if (r.category !== 'transmute') procIlUpdate(r.id);
+            });
+        }
+
+        function renderProcResultsHTML(crafts, procRate, craftCost, revenuePerUnit) {
+            var totalCost = craftCost * crafts;
+            var extraYield = crafts * (procRate / 100);
+            var yieldWithProc = crafts + extraYield;
+            var profitNoProc   = (crafts * revenuePerUnit) - totalCost;
+            var profitWithProc = (yieldWithProc * revenuePerUnit) - totalCost;
+            var procBonus = profitWithProc - profitNoProc;
+            var marginNoProc   = totalCost > 0 ? (profitNoProc   / totalCost * 100).toFixed(1) + '%' : '—';
+            var marginWithProc = totalCost > 0 ? (profitWithProc / totalCost * 100).toFixed(1) + '%' : '—';
+            function pRow(lbl, val, hl) {
+                return '<div class="proc-row' + (hl ? ' hl' : '') + '"><span class="proc-row-lbl">' + lbl + '</span><span class="proc-row-val">' + val + '</span></div>';
+            }
+            function pgold(v) { return '<span class="' + profitClass(v) + '">' + (v >= 0 ? '+' : '') + gold(v) + '</span>'; }
+            return pRow('Input cost', gold(totalCost)) +
+                '<hr class="proc-divider">' +
+                '<div style="font-size:0.75em;color:#5a5a8c;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Without procs</div>' +
+                pRow('Yield', crafts + ' items') +
+                pRow('Profit', pgold(profitNoProc) + ' <span style="color:#555">(' + marginNoProc + ')</span>', true) +
+                '<hr class="proc-divider">' +
+                '<div style="font-size:0.75em;color:#5a3a8c;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">With procs on rate</div>' +
+                pRow('Expected yield', yieldWithProc.toFixed(1) + ' items <span style="color:#a78bfa">(+' + extraYield.toFixed(1) + ')</span>') +
+                pRow('Profit from bonus yield', pgold(procBonus)) +
+                '<hr class="proc-divider">' +
+                pRow('Profit', pgold(profitWithProc) + ' <span style="color:#555">(' + marginWithProc + ')</span>', true);
+        }
+
+        function procModalUpdate() {
+            var overlay = document.getElementById('proc-overlay');
+            if (!overlay || !overlay.classList.contains('open')) return;
+            var resultsEl = document.getElementById('proc-results');
+            if (!resultsEl) return;
+            var crafts = parseInt((document.getElementById('proc-crafts') || {}).value) || 100;
+            var r = alchResults.find(function(x) { return x.recipe.id === procModalRecipeId; });
+            if (!r) {
+                resultsEl.innerHTML = '<div style="color:#888;font-size:0.85em;padding:8px 0">Import prices first to see calculations.</div>';
+                return;
+            }
+            var ahCutPct = getVal('alch_ah_cut') / 100;
+            var revenuePerUnit = r.salePrice * (1 - ahCutPct);
+            resultsEl.innerHTML = renderProcResultsHTML(crafts, alchProcRate, r.craftCost, revenuePerUnit);
+        }
+
+        function procIlStep(recipeId, delta) {
+            var inp = document.getElementById('proc-il-crafts-' + recipeId);
+            if (!inp) return;
+            inp.value = Math.max(1, (parseInt(inp.value) || 100) + delta);
+            procIlUpdate(recipeId);
+        }
+
+        function procIlReset(recipeId) {
+            var inp = document.getElementById('proc-il-crafts-' + recipeId);
+            if (inp) inp.value = 100;
+            procIlUpdate(recipeId);
+        }
+
+        function procIlUpdate(recipeId) {
+            var resultsEl = document.getElementById('proc-il-results-' + recipeId);
+            if (!resultsEl) return;
+            var rateLabel = document.getElementById('proc-il-rate-label-' + recipeId);
+            if (rateLabel) rateLabel.textContent = 'at ' + alchProcRate + '% proc rate';
+            var craftsInp = document.getElementById('proc-il-crafts-' + recipeId);
+            var crafts = parseInt((craftsInp || {}).value) || 100;
+            var r = alchResults.find(function(x) { return x.recipe.id === recipeId; });
+            if (!r) {
+                resultsEl.innerHTML = '<div style="color:#888;font-size:0.85em;padding:8px 0">Import prices first to see calculations.</div>';
+                return;
+            }
+            var ahCutPct = getVal('alch_ah_cut') / 100;
+            var revenuePerUnit = r.salePrice * (1 - ahCutPct);
+            resultsEl.innerHTML = renderProcResultsHTML(crafts, alchProcRate, r.craftCost, revenuePerUnit);
+        }
+
+        // ===== EVERYTHING TAB =====
+
+        function buildEvSections() {
+            return [
+                {
+                    tabId: 'bags', tabLabel: 'Bags',
+                    cats: [
+                        { catId: 'bags_nw_bag', catLabel: 'Netherweave Bag', items: [{ id: 'bags_nw_bag', name: 'Netherweave Bag' }] },
+                        { catId: 'bags_imbued_bag', catLabel: 'Imbued Netherweave Bag', items: [{ id: 'bags_imbued_bag', name: 'Imbued Netherweave Bag' }] }
+                    ]
+                },
+                {
+                    tabId: 'gear', tabLabel: 'Tailoring Gear',
+                    cats: GEAR_CATEGORY_ORDER.map(function(cat) {
+                        return {
+                            catId: 'gear_' + cat.includes[0],
+                            catLabel: cat.label,
+                            items: GEAR_RECIPES.filter(function(r) { return cat.includes.indexOf(r.category) !== -1; })
+                                .map(function(r) { return { id: 'gear_' + r.id, name: r.name }; })
+                        };
+                    }).filter(function(cat) { return cat.items.length > 0; })
+                },
+                {
+                    tabId: 'alchemy', tabLabel: 'Alchemy',
+                    cats: CATEGORY_ORDER.map(function(cat) {
+                        return {
+                            catId: 'alch_' + cat.includes[0],
+                            catLabel: cat.label,
+                            items: ALCHEMY_RECIPES.filter(function(r) { return cat.includes.indexOf(r.category) !== -1; })
+                                .map(function(r) { return { id: 'alch_' + r.id, name: r.name }; })
+                        };
+                    }).filter(function(cat) { return cat.items.length > 0; })
+                },
+                {
+                    tabId: 'tx', tabLabel: 'Transmutes / Dailies',
+                    cats: [
+                        { catId: 'tx_mote_primal', catLabel: 'Mote \u2192 Primal',
+                          items: TX_PRIMALS.map(function(p) { return { id: 'tx_primal_' + p.id, name: p.primal }; }) },
+                        { catId: 'tx_planar', catLabel: 'Planar Essence',
+                          items: [{ id: 'tx_planar_essence', name: '3\u00d7 Lesser \u2192 Greater Planar' }] },
+                        { catId: 'tx_transmutes', catLabel: 'Transmutes',
+                          items: TRANSMUTE_RECIPES.map(function(r) { return { id: 'tx_' + r.id, name: r.name }; }) },
+                        { catId: 'tx_cloth', catLabel: 'Cloth Dailies',
+                          items: CLOTH_DAILIES.map(function(r) { return { id: 'tx_' + r.id, name: r.name }; }) }
+                    ]
+                },
+                {
+                    tabId: 'cooking', tabLabel: 'Cooking',
+                    cats: COOKING_CATEGORY_ORDER.map(function(cat) {
+                        return {
+                            catId: 'cook_' + cat.includes[0],
+                            catLabel: cat.label,
+                            items: COOKING_RECIPES.filter(function(r) { return cat.includes.indexOf(r.category) !== -1; })
+                                .map(function(r) { return { id: 'cook_' + r.id, name: r.name }; })
+                        };
+                    }).filter(function(cat) { return cat.items.length > 0; })
+                }
+            ];
+        }
+
+        function buildEvFilterHTML() {
+            var html = '';
+            evSections.forEach(function(section) {
+                var tabHid = !!evHidden['tab_' + section.tabId];
+                html += '<div class="ev-ftree-tab">';
+                html += '<label><input type="checkbox"' + (!tabHid ? ' checked' : '') + ' onchange="evToggleTab(\'' + section.tabId + '\')"> ' + section.tabLabel + '</label>';
+                html += '<div class="ev-ftree-cats">';
+                section.cats.forEach(function(cat) {
+                    var catHid = !!evHidden['cat_' + cat.catId];
+                    var catChecked = !tabHid && !catHid;
+                    html += '<div class="ev-ftree-cat">';
+                    html += '<label><input type="checkbox"' + (catChecked ? ' checked' : '') + (tabHid ? ' disabled' : '') + ' onchange="evToggleCat(\'' + cat.catId + '\')"> ' + cat.catLabel + '</label>';
+                    html += '<div class="ev-ftree-items">';
+                    cat.items.forEach(function(item) {
+                        var itemHid = !!evHidden['item_' + item.id];
+                        var itemChecked = !tabHid && !catHid && !itemHid;
+                        html += '<div class="ev-ftree-item"><label><input type="checkbox"' + (itemChecked ? ' checked' : '') + ((tabHid || catHid) ? ' disabled' : '') + ' onchange="evToggleItem(\'' + item.id + '\')"> ' + item.name + '</label></div>';
+                    });
+                    html += '</div></div>';
+                });
+                html += '</div></div>';
+            });
+            return html;
+        }
+
+        function evToggleTab(tabId) {
+            evHidden['tab_' + tabId] = !evHidden['tab_' + tabId];
+            evSaveHidden(); evRefreshFilter(); evCalculate();
+        }
+        function evToggleCat(catId) {
+            evHidden['cat_' + catId] = !evHidden['cat_' + catId];
+            evSaveHidden(); evRefreshFilter(); evCalculate();
+        }
+        function evToggleItem(itemId) {
+            evHidden['item_' + itemId] = !evHidden['item_' + itemId];
+            evSaveHidden(); evRefreshFilter(); evCalculate();
+        }
+        function evSaveHidden() { localStorage.setItem(EV_HIDDEN_KEY, JSON.stringify(evHidden)); }
+        function evRefreshFilter() {
+            var body = document.getElementById('ev-filter-body');
+            if (body) body.innerHTML = buildEvFilterHTML();
+        }
+        function openEvFilter() {
+            evRefreshFilter();
+            var ov = document.getElementById('ev-filter-overlay');
+            if (ov) ov.classList.add('open');
+        }
+        function closeEvFilter() {
+            var ov = document.getElementById('ev-filter-overlay');
+            if (ov) ov.classList.remove('open');
+        }
+        function evResetFilter() {
+            evHidden = {};
+            evSaveHidden(); evRefreshFilter(); evCalculate();
+        }
+        function setEvSort(by) {
+            evSortBy = by;
+            localStorage.setItem(EV_SORT_KEY, by);
+            document.querySelectorAll('.ev-sort-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sort === by); });
+            evCalculate();
+        }
+        function setEvView(view) {
+            evView = view;
+            localStorage.setItem(EV_VIEW_KEY, view);
+            document.querySelectorAll('.ev-view-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.view === view); });
+            evCalculate();
+        }
+        function evGetTsm(tsmTab, tsmId, field) {
+            var tsm = tsmTab === 'alch' ? alchTsm : tsmTab === 'gear' ? gearTsm : tsmTab === 'tx' ? txTsm : tsmTab === 'cook' ? cookTsm : null;
+            if (!tsm || !tsmId || !tsm[tsmId]) return null;
+            return tsm[tsmId][field] != null ? tsm[tsmId][field] : null;
+        }
+        function evRowHtml(row) {
+            var cls = profitClass(row.profit);
+            var pct = profitPctStr(row.profit, row.craftCost);
+            var daily = evGetTsm(row.tsmTab, row.tsmId, 'daily');
+            var avg = evGetTsm(row.tsmTab, row.tsmId, 'avgPrice');
+            return '<tr>' +
+                '<td>' + row.name + ' <span class="ev-tab-badge">' + row.tabLabel + '</span></td>' +
+                '<td>' + gold(row.craftCost) + '</td>' +
+                '<td>' + gold(row.revenue) + '</td>' +
+                '<td class="' + cls + '">' + (row.profit >= 0 ? '+' : '') + gold(row.profit) + '</td>' +
+                '<td class="' + cls + '">' + pct + '</td>' +
+                '<td>' + (daily != null ? daily : '\u2014') + '</td>' +
+                '<td>' + (avg != null ? gold(avg) : '\u2014') + '</td>' +
+            '</tr>';
+        }
+        function evCalculate() {
+            var body = document.getElementById('ev-body');
+            if (!body) return;
+            var rows = [];
+            var hidden = getHiddenRecipes();
+
+            // Bags
+            bagsResults.forEach(function(b) {
+                rows.push({ id: b.id, name: b.name, tab: 'bags', tabLabel: 'Bags', catId: b.id, catLabel: b.name, craftCost: b.craftCost, revenue: b.revenue, profit: b.profit, tsmTab: null, tsmId: null });
+            });
+
+            // Gear
+            var gearAhCut = getVal('gear_ah_cut') / 100;
+            gearResults.forEach(function(r) {
+                var catInfo = GEAR_CATEGORY_ORDER.find(function(c) { return c.includes.indexOf(r.recipe.category) !== -1; });
+                var catId = 'gear_' + (catInfo ? catInfo.includes[0] : r.recipe.category);
+                var catLabel = catInfo ? catInfo.label : r.recipe.category;
+                rows.push({ id: 'gear_' + r.recipe.id, name: r.recipe.name, tab: 'gear', tabLabel: 'Tailoring Gear', catId: catId, catLabel: catLabel, craftCost: r.craftCost, revenue: r.salePrice * (1 - gearAhCut), profit: r.profit, tsmTab: 'gear', tsmId: r.recipe.id });
+            });
+
+            // Alchemy
+            var alchAhCut = getVal('alch_ah_cut') / 100;
+            alchResults.forEach(function(r) {
+                if (hidden[r.recipe.id]) return;
+                var catInfo = CATEGORY_ORDER.find(function(c) { return c.includes.indexOf(r.recipe.category) !== -1; });
+                var catId = 'alch_' + (catInfo ? catInfo.includes[0] : r.recipe.category);
+                var catLabel = catInfo ? catInfo.label : r.recipe.category;
+                rows.push({ id: 'alch_' + r.recipe.id, name: r.recipe.name, tab: 'alchemy', tabLabel: 'Alchemy', catId: catId, catLabel: catLabel, craftCost: r.craftCost, revenue: r.salePrice * (1 - alchAhCut), profit: r.profit, tsmTab: 'alch', tsmId: r.recipe.id });
+            });
+
+            // Transmutes / Dailies
+            txSummaryRows.forEach(function(row) {
+                var catId, catLabel, itemId;
+                if (row.primalId) {
+                    catId = 'tx_mote_primal'; catLabel = 'Mote \u2192 Primal'; itemId = 'tx_primal_' + row.primalId;
+                } else if (row.recipeId === 'planar_essence') {
+                    catId = 'tx_planar'; catLabel = 'Planar Essence'; itemId = 'tx_planar_essence';
+                } else if (TRANSMUTE_RECIPES.some(function(r) { return r.id === row.recipeId; })) {
+                    catId = 'tx_transmutes'; catLabel = 'Transmutes'; itemId = 'tx_' + row.recipeId;
+                } else {
+                    catId = 'tx_cloth'; catLabel = 'Cloth Dailies'; itemId = 'tx_' + row.recipeId;
+                }
+                rows.push({ id: itemId, name: row.label, tab: 'tx', tabLabel: 'Transmutes / Dailies', catId: catId, catLabel: catLabel, craftCost: row.cost, revenue: row.revenue, profit: row.profit, tsmTab: 'tx', tsmId: row.recipeId });
+            });
+
+            // Cooking
+            var cookAhEl = document.getElementById('cook_ah_cut');
+            var cookAhCut = cookAhEl ? parseFloat(cookAhEl.value) / 100 : 0.05;
+            cookResults.forEach(function(r) {
+                var catInfo = COOKING_CATEGORY_ORDER.find(function(c) { return c.includes.indexOf(r.recipe.category) !== -1; });
+                var catId = 'cook_' + (catInfo ? catInfo.includes[0] : r.recipe.category);
+                var catLabel = catInfo ? catInfo.label : r.recipe.category;
+                rows.push({ id: 'cook_' + r.recipe.id, name: r.recipe.name, tab: 'cooking', tabLabel: 'Cooking', catId: catId, catLabel: catLabel, craftCost: r.craftCost, revenue: r.salePrice * (1 - cookAhCut), profit: r.profit, tsmTab: 'cook', tsmId: r.recipe.id });
+            });
+
+            // Apply filter
+            rows = rows.filter(function(row) {
+                return !evHidden['tab_' + row.tab] && !evHidden['cat_' + row.catId] && !evHidden['item_' + row.id];
+            });
+
+            // Render
+            if (evView === 'sections') {
+                var tabOrder = ['bags', 'gear', 'alchemy', 'tx', 'cooking'];
+                var html = '';
+                tabOrder.forEach(function(tabId) {
+                    var tabRows = rows.filter(function(r) { return r.tab === tabId; });
+                    if (!tabRows.length) return;
+                    sortResults(tabRows, evSortBy);
+                    html += '<tr class="ev-section-hdr"><td colspan="7">' + tabRows[0].tabLabel + '</td></tr>';
+                    tabRows.forEach(function(row) { html += evRowHtml(row); });
+                });
+                body.innerHTML = html;
+            } else {
+                sortResults(rows, evSortBy);
+                var html = '';
+                rows.forEach(function(row) { html += evRowHtml(row); });
+                body.innerHTML = html;
+            }
+        }
+
+        function evInit() {
+            evSections = buildEvSections();
+            var tab = document.getElementById('tab-everything');
+            if (!tab) return;
+            tab.insertAdjacentHTML('beforeend',
+                '<div class="ev-filter-overlay" id="ev-filter-overlay">' +
+                    '<div class="ev-filter-modal">' +
+                        '<div class="ev-filter-hdr">' +
+                            '<span class="ev-filter-title">Filter Recipes</span>' +
+                            '<button class="ev-filter-close-btn" onclick="closeEvFilter()">\u00d7</button>' +
+                        '</div>' +
+                        '<div class="ev-filter-body" id="ev-filter-body"></div>' +
+                        '<div class="ev-filter-footer">' +
+                            '<button class="ev-filter-reset-btn" onclick="evResetFilter()">Show All</button>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>'
+            );
+            document.getElementById('ev-filter-overlay').addEventListener('click', function(e) {
+                if (e.target.id === 'ev-filter-overlay') closeEvFilter();
+            });
+        }
+
+        // ===== INGREDIENT SEARCH =====
+
+        var ingSearchIndex = null;
+
+        function buildIngSearchIndex() {
+            var index = {};
+            function add(itemName, entry) {
+                var key = itemName.toLowerCase();
+                if (!index[key]) index[key] = { displayName: itemName, recipes: [] };
+                var dup = index[key].recipes.some(function(r) { return r.recipeId === entry.recipeId && r.tab === entry.tab; });
+                if (!dup) index[key].recipes.push(entry);
+            }
+
+            // Alchemy
+            ALCHEMY_RECIPES.forEach(function(r) {
+                r.ingredients.forEach(function(ing) {
+                    add(ing.item, { recipeId: r.id, recipeName: r.name, tab: 'alchemy', tabLabel: 'Alchemy', qty: ing.qty });
+                    if (ing.craftFrom && ing.craftFrom.item) {
+                        add(ing.craftFrom.item, { recipeId: r.id, recipeName: r.name, tab: 'alchemy', tabLabel: 'Alchemy', qty: ing.craftFrom.qty * ing.qty, viaItem: ing.item });
+                    }
+                });
+            });
+
+            // Gear
+            GEAR_RECIPES.forEach(function(r) {
+                r.ingredients.forEach(function(ing) {
+                    if (ing.type === 'bop') return;
+                    add(ing.item, { recipeId: r.id, recipeName: r.name, tab: 'gear', tabLabel: 'Tailoring Gear', qty: ing.qty });
+                    if (ing.craftFrom) {
+                        if (ing.craftFrom.item) {
+                            add(ing.craftFrom.item, { recipeId: r.id, recipeName: r.name, tab: 'gear', tabLabel: 'Tailoring Gear', qty: ing.craftFrom.qty * ing.qty, viaItem: ing.item });
+                        }
+                        if (ing.craftFrom.mats) {
+                            ing.craftFrom.mats.forEach(function(mat) {
+                                if (mat.type === 'vendor') return;
+                                add(mat.item, { recipeId: r.id, recipeName: r.name, tab: 'gear', tabLabel: 'Tailoring Gear', qty: mat.qty * ing.qty, viaItem: ing.item });
+                            });
+                        }
+                    }
+                });
+            });
+
+            // Cooking
+            COOKING_RECIPES.forEach(function(r) {
+                r.ingredients.forEach(function(ing) {
+                    add(ing.item, { recipeId: r.id, recipeName: r.name, tab: 'cooking', tabLabel: 'Cooking', qty: ing.qty });
+                });
+            });
+
+            // Transmute recipes
+            TRANSMUTE_RECIPES.forEach(function(r) {
+                r.ingredients.forEach(function(ing) {
+                    if (ing.type === 'primal') {
+                        var p = TX_PRIMALS.find(function(x) { return x.id === ing.primalId; });
+                        if (p) {
+                            add(p.primal, { recipeId: r.id, recipeName: r.name, tab: 'tx', tabLabel: 'Transmutes / Dailies', qty: ing.qty });
+                            add(p.mote, { recipeId: r.id, recipeName: r.name, tab: 'tx', tabLabel: 'Transmutes / Dailies', qty: ing.qty * 10, viaItem: p.primal });
+                        }
+                    } else if (ing.type === 'gem') {
+                        add(ing.item, { recipeId: r.id, recipeName: r.name, tab: 'tx', tabLabel: 'Transmutes / Dailies', qty: ing.qty });
+                    }
+                });
+            });
+
+            // Cloth dailies
+            CLOTH_DAILIES.forEach(function(r) {
+                r.ingredients.forEach(function(ing) {
+                    if (ing.type === 'imbued_bolt') {
+                        add('Bolt of Imbued Netherweave', { recipeId: r.id, recipeName: r.name, tab: 'tx', tabLabel: 'Transmutes / Dailies', qty: ing.qty });
+                        add('Bolt of Netherweave', { recipeId: r.id, recipeName: r.name, tab: 'tx', tabLabel: 'Transmutes / Dailies', qty: ing.qty * 3, viaItem: 'Bolt of Imbued Netherweave' });
+                        add('Netherweave Cloth', { recipeId: r.id, recipeName: r.name, tab: 'tx', tabLabel: 'Transmutes / Dailies', qty: ing.qty * 18, viaItem: 'Bolt of Imbued Netherweave' });
+                        add('Arcane Dust', { recipeId: r.id, recipeName: r.name, tab: 'tx', tabLabel: 'Transmutes / Dailies', qty: ing.qty * 2, viaItem: 'Bolt of Imbued Netherweave' });
+                    } else if (ing.type === 'primal') {
+                        var p = TX_PRIMALS.find(function(x) { return x.id === ing.primalId; });
+                        if (p) {
+                            add(p.primal, { recipeId: r.id, recipeName: r.name, tab: 'tx', tabLabel: 'Transmutes / Dailies', qty: ing.qty });
+                            add(p.mote, { recipeId: r.id, recipeName: r.name, tab: 'tx', tabLabel: 'Transmutes / Dailies', qty: ing.qty * 10, viaItem: p.primal });
+                        }
+                    }
+                });
+            });
+
+            // Bags (static)
+            var bagsIng = [
+                { item: 'Netherweave Cloth',         recipeId: 'bags_nw_bag',     recipeName: 'Netherweave Bag',         qty: 24 },
+                { item: 'Rune Thread',               recipeId: 'bags_nw_bag',     recipeName: 'Netherweave Bag',         qty: 1  },
+                { item: 'Bolt of Netherweave',       recipeId: 'bags_nw_bag',     recipeName: 'Netherweave Bag',         qty: 4  },
+                { item: 'Netherweave Cloth',         recipeId: 'bags_imbued_bag', recipeName: 'Imbued Netherweave Bag',  qty: 72 },
+                { item: 'Arcane Dust',               recipeId: 'bags_imbued_bag', recipeName: 'Imbued Netherweave Bag',  qty: 8  },
+                { item: 'Netherweb Spider Silk',     recipeId: 'bags_imbued_bag', recipeName: 'Imbued Netherweave Bag',  qty: 2  },
+                { item: 'Lesser Planar Essence',     recipeId: 'bags_imbued_bag', recipeName: 'Imbued Netherweave Bag',  qty: 3  },
+                { item: 'Bolt of Netherweave',       recipeId: 'bags_imbued_bag', recipeName: 'Imbued Netherweave Bag',  qty: 12 },
+                { item: 'Bolt of Imbued Netherweave',recipeId: 'bags_imbued_bag', recipeName: 'Imbued Netherweave Bag',  qty: 4  },
+                { item: 'Greater Planar Essence',    recipeId: 'bags_imbued_bag', recipeName: 'Imbued Netherweave Bag',  qty: 1  }
+            ];
+            bagsIng.forEach(function(b) {
+                add(b.item, { recipeId: b.recipeId, recipeName: b.recipeName, tab: 'bags', tabLabel: 'Bags', qty: b.qty });
+            });
+
+            return index;
+        }
+
+        function ingGetProfit(tab, recipeId) {
+            if (tab === 'alchemy') {
+                var r = alchResults.find(function(x) { return x.recipe.id === recipeId; });
+                return r ? r.profit : null;
+            } else if (tab === 'gear') {
+                var r = gearResults.find(function(x) { return x.recipe.id === recipeId; });
+                return r ? r.profit : null;
+            } else if (tab === 'cooking') {
+                var r = cookResults.find(function(x) { return x.recipe.id === recipeId; });
+                return r ? r.profit : null;
+            } else if (tab === 'tx') {
+                var r = txSummaryRows.find(function(x) { return x.recipeId === recipeId; });
+                return r ? r.profit : null;
+            } else if (tab === 'bags') {
+                var r = bagsResults.find(function(x) { return x.id === recipeId; });
+                return r ? r.profit : null;
+            }
+            return null;
+        }
+
+        function ingGetIngredients(tab, recipeId) {
+            if (tab === 'alchemy') {
+                var r = ALCHEMY_RECIPES.find(function(x) { return x.id === recipeId; });
+                if (!r) return [];
+                return r.ingredients.map(function(ing) {
+                    return ing.qty + '\u00d7 ' + ing.item + (ing.type === 'vendor' ? ' (vendor)' : ing.type === 'bop' ? ' (BOP)' : '');
+                });
+            } else if (tab === 'gear') {
+                var r = GEAR_RECIPES.find(function(x) { return x.id === recipeId; });
+                if (!r) return [];
+                return r.ingredients.map(function(ing) {
+                    return ing.qty + '\u00d7 ' + ing.item + (ing.type === 'vendor' ? ' (vendor)' : ing.type === 'bop' ? ' (BOP)' : '');
+                });
+            } else if (tab === 'cooking') {
+                var r = COOKING_RECIPES.find(function(x) { return x.id === recipeId; });
+                if (!r) return [];
+                return r.ingredients.map(function(ing) {
+                    return ing.qty + '\u00d7 ' + ing.item + (ing.type === 'vendor' ? ' (vendor)' : '');
+                });
+            } else if (tab === 'tx') {
+                var r = TRANSMUTE_RECIPES.find(function(x) { return x.id === recipeId; });
+                if (!r) r = CLOTH_DAILIES.find(function(x) { return x.id === recipeId; });
+                if (!r) return [];
+                return r.ingredients.map(function(ing) {
+                    if (ing.type === 'primal') {
+                        var p = TX_PRIMALS.find(function(x) { return x.id === ing.primalId; });
+                        return ing.qty + '\u00d7 ' + (p ? p.primal : ing.item);
+                    } else if (ing.type === 'imbued_bolt') {
+                        return ing.qty + '\u00d7 Bolt of Imbued Netherweave';
+                    }
+                    return ing.qty + '\u00d7 ' + ing.item;
+                });
+            } else if (tab === 'bags') {
+                if (recipeId === 'bags_nw_bag') return ['4\u00d7 Bolt of Netherweave', '1\u00d7 Rune Thread (vendor)'];
+                if (recipeId === 'bags_imbued_bag') return ['4\u00d7 Bolt of Imbued Netherweave', '2\u00d7 Netherweb Spider Silk', '1\u00d7 Greater Planar Essence'];
+            }
+            return [];
+        }
+
+        function ingGotoRecipe(tab, recipeId) {
+            closeIngSearch();
+            switchTab(tab);
+            if (tab === 'alchemy') alchSelectRecipe(recipeId);
+            else if (tab === 'gear') gearSelectRecipe(recipeId);
+            else if (tab === 'tx') txSelectRecipe(recipeId);
+            else if (tab === 'cooking') cookSelectRecipe(recipeId);
+        }
+
+        function openIngSearch() {
+            if (!ingSearchIndex) ingSearchIndex = buildIngSearchIndex();
+            var ov = document.getElementById('is-overlay');
+            if (ov) ov.classList.add('open');
+            var inp = document.getElementById('is-input');
+            if (inp) { inp.value = ''; inp.focus(); }
+            document.getElementById('is-results').innerHTML = '<div class="is-empty">Type an ingredient name to find which recipes use it.</div>';
+        }
+
+        function closeIngSearch() {
+            var ov = document.getElementById('is-overlay');
+            if (ov) ov.classList.remove('open');
+        }
+
+        function runIngSearch() {
+            var query = (document.getElementById('is-input').value || '').trim().toLowerCase();
+            var resultsEl = document.getElementById('is-results');
+            if (!query) {
+                resultsEl.innerHTML = '<div class="is-empty">Type an ingredient name to find which recipes use it.</div>';
+                return;
+            }
+            var matches = [];
+            for (var key in ingSearchIndex) {
+                if (key.indexOf(query) !== -1) matches.push(ingSearchIndex[key]);
+            }
+            matches.sort(function(a, b) {
+                var ai = a.displayName.toLowerCase().indexOf(query);
+                var bi = b.displayName.toLowerCase().indexOf(query);
+                if (ai !== bi) return ai - bi;
+                return a.displayName.localeCompare(b.displayName);
+            });
+            if (!matches.length) {
+                resultsEl.innerHTML = '<div class="is-empty">No ingredients found matching \u201c' + query + '\u201d.</div>';
+                return;
+            }
+            var html = '';
+            matches.forEach(function(item) {
+                html += '<div class="is-item-group">';
+                html += '<div style="padding:6px 18px 3px;font-size:0.78em;color:#a78bfa;font-weight:bold;letter-spacing:0.3px;text-transform:uppercase;">' + item.displayName + '</div>';
+                item.recipes.forEach(function(rec) {
+                    var profit = ingGetProfit(rec.tab, rec.recipeId);
+                    var profitHtml = profit !== null
+                        ? '<span class="is-profit ' + profitClass(profit) + '">' + (profit >= 0 ? '+' : '') + gold(profit) + '</span>'
+                        : '<span class="is-profit" style="color:#555">—</span>';
+                    var viaHtml = rec.viaItem ? ' <span style="color:#555;font-size:0.78em">via ' + rec.viaItem + '</span>' : '';
+                    var ings = ingGetIngredients(rec.tab, rec.recipeId);
+                    var ingListHtml = ings.map(function(i) { return '<span>' + i + '</span>'; }).join(' &nbsp;·&nbsp; ');
+                    var craftCostVal = null;
+                    if (rec.tab === 'alchemy') { var rx = alchResults.find(function(x){return x.recipe.id===rec.recipeId;}); if(rx) craftCostVal = rx.craftCost; }
+                    else if (rec.tab === 'gear') { var rx = gearResults.find(function(x){return x.recipe.id===rec.recipeId;}); if(rx) craftCostVal = rx.craftCost; }
+                    else if (rec.tab === 'cooking') { var rx = cookResults.find(function(x){return x.recipe.id===rec.recipeId;}); if(rx) craftCostVal = rx.craftCost; }
+                    else if (rec.tab === 'tx') { var rx = txSummaryRows.find(function(x){return x.recipeId===rec.recipeId;}); if(rx) craftCostVal = rx.cost; }
+                    else if (rec.tab === 'bags') { var rx = bagsResults.find(function(x){return x.id===rec.recipeId;}); if(rx) craftCostVal = rx.craftCost; }
+                    var statsHtml = craftCostVal !== null
+                        ? '<div class="is-detail-stats"><span>Cost: <b>' + gold(craftCostVal) + '</b></span><span>Profit: <b>' + (profit !== null ? (profit>=0?'+':'') + gold(profit) : '\u2014') + '</b></span></div>'
+                        : '';
+                    var gotoTab = rec.tab === 'bags' ? 'bags' : rec.tab;
+                    var gotoId = rec.tab === 'bags' ? '' : rec.recipeId;
+                    var gotoBtnHtml = gotoId
+                        ? '<button class="is-goto-btn" onclick="ingGotoRecipe(\'' + gotoTab + '\',\'' + gotoId + '\');event.stopPropagation();">\u2192 Go to recipe</button>'
+                        : '<button class="is-goto-btn" onclick="ingGotoRecipe(\'' + gotoTab + '\',\'\');event.stopPropagation();">\u2192 Go to tab</button>';
+                    html += '<div class="is-recipe-row" onclick="this.classList.toggle(\'open\')">' +
+                        '<div class="is-recipe-hdr">' +
+                            '<span class="is-recipe-name">' + rec.recipeName + viaHtml + '</span>' +
+                            '<span class="ev-tab-badge">' + rec.tabLabel + '</span>' +
+                            '<span class="is-qty">\u00d7' + rec.qty + '</span>' +
+                            profitHtml +
+                            '<span class="is-arrow">\u25b6</span>' +
+                        '</div>' +
+                        '<div class="is-recipe-detail">' +
+                            '<div class="is-detail-ings">' + ingListHtml + '</div>' +
+                            statsHtml +
+                            gotoBtnHtml +
+                        '</div>' +
+                    '</div>';
+                });
+                html += '</div>';
+            });
+            resultsEl.innerHTML = html;
         }
 
         function buildAhInputMap() {
@@ -3028,7 +3880,7 @@
         var CD_KEY = 'tbc_cooldowns';
         var CD_DURATIONS = {
             cloth:     (3 * 24 * 60 + 20) * 60 * 1000,  // 3d 20h
-            transmute: 24 * 60 * 60 * 1000               // 1d
+            transmute: 20 * 60 * 60 * 1000               // 20h
         };
 
         function cdLoad() {
@@ -3343,6 +4195,12 @@
             var verdictEl = document.getElementById('band_verdict');
             verdictEl.innerHTML = '<span class="profit">' + clothOptions[0].name + '</span> <span style="color:#888; font-size:0.85em;">(' + (clothOptions[0].val >= 0 ? '+' : '') + gold(clothOptions[0].val) + '/cloth)</span>';
 
+            // Expose bags results for Everything tab
+            bagsResults = [
+                { id: 'bags_nw_bag', name: 'Netherweave Bag', craftCost: nbtOptimalCost, revenue: nwBagSale * (1 - ahCutPct), profit: nbdProfitOptimal },
+                { id: 'bags_imbued_bag', name: 'Imbued Netherweave Bag', craftCost: bdOptimalCost, revenue: imbuedBagSale * (1 - ahCutPct), profit: bdProfitOptimal }
+            ];
+            evCalculate();
             saveToStorage();
         }
 
@@ -3378,6 +4236,27 @@
             '</div>';
         }
 
+        function setAlchBatch(size) {
+            alchBatchSize = size;
+            localStorage.setItem(ALCH_BATCH_KEY, size);
+            document.querySelectorAll('.alch-batch-btn').forEach(function(b) {
+                b.classList.toggle('active', parseInt(b.dataset.batch) === size);
+            });
+            var costHdr = document.getElementById('alch-hdr-cost');
+            var revHdr  = document.getElementById('alch-hdr-revenue');
+            var noteEl  = document.getElementById('alch-batch-note');
+            if (size === 1) {
+                if (costHdr) costHdr.textContent = 'Craft Cost';
+                if (revHdr)  revHdr.textContent  = 'Sale Price';
+                if (noteEl)  noteEl.textContent   = '';
+            } else {
+                if (costHdr) costHdr.textContent = 'Total Cost';
+                if (revHdr)  revHdr.textContent  = 'Total Revenue';
+                if (noteEl)  noteEl.textContent   = '\u00d7' + size + ' crafts \u00b7 ' + alchProcRate + '% proc';
+            }
+            alchCalculate();
+        }
+
         // ===== ALCHEMY: RECIPE VISIBILITY =====
         function getHiddenRecipes() {
             try { return JSON.parse(localStorage.getItem(ALCH_HIDDEN_KEY)) || {}; }
@@ -3401,19 +4280,45 @@
             alchCalculate();
         }
 
+        function toggleManageCat(includesStr, doHide) {
+            var includes = includesStr.split(',');
+            var hidden = getHiddenRecipes();
+            ALCHEMY_RECIPES.filter(function(r) {
+                return includes.indexOf(r.category) !== -1;
+            }).forEach(function(r) {
+                if (doHide) hidden[r.id] = true;
+                else delete hidden[r.id];
+                var cb = document.querySelector('[data-recipe-manage="' + r.id + '"]');
+                if (cb) cb.checked = !doHide;
+            });
+            setHiddenRecipes(hidden);
+            applyHiddenRecipes();
+        }
+
         function buildManageRecipesHTML() {
             var hidden = getHiddenRecipes();
             var html = '<div class="recipe-manage-overlay" id="recipe-manage-overlay">' +
                 '<div class="recipe-manage-modal">' +
-                '<h2>Manage Recipes</h2>' +
-                '<div class="recipe-manage-hint">Uncheck recipes you haven\'t unlocked yet.</div>';
+                '<div class="recipe-manage-hdr">' +
+                    '<h2>Manage Recipes</h2>' +
+                    '<button class="recipe-manage-close" id="recipe-manage-close">\u00d7</button>' +
+                '</div>' +
+                '<div class="recipe-manage-hint">Uncheck recipes you haven\'t unlocked yet.</div>' +
+                '<div class="recipe-manage-scroll">';
 
             CATEGORY_ORDER.forEach(function(cat) {
                 var recipes = ALCHEMY_RECIPES.filter(function(r) {
                     return cat.includes.indexOf(r.category) !== -1;
                 });
                 if (recipes.length === 0) return;
-                html += '<div class="recipe-manage-cat">' + cat.label + '</div>';
+                var incStr = cat.includes.join(',');
+                html += '<div class="recipe-manage-cat-row">' +
+                    '<span class="recipe-manage-cat">' + cat.label + '</span>' +
+                    '<span class="recipe-manage-cat-btns">' +
+                        '<button class="recipe-manage-cat-btn" onclick="toggleManageCat(\'' + incStr + '\', false)">All</button>' +
+                        '<button class="recipe-manage-cat-btn" onclick="toggleManageCat(\'' + incStr + '\', true)">None</button>' +
+                    '</span>' +
+                '</div>';
                 recipes.forEach(function(r) {
                     var checked = !hidden[r.id] ? ' checked' : '';
                     html += '<label class="recipe-manage-item">' +
@@ -3423,8 +4328,7 @@
                 });
             });
 
-            html += '<button class="recipe-manage-close" id="recipe-manage-close">Done</button>';
-            html += '</div></div>';
+            html += '</div></div></div>';
             return html;
         }
 
@@ -3459,15 +4363,23 @@
 
         function buildAllViewHTML() {
             return '<div id="alch-view-all">' +
-                '<div class="tier-label">Profit Overview <span class="sort-toggle">' +
-                    '<button id="alch-sort-profit" class="sort-btn active" onclick="setSortBy(\'alch\',\'profit\')">Gold</button>' +
-                    '<button id="alch-sort-pct" class="sort-btn" onclick="setSortBy(\'alch\',\'pct\')">% Margin</button>' +
-                '</span></div>' +
+                '<div class="tier-label">Profit Overview ' +
+                    '<span class="sort-toggle">' +
+                        '<button id="alch-sort-profit" class="sort-btn active" onclick="setSortBy(\'alch\',\'profit\')">Gold</button>' +
+                        '<button id="alch-sort-pct" class="sort-btn" onclick="setSortBy(\'alch\',\'pct\')">% Margin</button>' +
+                    '</span>' +
+                    '<span class="sort-toggle" style="margin-left:12px"><span style="font-size:0.72em;color:#888;margin-right:5px">Batch</span>' +
+                        '<button class="sort-btn alch-batch-btn active" data-batch="1" onclick="setAlchBatch(1)">\u00d71</button>' +
+                        '<button class="sort-btn alch-batch-btn" data-batch="100" onclick="setAlchBatch(100)">\u00d7100</button>' +
+                        '<button class="sort-btn alch-batch-btn" data-batch="1000" onclick="setAlchBatch(1000)">\u00d71000</button>' +
+                    '</span>' +
+                    '<span id="alch-batch-note" style="font-size:0.72em;color:#a78bfa;margin-left:8px"></span>' +
+                '</div>' +
                 '<table class="alch-summary">' +
                     '<thead><tr>' +
                         '<th>Recipe</th>' +
-                        '<th>Craft Cost</th>' +
-                        '<th>Sale Price</th>' +
+                        '<th id="alch-hdr-cost">Craft Cost</th>' +
+                        '<th id="alch-hdr-revenue">Sale Price</th>' +
                         '<th>Profit</th>' +
                         '<th>Margin</th>' +
                         '<th style="color:#a78bfa">Daily Sold</th>' +
@@ -3527,7 +4439,29 @@
             '</div>';
             html += '<div class="deposit-note" id="alch_' + recipe.id + '_deposit_note">-</div>';
 
-            html += '</div></div>';
+            html += '</div>';
+
+            if (recipe.category !== 'transmute') {
+                html += '<div class="card">' +
+                    '<h3>Proc Calculator <span class="proc-il-rate-label" id="proc-il-rate-label-' + recipe.id + '">at ' + alchProcRate + '% proc rate</span></h3>' +
+                    '<div class="proc-input-row">' +
+                        '<label>Crafts</label>' +
+                        '<div class="proc-stepper-wrap">' +
+                            '<button class="proc-step-btn" onclick="procIlStep(\'' + recipe.id + '\',-100)">−100</button>' +
+                            '<button class="proc-step-btn" onclick="procIlStep(\'' + recipe.id + '\',-10)">−10</button>' +
+                            '<button class="proc-step-btn" onclick="procIlStep(\'' + recipe.id + '\',-1)">−1</button>' +
+                            '<input type="number" id="proc-il-crafts-' + recipe.id + '" value="100" min="1" step="1" oninput="procIlUpdate(\'' + recipe.id + '\')">' +
+                            '<button class="proc-step-btn" onclick="procIlStep(\'' + recipe.id + '\',1)">+1</button>' +
+                            '<button class="proc-step-btn" onclick="procIlStep(\'' + recipe.id + '\',10)">+10</button>' +
+                            '<button class="proc-step-btn" onclick="procIlStep(\'' + recipe.id + '\',100)">+100</button>' +
+                            '<button class="proc-step-btn proc-reset-btn" onclick="procIlReset(\'' + recipe.id + '\')">Reset</button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div id="proc-il-results-' + recipe.id + '"></div>' +
+                '</div>';
+            }
+
+            html += '</div>';
             return html;
         }
 
@@ -3665,6 +4599,35 @@
 
             // Add manage recipes modal overlay
             document.getElementById('tab-alchemy').insertAdjacentHTML('beforeend', buildManageRecipesHTML());
+            document.getElementById('tab-alchemy').insertAdjacentHTML('beforeend',
+                '<div class="proc-overlay" id="proc-overlay">' +
+                '<div class="proc-modal">' +
+                    '<div class="proc-modal-hdr">' +
+                        '<span class="proc-modal-title" id="proc-modal-title">Proc Calculator</span>' +
+                        '<button class="proc-modal-close-btn" id="proc-modal-close-btn">\u00d7</button>' +
+                    '</div>' +
+                    '<div class="proc-modal-body">' +
+                        '<div class="proc-input-row">' +
+                            '<label>Crafts</label>' +
+                            '<div class="proc-stepper-wrap">' +
+                                '<button class="proc-step-btn" onclick="procStep(-100)">−100</button>' +
+                                '<button class="proc-step-btn" onclick="procStep(-10)">−10</button>' +
+                                '<button class="proc-step-btn" onclick="procStep(-1)">−1</button>' +
+                                '<input type="number" id="proc-crafts" value="100" min="1" step="1" oninput="procModalUpdate()">' +
+                                '<button class="proc-step-btn" onclick="procStep(1)">+1</button>' +
+                                '<button class="proc-step-btn" onclick="procStep(10)">+10</button>' +
+                                '<button class="proc-step-btn" onclick="procStep(100)">+100</button>' +
+                                '<button class="proc-step-btn proc-reset-btn" onclick="procResetCrafts()">Reset</button>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="proc-input-row">' +
+                            '<label>Proc Rate</label>' +
+                            '<input type="number" id="proc-rate-input" value="20" min="0" max="200" step="1" oninput="saveProcRate()">' +
+                            '<span style="color:#666;font-size:0.8em">% extra yield</span>' +
+                        '</div>' +
+                        '<div id="proc-results"></div>' +
+                    '</div>' +
+                '</div></div>');
         }
 
         // ===== ALCHEMY: IMPORT =====
@@ -3821,19 +4784,43 @@
                 results.push({ recipe: r, craftCost: craftCost, salePrice: salePrice, profit: profit });
             });
 
+            alchResults = results;
+            procModalUpdate();
+            results.forEach(function(r) {
+                if (r.recipe.category !== 'transmute') procIlUpdate(r.recipe.id);
+            });
+            evCalculate();
             // Update "All" summary view, sorted by profit (best first), excluding hidden recipes
             var hidden = getHiddenRecipes();
             var visibleResults = results.filter(function(r) { return !hidden[r.recipe.id]; });
-            sortResults(visibleResults, alchSortBy);
+            var batchAhCutPct = getVal('alch_ah_cut') / 100;
+            if (alchBatchSize > 1) {
+                visibleResults.forEach(function(r) {
+                    var procMult = r.recipe.category !== 'transmute' ? (1 + alchProcRate / 100) : 1;
+                    r._batchCost   = r.craftCost * alchBatchSize;
+                    r._batchProfit = r.salePrice * (1 - batchAhCutPct) * alchBatchSize * procMult - r._batchCost;
+                });
+                sortResults(visibleResults, alchSortBy, '_batchProfit', '_batchCost');
+            } else {
+                sortResults(visibleResults, alchSortBy);
+            }
             var tbody = '';
             visibleResults.forEach(function(r) {
-                var cls = profitClass(r.profit);
-                var pct = profitPctStr(r.profit, r.craftCost);
+                var isProcRecipe = r.recipe.category !== 'transmute';
+                var procMult = (alchBatchSize > 1 && isProcRecipe) ? (1 + alchProcRate / 100) : 1;
+                var displayCost   = r.craftCost * alchBatchSize;
+                var displayRev    = alchBatchSize === 1 ? r.salePrice : r.salePrice * (1 - batchAhCutPct) * alchBatchSize * procMult;
+                var displayProfit = alchBatchSize === 1 ? r.profit : displayRev - displayCost;
+                var cls = profitClass(displayProfit);
+                var pct = profitPctStr(displayProfit, displayCost);
+                var procBtnHtml = isProcRecipe
+                    ? '<button class="proc-btn" data-recipe="' + r.recipe.id + '" onclick="openProcModal(\'' + r.recipe.id + '\');event.stopPropagation()">Proc</button>'
+                    : '';
                 tbody += '<tr class="alch-summary-row" data-recipe="' + r.recipe.id + '">' +
-                    '<td>' + stalenessDotHtml(getAlchRecipeStalenessInputs(r.recipe)) + r.recipe.name + '</td>' +
-                    '<td>' + gold(r.craftCost) + '</td>' +
-                    '<td>' + gold(r.salePrice) + '</td>' +
-                    '<td class="' + cls + '">' + (r.profit >= 0 ? '+' : '') + gold(r.profit) + '</td>' +
+                    '<td>' + stalenessDotHtml(getAlchRecipeStalenessInputs(r.recipe)) + r.recipe.name + procBtnHtml + '</td>' +
+                    '<td>' + gold(displayCost) + '</td>' +
+                    '<td>' + gold(displayRev) + '</td>' +
+                    '<td class="' + cls + '">' + (displayProfit >= 0 ? '+' : '') + gold(displayProfit) + '</td>' +
                     '<td class="' + cls + '">' + pct + '</td>' +
                     '<td onclick="event.stopPropagation()">' + tsmInputHtml(alchTsm, r.recipe.id, 'daily', 'alch') + '</td>' +
                     '<td onclick="event.stopPropagation()">' + tsmInputHtml(alchTsm, r.recipe.id, 'avgPrice', 'alch') + '</td>' +
@@ -4225,6 +5212,7 @@
                 results.push({ recipe: r, craftCost: craftCost, salePrice: salePrice, profit: profit });
             });
 
+            gearResults = results;
             sortResults(results, gearSortBy);
             var tbody = '';
             results.forEach(function(r) {
@@ -4246,6 +5234,7 @@
             }
 
             gearSaveToStorage();
+            evCalculate();
         }
 
         // ===== GEAR: RECIPE SELECTION =====
@@ -4645,7 +5634,8 @@
             var imbuedBest     = Math.min(imbuedBoltAH, imbuedCraft);
             var useImbuedCraft = imbuedCraft < imbuedBoltAH;
 
-            var summaryRows = [];
+            txSummaryRows = [];
+            var summaryRows = txSummaryRows;
 
             // === MOTE → PRIMAL TABLE ===
             var primalDeposit = txGet('tx_deposit_primal');
@@ -4828,6 +5818,7 @@
             }
 
             txSaveToStorage();
+            evCalculate();
         }
 
         // ===== TRANSMUTES / DAILIES: SELECT =====
@@ -5235,6 +6226,7 @@
                 results.push({ recipe: r, craftCost: craftCost, salePrice: salePrice, profit: profit });
             });
 
+            cookResults = results;
             sortResults(results, cookSortBy);
             var tbody = '';
             results.forEach(function(r) {
@@ -5260,6 +6252,7 @@
             }
 
             cookSaveToStorage();
+            evCalculate();
         }
 
         // ===== COOKING: SELECT =====
@@ -5423,6 +6416,7 @@
         loadFromStorage();
 
         // 2. Generate alchemy UI, gear UI, and transmutes/dailies UI
+        evInit();
         alchInit();
         gearInit();
         txInit();
@@ -5529,6 +6523,11 @@
             // Click overlay background to close
             if (e.target.id === 'recipe-manage-overlay') {
                 e.target.classList.remove('open');
+                return;
+            }
+
+            if (e.target.id === 'proc-modal-close-btn' || e.target.id === 'proc-overlay') {
+                closeProcModal();
                 return;
             }
 
@@ -5703,6 +6702,11 @@
         // 6. Load staleness data, TSM notes, and build AH input map before first calculate
         try { priceTimestamps = JSON.parse(localStorage.getItem(PRICE_TIMESTAMPS_KEY) || '{}'); } catch(e) { priceTimestamps = {}; }
         lastImportBatchTime = parseInt(localStorage.getItem(LAST_IMPORT_BATCH_KEY) || '0') || 0;
+        alchProcRate  = parseFloat(localStorage.getItem(ALCH_PROC_KEY)  || '20') || 20;
+        alchBatchSize = parseInt(localStorage.getItem(ALCH_BATCH_KEY) || '1')  || 1;
+        evSortBy = localStorage.getItem(EV_SORT_KEY) || 'profit';
+        evView = localStorage.getItem(EV_VIEW_KEY) || 'flat';
+        try { evHidden = JSON.parse(localStorage.getItem(EV_HIDDEN_KEY) || '{}'); } catch(e) { evHidden = {}; }
         try { alchTsm = JSON.parse(localStorage.getItem(ALCH_TSM_KEY) || '{}'); } catch(e) { alchTsm = {}; }
         try { gearTsm = JSON.parse(localStorage.getItem(GEAR_TSM_KEY) || '{}'); } catch(e) { gearTsm = {}; }
         try { txTsm = JSON.parse(localStorage.getItem(TX_TSM_KEY) || '{}'); } catch(e) { txTsm = {}; }
@@ -5712,6 +6716,7 @@
         // 7. Initial calculations (summary row dots use timestamps loaded above)
         calculate();
         alchCalculate();
+        if (alchBatchSize !== 1) setAlchBatch(alchBatchSize);
         gearCalculate();
         txCalculate();
         cookCalculate();
@@ -5719,8 +6724,15 @@
         // 8. Inject price-row staleness dots (after DOM is fully built by init + calculate)
         injectStalenessDotsToRows();
 
+        document.getElementById('is-overlay').addEventListener('click', function(e) {
+            if (e.target.id === 'is-overlay') closeIngSearch();
+        });
+
         // 9. Restore last tab and recipe selection
-        switchTab(localStorage.getItem(TAB_STORAGE_KEY) || 'bags');
+        switchTab(localStorage.getItem(TAB_STORAGE_KEY) || 'everything');
+        // Restore ev toolbar button states
+        document.querySelectorAll('.ev-sort-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sort === evSortBy); });
+        document.querySelectorAll('.ev-view-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.view === evView); });
         // Periodic staleness refresh (every 30s)
         setInterval(function() {
             updateStalenessDotsOnRows();

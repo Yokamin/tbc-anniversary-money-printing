@@ -1,10 +1,17 @@
 # TBC Crafting Calculator
 
-## Version: 1.6
+## Version: 1.7
 
 Single-page HTML app for calculating crafting profitability in WoW TBC Anniversary.
 
 ### Tabs
+
+**Everything** *(default tab)*
+- Combined profit overview of all craftable items across all tabs in one place
+- Two views: **Flat List** (all items sorted together) or **By Section** (grouped by tab)
+- Gold / % Margin sort toggle
+- **Filter popup**: 3-level checkbox tree (tab → category → individual recipe) — hide anything you don't need; state persists across reloads
+- Read-only Daily Sold / Avg Price columns pulled from per-tab TSM data
 
 **Bags**
 - Calculates craft vs buy decisions across a 3-tier crafting chain
@@ -37,8 +44,10 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
   - Flasks: Fortification, Mighty Restoration, Relentless Assault, Pure Death, Blinding Light, Distilled Wisdom, Supreme Power
   - Misc / Enchanting: Brilliant Wizard Oil (craft-vs-buy comparison, crafted by Enchanter)
 - Dropdown to view individual recipe details or "All (Profit Overview)" summary table
-- Summary table sorted by profit (best first)
-- Manage recipes modal: hide/show recipes you haven't unlocked
+- **Batch toggle** (×1 / ×100 / ×1000): scales cost, revenue, and profit in the overview by batch size; non-transmute recipes include proc bonus yield at the configured proc rate; transmutes excluded from procs; margin % reflects procs
+- **Proc Calculator**: "Proc" button per elixir/flask row opens a popup with crafts stepper, expected yield, and profit breakdown with vs without procs; also shown inline in individual recipe detail views
+- Manage recipes modal: hide/show recipes you haven't unlocked — grouped by category with All/None quick-select per category
+- Transmute cooldown: 20 hours (not 24)
 
 **Transmutes / Dailies**
 - Mote → Primal profit table: all 7 primals (Air, Earth, Fire, Life, Mana, Shadow, Water)
@@ -46,7 +55,7 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
   - Shows cost (10× mote), revenue (primal sell − AH%), and profit per conversion
   - Sorted by profit descending
 - Planar Essence conversion: 3× Lesser → 1× Greater profit view
-- Alchemy transmutes (1-day cooldown):
+- Alchemy transmutes (20h cooldown):
   - Primal Might (all 5 primals)
   - Skyfire Diamond (gems + Primal Air/Fire)
   - Earthstorm Diamond (gems + Primal Water/Earth)
@@ -60,6 +69,7 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
 
 ### Shared Features
 
+- **🔍 Ingredients button** (global toolbar): search any ingredient name across all tabs — shows every recipe that uses it with tab badge, quantity, and profit; click a recipe to expand full ingredient list and a "Go to recipe" shortcut
 - AH price import: paste Auctionator export data to bulk-update prices. **Reset** button clears the import field; **Reset** button on the export field clears the output.
 - **Reset AH Prices** button (top-right of tab bar): zeroes all AH-imported prices across all tabs. Vendor prices (Imbued Vial, Rune Thread), deposit values, and AH cut % are preserved.
 - **Wider layout**: no max-width constraint — uses full browser width
@@ -105,7 +115,6 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
 - Categories: Battle Elixir, Guardian Elixir, Flask, Food, Potion, Oil — colour-coded badges
 - Primary consumables shown clearly; situational alternatives marked with **ALT** badge
 - Notes shown inline (e.g. "Demons only", "400 Haste — when armour capped")
-- WoWhead tooltip integration planned for a future update
 
 ### Auctionator Buy-List Export
 
