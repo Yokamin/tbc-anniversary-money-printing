@@ -63,9 +63,14 @@ To ensure subcategory `ALL` always sorts before individual items, items use a ca
 | Tailoring Gear | Dynamic UI from `GEAR_RECIPES` array |
 | Alchemy | Dynamic UI from `ALCHEMY_RECIPES` array — elixirs, potions, flasks ONLY |
 | Transmutes / Dailies | Mote→Primal profit table, Planar Essence, alchemy transmutes, tailoring cloth dailies |
+| Enchanting | Dynamic UI from `ENCHANTING_RECIPES` array — shard conversions, consumable oils |
+| Leatherworking | Dynamic UI from `LW_RECIPES` array — leg armor kits |
 
 ### Why transmutes are NOT in the Alchemy tab
 Transmutes (Primal Might, Skyfire Diamond, Earthstorm Diamond) and cloth dailies (Primal Mooncloth, Shadowcloth, Spellcloth) are all cooldown-based. They live in the Transmutes/Dailies tab to keep Alchemy clean and because they conceptually belong to the "primal economy" view, not the "herb/potion crafting" view.
+
+### Why Enchanting is its own tab (not in Alchemy)
+Enchanting recipes (shard conversions, oils) are a different profession. The old "Misc / Enchanting" category in Alchemy was a temporary home for Brilliant Wizard Oil, which has been removed (requires Zandalar rep; not a recipe the user will have). Enchanting now has a proper tab so its profits are visible alongside the others.
 
 ### Why cloth dailies are in Transmutes (not Tailoring Gear)
 Cloth dailies have a 3d 20h cooldown and consume primals. They're checked/updated on a cooldown timer, not on a per-craft basis. The Tailoring Gear tab is for on-demand gear crafting. The Transmutes tab groups all cooldown-gated crafting together.
@@ -80,7 +85,13 @@ Primal Nether is Bind on Pickup — it cannot be bought or sold on the AH. In th
 
 ## Shared Price Sync
 
-Items that appear across multiple tabs are synced via `SHARED_PRICE_GROUPS` in the JS. When one input is updated, the others auto-update. Key synced items: Netherweave Cloth, Arcane Dust, Bolts of Netherweave, Motes of Fire/Earth (still in Alchemy for Elixir of Firepower and Ironshield Potion), Mote/Primal of Mana/Shadow/Fire/Earth between Gear and Transmutes tabs.
+Items that appear across multiple tabs are synced automatically via the `ALL_NAME_TO_INPUTS` unified map (built by `buildAllNameToInputs()` at init). This replaced the old manually-maintained `SHARED_PRICE_GROUPS` list.
+
+`buildAllNameToInputs()` aggregates all per-tab `xxxNameToInput` maps into `{ itemName: [inputId1, inputId2, ...] }`, excluding AH cut and deposit inputs. `syncSharedPrice(id)` propagates a single change; `syncAllSharedPrices()` reconciles all groups at once (called after import and on init).
+
+`globalImportPrices()` also uses `ALL_NAME_TO_INPUTS` directly — when an item name is found, all matching inputs across all tabs are updated in one pass. No new tab requires any manual sync wiring; just populate the tab's `xxxNameToInput` map and add it to `buildAllNameToInputs()`'s `allMaps` array.
+
+Key synced items: Netherweave Cloth, Arcane Dust (Bags/Gear/TX/Enchanting), Bolts of Netherweave, Rune Thread, Motes of Fire/Earth (Alchemy + Gear + TX), Mote/Primal of Mana/Shadow/Fire/Earth (Gear ↔ TX), Lesser/Greater Planar Essence (Bags ↔ TX), Primal Air / Mote of Air (TX ↔ LW), Netherbloom / Nightmare Vine (Alchemy ↔ Enchanting).
 
 ---
 

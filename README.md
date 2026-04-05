@@ -1,6 +1,6 @@
 # TBC Crafting Calculator
 
-## Version: 1.7
+## Version: 1.8
 
 Single-page HTML app for calculating crafting profitability in WoW TBC Anniversary.
 
@@ -42,7 +42,6 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
   - Elixirs: Healing Power, Major Agility, Major Shadow Power, Major Defense, Major Mageblood, Adept's Elixir, Mastery, Major Fortitude, Major Strength, Onslaught, Major Firepower, Gift of Arthas, Elixir of Demonslaying, Elixir of Draenic Wisdom, Greater Arcane Elixir
   - Potions: Volatile Healing, Super Mana, Unstable Mana, Haste, Destruction, Ironshield, Heroic, Insane Strength, Super Rejuvenation, Fel Mana, Mad Alchemist's
   - Flasks: Fortification, Mighty Restoration, Relentless Assault, Pure Death, Blinding Light, Distilled Wisdom, Supreme Power
-  - Misc / Enchanting: Brilliant Wizard Oil (craft-vs-buy comparison, crafted by Enchanter)
 - Dropdown to view individual recipe details or "All (Profit Overview)" summary table
 - **Batch toggle** (×1 / ×100 / ×1000): scales cost, revenue, and profit in the overview by batch size; non-transmute recipes include proc bonus yield at the configured proc rate; transmutes excluded from procs; margin % reflects procs
 - **Proc Calculator**: "Proc" button per elixir/flask row opens a popup with crafts stepper, expected yield, and profit breakdown with vs without procs; also shown inline in individual recipe detail views
@@ -96,7 +95,7 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
 - All prices saved to localStorage (persist across reloads)
 - Tab and recipe selection remembered across sessions
 - Shared price sync: updating a material in one tab auto-updates it in all other tabs
-  - Synced: Netherweave Cloth, Arcane Dust, Bolt of Netherweave, Bolt of Imbued Netherweave, Rune Thread, Lesser/Greater Planar Essence, Mote/Primal of Fire, Earth, Mana, Shadow
+  - Synced: Netherweave Cloth, Arcane Dust (Bags/Gear/TX/Enchanting), Bolt of Netherweave, Bolt of Imbued Netherweave, Rune Thread, Lesser/Greater Planar Essence, Mote/Primal of Fire, Earth, Mana, Shadow
 
 **Cooking**
 - Dynamically generated UI from recipe data array, same structure as Alchemy
@@ -109,6 +108,23 @@ Single-page HTML app for calculating crafting profitability in WoW TBC Anniversa
   - +44 Heal Power / +22 Spell / +6 Spirit: Golden Fish Sticks
   - +20 Spell Crit: Skullfish Soup
 - Vendor items (Soothing Spices, Goldenbark Apple, Hot Spices) pre-filled with vendor prices
+
+**Enchanting**
+- Dynamically generated UI from recipe data array
+- Recipes tracked:
+  - Shards: Large Prismatic Shard (3× Small Prismatic Shard → 1× Large)
+  - Oils: Superior Mana Oil (Netherbloom + Arcane Dust + Imbued Vial), Superior Wizard Oil (Arcane Dust + Nightmare Vine + Imbued Vial)
+- Arcane Dust price syncs automatically with Bags, Tailoring Gear, and Transmutes tabs
+- Full profit overview with Gold / % Margin sort, TSM note columns, staleness dots, back button
+
+**Leatherworking**
+- Dynamically generated UI from recipe data array
+- Recipes tracked:
+  - Leg Armor: Cobrahide Leg Armor (4× Heavy Knothide Leather, 2× Cobra Scales, 4× Primal Air)
+- Buy vs craft comparison per ingredient:
+  - Heavy Knothide Leather: buy or craft from 5× Knothide Leather (auto-selects cheapest)
+  - Primal Air: buy or use 10× Mote of Air (auto-selects cheapest)
+- Full profit overview with TSM note columns, staleness dots, back button
 
 **Consumables** *(reference only — no price calculations)*
 - Class/spec consumable cheat sheet for all 9 TBC classes
@@ -128,5 +144,7 @@ The Transmutes / Dailies tab includes an in-app export generator. Click "Generat
 | `3.x`  | Alchemy (3.1=Elixirs, 3.2=Potions, 3.3=Flasks) |
 | `4.x`  | Transmutes/Dailies (4.1=Mote→Primals, 4.2=Transmutes, 4.3=Cloth) |
 | `5.x`  | Cooking |
+| `6.x`  | Enchanting (6.1=Shards, 6.2=Oils) |
+| `7.x`  | Leatherworking |
 
 See `DECISIONS.md` for full naming conventions and design rationale.

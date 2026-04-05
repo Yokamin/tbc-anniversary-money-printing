@@ -1226,6 +1226,8 @@
             <button class="tab-btn" data-tab="alchemy">Alchemy</button>
             <button class="tab-btn" data-tab="transmutes">Transmutes / Dailies</button>
             <button class="tab-btn" data-tab="cooking">Cooking</button>
+            <button class="tab-btn" data-tab="enchanting">Enchanting</button>
+            <button class="tab-btn" data-tab="leatherworking">Leatherworking</button>
             <button class="tab-btn" data-tab="consumables">Consumables</button>
         </div>
 
@@ -1753,6 +1755,22 @@
             </div>
         </div>
 
+        <div id="tab-enchanting" class="tab-content" style="display:none">
+            <div class="alch-layout">
+                <div class="sidebar" id="ench-col-left"></div>
+                <div class="sidebar" id="ench-col-right"></div>
+                <div class="main-area" id="ench-main"></div>
+            </div>
+        </div>
+
+        <div id="tab-leatherworking" class="tab-content" style="display:none">
+            <div class="alch-layout">
+                <div class="sidebar" id="lw-col-left"></div>
+                <div class="sidebar" id="lw-col-right"></div>
+                <div class="main-area" id="lw-main"></div>
+            </div>
+        </div>
+
         <div id="tab-consumables" class="tab-content" style="display:none">
             <div id="cons-grid-container"></div>
         </div>
@@ -1777,12 +1795,21 @@
         const ALCH_HIDDEN_KEY = 'tbc_alchemy_hidden_recipes';
         const ALCH_COLLAPSED_KEY = 'tbc_alchemy_collapsed_panels';
 
+        const ENCH_STORAGE_KEY = 'tbc_enchanting_calculator';
+        const ENCH_LOCKS_KEY = 'tbc_enchanting_locks';
+        const ENCH_RECIPE_KEY = 'tbc_enchanting_selected_recipe';
+        const LW_STORAGE_KEY = 'tbc_lw_calculator';
+        const LW_LOCKS_KEY = 'tbc_lw_locks';
+        const LW_RECIPE_KEY = 'tbc_lw_selected_recipe';
+
         // ===== TSM NOTES =====
         const ALCH_TSM_KEY = 'tbc_alch_tsm';
         const GEAR_TSM_KEY = 'tbc_gear_tsm';
         const TX_TSM_KEY = 'tbc_tx_tsm';
         const COOK_TSM_KEY = 'tbc_cook_tsm';
-        var alchTsm = {}, gearTsm = {}, txTsm = {}, cookTsm = {};
+        const ENCH_TSM_KEY = 'tbc_ench_tsm';
+        const LW_TSM_KEY = 'tbc_lw_tsm';
+        var alchTsm = {}, gearTsm = {}, txTsm = {}, cookTsm = {}, enchTsm = {}, lwTsm = {};
         const ALCH_PROC_KEY = 'tbc_alch_proc_rate';
         const ALCH_BATCH_KEY = 'tbc_alch_batch';
         const EV_SORT_KEY = 'tbc_ev_sort';
@@ -1794,6 +1821,8 @@
         var gearResults = [];
         var txSummaryRows = [];
         var cookResults = [];
+        var enchResults = [];
+        var lwResults = [];
         var bagsResults = [];
         var evSortBy = 'profit';
         var evView = 'flat';
@@ -1802,7 +1831,7 @@
         var procModalRecipeId = null;
 
         // ===== SORT STATE =====
-        var alchSortBy = 'profit', gearSortBy = 'profit', txSortBy = 'profit', cookSortBy = 'profit';
+        var alchSortBy = 'profit', gearSortBy = 'profit', txSortBy = 'profit', cookSortBy = 'profit', enchSortBy = 'profit', lwSortBy = 'profit';
 
         // ===== PRICE STALENESS TRACKING =====
         const PRICE_TIMESTAMPS_KEY = 'tbc_price_timestamps';
@@ -1894,11 +1923,13 @@
             else if (tab === 'gear') { gearSortBy = by; gearCalculate(); }
             else if (tab === 'tx') { txSortBy = by; txCalculate(); }
             else if (tab === 'cook') { cookSortBy = by; cookCalculate(); }
+            else if (tab === 'ench') { enchSortBy = by; enchCalculate(); }
+            else if (tab === 'lw') { lwSortBy = by; lwCalculate(); }
             updateSortToggle(tab);
         }
 
         function updateSortToggle(tab) {
-            var sortBy = tab === 'alch' ? alchSortBy : tab === 'gear' ? gearSortBy : tab === 'tx' ? txSortBy : cookSortBy;
+            var sortBy = tab === 'alch' ? alchSortBy : tab === 'gear' ? gearSortBy : tab === 'tx' ? txSortBy : tab === 'ench' ? enchSortBy : tab === 'lw' ? lwSortBy : cookSortBy;
             ['profit', 'pct'].forEach(function(by) {
                 var btn = document.getElementById(tab + '-sort-' + by);
                 if (btn) btn.classList.toggle('active', sortBy === by);
@@ -2089,6 +2120,28 @@
                                 .map(function(r) { return { id: 'cook_' + r.id, name: r.name }; })
                         };
                     }).filter(function(cat) { return cat.items.length > 0; })
+                },
+                {
+                    tabId: 'enchanting', tabLabel: 'Enchanting',
+                    cats: ENCHANTING_CATEGORY_ORDER.map(function(cat) {
+                        return {
+                            catId: 'ench_' + cat.includes[0],
+                            catLabel: cat.label,
+                            items: ENCHANTING_RECIPES.filter(function(r) { return cat.includes.indexOf(r.category) !== -1; })
+                                .map(function(r) { return { id: 'ench_' + r.id, name: r.name }; })
+                        };
+                    }).filter(function(cat) { return cat.items.length > 0; })
+                },
+                {
+                    tabId: 'leatherworking', tabLabel: 'Leatherworking',
+                    cats: LW_CATEGORY_ORDER.map(function(cat) {
+                        return {
+                            catId: 'lw_' + cat.includes[0],
+                            catLabel: cat.label,
+                            items: LW_RECIPES.filter(function(r) { return cat.includes.indexOf(r.category) !== -1; })
+                                .map(function(r) { return { id: 'lw_' + r.id, name: r.name }; })
+                        };
+                    }).filter(function(cat) { return cat.items.length > 0; })
                 }
             ];
         }
@@ -2161,7 +2214,7 @@
             evCalculate();
         }
         function evGetTsm(tsmTab, tsmId, field) {
-            var tsm = tsmTab === 'alch' ? alchTsm : tsmTab === 'gear' ? gearTsm : tsmTab === 'tx' ? txTsm : tsmTab === 'cook' ? cookTsm : null;
+            var tsm = tsmTab === 'alch' ? alchTsm : tsmTab === 'gear' ? gearTsm : tsmTab === 'tx' ? txTsm : tsmTab === 'cook' ? cookTsm : tsmTab === 'ench' ? enchTsm : tsmTab === 'lw' ? lwTsm : null;
             if (!tsm || !tsmId || !tsm[tsmId]) return null;
             return tsm[tsmId][field] != null ? tsm[tsmId][field] : null;
         }
@@ -2235,6 +2288,26 @@
                 rows.push({ id: 'cook_' + r.recipe.id, name: r.recipe.name, tab: 'cooking', tabLabel: 'Cooking', catId: catId, catLabel: catLabel, craftCost: r.craftCost, revenue: r.salePrice * (1 - cookAhCut), profit: r.profit, tsmTab: 'cook', tsmId: r.recipe.id });
             });
 
+            // Enchanting
+            var enchAhEl = document.getElementById('ench_ah_cut');
+            var enchAhCut = enchAhEl ? parseFloat(enchAhEl.value) / 100 : 0.05;
+            enchResults.forEach(function(r) {
+                var catInfo = ENCHANTING_CATEGORY_ORDER.find(function(c) { return c.includes.indexOf(r.recipe.category) !== -1; });
+                var catId = 'ench_' + (catInfo ? catInfo.includes[0] : r.recipe.category);
+                var catLabel = catInfo ? catInfo.label : r.recipe.category;
+                rows.push({ id: 'ench_' + r.recipe.id, name: r.recipe.name, tab: 'enchanting', tabLabel: 'Enchanting', catId: catId, catLabel: catLabel, craftCost: r.craftCost, revenue: r.salePrice * (1 - enchAhCut), profit: r.profit, tsmTab: 'ench', tsmId: r.recipe.id });
+            });
+
+            // Leatherworking
+            var lwAhEl = document.getElementById('lw_ah_cut');
+            var lwAhCut = lwAhEl ? parseFloat(lwAhEl.value) / 100 : 0.05;
+            lwResults.forEach(function(r) {
+                var catInfo = LW_CATEGORY_ORDER.find(function(c) { return c.includes.indexOf(r.recipe.category) !== -1; });
+                var catId = 'lw_' + (catInfo ? catInfo.includes[0] : r.recipe.category);
+                var catLabel = catInfo ? catInfo.label : r.recipe.category;
+                rows.push({ id: 'lw_' + r.recipe.id, name: r.recipe.name, tab: 'leatherworking', tabLabel: 'Leatherworking', catId: catId, catLabel: catLabel, craftCost: r.craftCost, revenue: r.salePrice * (1 - lwAhCut), profit: r.profit, tsmTab: 'lw', tsmId: r.recipe.id });
+            });
+
             // Apply filter
             rows = rows.filter(function(row) {
                 return !evHidden['tab_' + row.tab] && !evHidden['cat_' + row.catId] && !evHidden['item_' + row.id];
@@ -2242,7 +2315,7 @@
 
             // Render
             if (evView === 'sections') {
-                var tabOrder = ['bags', 'gear', 'alchemy', 'tx', 'cooking'];
+                var tabOrder = ['bags', 'gear', 'alchemy', 'tx', 'cooking', 'enchanting', 'leatherworking'];
                 var html = '';
                 tabOrder.forEach(function(tabId) {
                     var tabRows = rows.filter(function(r) { return r.tab === tabId; });
@@ -2365,6 +2438,24 @@
                 });
             });
 
+            // Enchanting
+            ENCHANTING_RECIPES.forEach(function(r) {
+                r.ingredients.forEach(function(ing) {
+                    add(ing.item, { recipeId: r.id, recipeName: r.name, tab: 'enchanting', tabLabel: 'Enchanting', qty: ing.qty });
+                });
+            });
+
+            // Leatherworking
+            LW_RECIPES.forEach(function(r) {
+                r.ingredients.forEach(function(ing) {
+                    if (ing.type === 'bop') return;
+                    add(ing.item, { recipeId: r.id, recipeName: r.name, tab: 'leatherworking', tabLabel: 'Leatherworking', qty: ing.qty });
+                    if (ing.craftFrom && ing.craftFrom.item) {
+                        add(ing.craftFrom.item, { recipeId: r.id, recipeName: r.name, tab: 'leatherworking', tabLabel: 'Leatherworking', qty: ing.craftFrom.qty * ing.qty, viaItem: ing.item });
+                    }
+                });
+            });
+
             // Bags (static)
             var bagsIng = [
                 { item: 'Netherweave Cloth',         recipeId: 'bags_nw_bag',     recipeName: 'Netherweave Bag',         qty: 24 },
@@ -2397,6 +2488,12 @@
                 return r ? r.profit : null;
             } else if (tab === 'tx') {
                 var r = txSummaryRows.find(function(x) { return x.recipeId === recipeId; });
+                return r ? r.profit : null;
+            } else if (tab === 'enchanting') {
+                var r = enchResults.find(function(x) { return x.recipe.id === recipeId; });
+                return r ? r.profit : null;
+            } else if (tab === 'leatherworking') {
+                var r = lwResults.find(function(x) { return x.recipe.id === recipeId; });
                 return r ? r.profit : null;
             } else if (tab === 'bags') {
                 var r = bagsResults.find(function(x) { return x.id === recipeId; });
@@ -2437,6 +2534,18 @@
                     }
                     return ing.qty + '\u00d7 ' + ing.item;
                 });
+            } else if (tab === 'enchanting') {
+                var r = ENCHANTING_RECIPES.find(function(x) { return x.id === recipeId; });
+                if (!r) return [];
+                return r.ingredients.map(function(ing) {
+                    return ing.qty + '\u00d7 ' + ing.item + (ing.type === 'vendor' ? ' (vendor)' : '');
+                });
+            } else if (tab === 'leatherworking') {
+                var r = LW_RECIPES.find(function(x) { return x.id === recipeId; });
+                if (!r) return [];
+                return r.ingredients.map(function(ing) {
+                    return ing.qty + '\u00d7 ' + ing.item + (ing.craftFrom ? ' (or ' + (ing.qty * ing.craftFrom.qty) + '\u00d7 ' + ing.craftFrom.item + ')' : '');
+                });
             } else if (tab === 'bags') {
                 if (recipeId === 'bags_nw_bag') return ['4\u00d7 Bolt of Netherweave', '1\u00d7 Rune Thread (vendor)'];
                 if (recipeId === 'bags_imbued_bag') return ['4\u00d7 Bolt of Imbued Netherweave', '2\u00d7 Netherweb Spider Silk', '1\u00d7 Greater Planar Essence'];
@@ -2451,6 +2560,8 @@
             else if (tab === 'gear') gearSelectRecipe(recipeId);
             else if (tab === 'tx') txSelectRecipe(recipeId);
             else if (tab === 'cooking') cookSelectRecipe(recipeId);
+            else if (tab === 'enchanting') enchSelectRecipe(recipeId);
+            else if (tab === 'leatherworking') lwSelectRecipe(recipeId);
         }
 
         function openIngSearch() {
@@ -2535,8 +2646,8 @@
         }
 
         function buildAhInputMap() {
-            var nonAhPattern = /^(alch_vendor_|alch_deposit_|gear_vendor_|gear_deposit_|cook_vendor_|cook_deposit_|tx_deposit_)/;
-            var allMaps = [NAME_TO_INPUT, alchNameToInput, gearNameToInput, txNameToInput, cookNameToInput];
+            var nonAhPattern = /^(alch_vendor_|alch_deposit_|gear_vendor_|gear_deposit_|cook_vendor_|cook_deposit_|tx_deposit_|ench_vendor_|ench_deposit_|lw_vendor_|lw_deposit_)/;
+            var allMaps = [NAME_TO_INPUT, alchNameToInput, gearNameToInput, txNameToInput, cookNameToInput, enchNameToInput, lwNameToInput];
             allMaps.forEach(function(map) {
                 for (var name in map) {
                     var id = map[name];
@@ -2664,6 +2775,34 @@
             return ids;
         }
 
+        function getEnchRecipeStalenessInputs(r) {
+            var ids = [];
+            var saleId = 'ench_sale_' + r.id;
+            if (AH_INPUT_TO_NAME[saleId]) ids.push(saleId);
+            r.ingredients.forEach(function(ing) {
+                if (ing.type === 'vendor' || STALENESS_EXEMPT_ITEMS.has(ing.item)) return;
+                var id = enchNameToInput[ing.item];
+                if (id && AH_INPUT_TO_NAME[id]) ids.push(id);
+            });
+            return ids;
+        }
+
+        function getLwRecipeStalenessInputs(r) {
+            var ids = [];
+            var saleId = 'lw_sale_' + r.id;
+            if (AH_INPUT_TO_NAME[saleId]) ids.push(saleId);
+            r.ingredients.forEach(function(ing) {
+                if (ing.type === 'bop' || ing.type === 'vendor' || STALENESS_EXEMPT_ITEMS.has(ing.item)) return;
+                var id = lwNameToInput[ing.item];
+                if (id && AH_INPUT_TO_NAME[id]) ids.push(id);
+                if (ing.craftFrom && ing.craftFrom.item && !STALENESS_EXEMPT_ITEMS.has(ing.craftFrom.item)) {
+                    var cfId = lwNameToInput[ing.craftFrom.item];
+                    if (cfId && AH_INPUT_TO_NAME[cfId]) ids.push(cfId);
+                }
+            });
+            return ids;
+        }
+
         // ===== TAILORING NAME MAP =====
         const NAME_TO_INPUT = {
             'Netherweave Cloth': 'price_cloth',
@@ -2675,6 +2814,7 @@
             'Bolt of Imbued Netherweave': 'price_imbued_bolt',
             'Netherweave Bag': 'price_nw_bag',
             'Imbued Netherweave Bag': 'price_imbued_bag',
+            'Rune Thread': 'price_thread',   // vendor — registered here for cross-tab sync
         };
 
         // ===== ALCHEMY RECIPE DATA =====
@@ -3019,23 +3159,11 @@
                     { item: 'Crystal Vial', qty: 1, type: 'vendor' },
                 ]
             },
-            // === Misc / Enchanting — tracked here for craft-vs-buy comparison ===
-            {
-                id: 'brilliant_wizard_oil',
-                name: 'Brilliant Wizard Oil',
-                category: 'misc',
-                ingredients: [
-                    { item: 'Large Brilliant Shard', qty: 2, type: 'ah' },
-                    { item: 'Firebloom', qty: 3, type: 'ah' },
-                    { item: 'Imbued Vial', qty: 1, type: 'vendor' },
-                ]
-            },
         ];
 
         const CATEGORY_ORDER = [
             { label: 'Elixirs & Potions', includes: ['elixir', 'potion'] },
             { label: 'Flasks', includes: ['flask'] },
-            { label: 'Misc / Enchanting', includes: ['misc'] },
         ];
 
         const VENDOR_DEFAULTS = {
@@ -3046,6 +3174,63 @@
             'Goldenbark Apple': 0.017,  // 1s 70c — cooking vendor
             'Hot Spices': 0.0032,       // 32c — cooking vendor
         };
+
+        // ===== ENCHANTING DATA =====
+
+        const ENCHANTING_RECIPES = [
+            {
+                id: 'large_prismatic_shard',
+                name: 'Large Prismatic Shard',
+                category: 'shard',
+                ingredients: [
+                    { item: 'Small Prismatic Shard', qty: 3, type: 'ah' }
+                ]
+            },
+            {
+                id: 'superior_mana_oil',
+                name: 'Superior Mana Oil',
+                category: 'oil',
+                ingredients: [
+                    { item: 'Netherbloom', qty: 1, type: 'ah' },
+                    { item: 'Arcane Dust', qty: 3, type: 'ah' },
+                    { item: 'Imbued Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+            {
+                id: 'superior_wizard_oil',
+                name: 'Superior Wizard Oil',
+                category: 'oil',
+                ingredients: [
+                    { item: 'Arcane Dust', qty: 3, type: 'ah' },
+                    { item: 'Nightmare Vine', qty: 1, type: 'ah' },
+                    { item: 'Imbued Vial', qty: 1, type: 'vendor' },
+                ]
+            },
+        ];
+
+        const ENCHANTING_CATEGORY_ORDER = [
+            { label: 'Shards', includes: ['shard'] },
+            { label: 'Oils', includes: ['oil'] },
+        ];
+
+        // ===== LEATHERWORKING DATA =====
+
+        const LW_RECIPES = [
+            {
+                id: 'cobrahide_leg_armor',
+                name: 'Cobrahide Leg Armor',
+                category: 'leg_armor',
+                ingredients: [
+                    { item: 'Heavy Knothide Leather', qty: 4, type: 'ah', craftFrom: { item: 'Knothide Leather', qty: 5 } },
+                    { item: 'Cobra Scales', qty: 2, type: 'ah' },
+                    { item: 'Primal Air', qty: 4, type: 'ah', craftFrom: { item: 'Mote of Air', qty: 10 } },
+                ]
+            },
+        ];
+
+        const LW_CATEGORY_ORDER = [
+            { label: 'Leg Armor', includes: ['leg_armor'] },
+        ];
 
         // Default deposit (listing fee) values for known items.
         // Bags tab deposits are hardcoded in static HTML.
@@ -3577,40 +3762,33 @@
         const gearNameToInput = {};
 
         // ===== SHARED PRICE GROUPS =====
-        // Each group is a list of input IDs that all represent the same item.
-        // When one is updated, the others sync automatically.
-        const SHARED_PRICE_GROUPS = [
-            // Bags ↔ Gear ↔ Transmutes/Dailies
-            ['price_cloth',       'gear_mat_netherweave_cloth',          'tx_cloth'],
-            ['price_dust',        'gear_mat_arcane_dust',                 'tx_dust'],
-            ['price_bolt',        'gear_mat_bolt_of_netherweave',         'tx_bolt_nw'],
-            ['price_imbued_bolt', 'gear_mat_bolt_of_imbued_netherweave',  'tx_imbued_bolt'],
-            ['price_thread',      'gear_vendor_rune_thread'],
-            ['price_lesser',      'tx_lesser_planar'],
-            ['price_greater',     'tx_greater_planar'],
-            // Mote of Fire: Alchemy (Elixir of Major Firepower) ↔ Gear ↔ Transmutes
-            ['alch_mat_mote_of_fire',  'gear_mat_mote_of_fire',  'tx_mote_fire'],
-            // Mote of Earth: Alchemy (Ironshield Potion) ↔ Gear ↔ Transmutes
-            ['alch_mat_mote_of_earth', 'gear_mat_mote_of_earth', 'tx_mote_earth'],
-            // Mana: Gear ↔ Transmutes (no longer in Alchemy — transmutes moved to TX tab)
-            ['gear_mat_mote_of_mana',   'tx_mote_mana'],
-            ['gear_mat_primal_mana',    'tx_primal_mana'],
-            // Shadow: Gear ↔ Transmutes
-            ['gear_mat_mote_of_shadow', 'tx_mote_shadow'],
-            ['gear_mat_primal_shadow',  'tx_primal_shadow'],
-            // Fire (primal): Gear ↔ Transmutes
-            ['gear_mat_primal_fire',    'tx_primal_fire'],
-            // Earth (primal): Gear ↔ Transmutes
-            ['gear_mat_primal_earth',   'tx_primal_earth'],
-            // Air, Life, Water: only in Transmutes tab — no cross-tab sync needed
-        ];
+        // Unified price sync: auto-built after all tabs initialise.
+        // Maps item name → every input ID across all tabs that holds that item's price.
+        // Any new tab/recipe automatically participates — no manual maintenance needed.
+        var ALL_NAME_TO_INPUTS = {};
+
+        function buildAllNameToInputs() {
+            ALL_NAME_TO_INPUTS = {};
+            var excludePattern = /(_ah_cut|_deposit_)/;
+            var allMaps = [NAME_TO_INPUT, alchNameToInput, gearNameToInput, txNameToInput, cookNameToInput, enchNameToInput, lwNameToInput];
+            allMaps.forEach(function(map) {
+                for (var name in map) {
+                    var id = map[name];
+                    if (!id || excludePattern.test(id)) continue;
+                    if (!ALL_NAME_TO_INPUTS[name]) ALL_NAME_TO_INPUTS[name] = [];
+                    if (ALL_NAME_TO_INPUTS[name].indexOf(id) === -1) ALL_NAME_TO_INPUTS[name].push(id);
+                }
+            });
+        }
 
         function syncSharedPrice(changedId) {
             var input = document.getElementById(changedId);
             if (!input) return;
             var value = input.value;
-            SHARED_PRICE_GROUPS.forEach(function(group) {
-                if (group.indexOf(changedId) === -1) return;
+            // Find all inputs for the same item name and sync them
+            for (var name in ALL_NAME_TO_INPUTS) {
+                var group = ALL_NAME_TO_INPUTS[name];
+                if (group.indexOf(changedId) === -1) continue;
                 group.forEach(function(id) {
                     if (id === changedId) return;
                     var sibling = document.getElementById(id);
@@ -3620,12 +3798,15 @@
                         autoSizeInput(sibling);
                     }
                 });
-            });
+                break;
+            }
         }
 
         function syncAllSharedPrices() {
-            SHARED_PRICE_GROUPS.forEach(function(group) {
-                // Find the first group member with a non-zero value and sync from it
+            for (var name in ALL_NAME_TO_INPUTS) {
+                var group = ALL_NAME_TO_INPUTS[name];
+                if (group.length < 2) continue;
+                // Find first input with a non-zero value and sync from it
                 var sourceId = null;
                 var sourceVal = null;
                 group.forEach(function(id) {
@@ -3635,7 +3816,7 @@
                         sourceVal = el.value;
                     }
                 });
-                if (sourceId === null) return;
+                if (sourceId === null) continue;
                 group.forEach(function(id) {
                     if (id === sourceId) return;
                     var el = document.getElementById(id);
@@ -3645,7 +3826,7 @@
                         autoSizeInput(el);
                     }
                 });
-            });
+            }
         }
 
         // ===== LOCK FUNCTIONS =====
@@ -3822,6 +4003,8 @@
                 if (id.startsWith('gear_')) return GEAR_LOCKS_KEY;
                 if (id.startsWith('tx_'))   return TX_LOCKS_KEY;
                 if (id.startsWith('cook_')) return COOK_LOCKS_KEY;
+                if (id.startsWith('ench_')) return ENCH_LOCKS_KEY;
+                if (id.startsWith('lw_'))   return LW_LOCKS_KEY;
                 return LOCKS_KEY;
             }
 
@@ -3834,26 +4017,27 @@
                 var copperPrice = parseInt(match[1]);
                 var name        = match[2];
                 var clean       = name.replace(/\s*\(\d+\)$/, '');
-                var inputId     = NAME_TO_INPUT[name]      || NAME_TO_INPUT[clean]      ||
-                                  alchNameToInput[name]    || alchNameToInput[clean]    ||
-                                  gearNameToInput[name]    || gearNameToInput[clean]    ||
-                                  txNameToInput[name]      || txNameToInput[clean]      ||
-                                  cookNameToInput[name]    || cookNameToInput[clean];
-                if (!inputId) continue;
-                var locks = getLocks(getLocksKey(inputId));
-                if (locks[inputId]) { skipped++; continue; }
+                var allIds = ALL_NAME_TO_INPUTS[name] || ALL_NAME_TO_INPUTS[clean] || [];
+                if (allIds.length === 0) continue;
                 var goldPrice = Math.round(copperPrice) / 10000;
-                var iName = AH_INPUT_TO_NAME[inputId] || clean;
-                priceTimestamps[iName] = batchTime;
-                var input = document.getElementById(inputId);
-                if (input) { input.value = goldPrice; updateGSCDisplay(inputId); autoSizeInput(input); updated++; }
+                var anyUpdated = false, anySkipped = false;
+                allIds.forEach(function(inputId) {
+                    var locks = getLocks(getLocksKey(inputId));
+                    if (locks[inputId]) { anySkipped = true; return; }
+                    var iName = AH_INPUT_TO_NAME[inputId] || name;
+                    priceTimestamps[iName] = batchTime;
+                    var input = document.getElementById(inputId);
+                    if (input) { input.value = goldPrice; updateGSCDisplay(inputId); autoSizeInput(input); anyUpdated = true; }
+                });
+                if (anyUpdated) updated++;
+                else if (anySkipped) skipped++;
             }
 
             lastImportBatchTime = batchTime;
             localStorage.setItem(PRICE_TIMESTAMPS_KEY, JSON.stringify(priceTimestamps));
             localStorage.setItem(LAST_IMPORT_BATCH_KEY, String(batchTime));
             syncAllSharedPrices();
-            calculate(); alchCalculate(); gearCalculate(); txCalculate(); cookCalculate();
+            calculate(); alchCalculate(); gearCalculate(); txCalculate(); cookCalculate(); enchCalculate(); lwCalculate();
             updateStalenessDotsOnRows();
 
             var msg = 'Updated ' + updated + ' price' + (updated !== 1 ? 's' : '');
@@ -6043,6 +6227,38 @@
             });
             lines.push(formatList('5.0 ALL COOKING', cookAll));
 
+            // 6.x Enchanting
+            var enchAll = [];
+            ENCHANTING_CATEGORY_ORDER.forEach(function(cat, idx) {
+                var sub    = ['6.1', '6.2'][idx];
+                var allLbl = ['ALL SHARDS', 'ALL OILS'][idx];
+                var catItems = [];
+                ENCHANTING_RECIPES.filter(function(r) { return cat.includes.indexOf(r.category) !== -1; }).forEach(function(r) {
+                    var items = [r.name];
+                    r.ingredients.forEach(function(ing) {
+                        if (ing.type !== 'vendor') items.push(ing.item);
+                    });
+                    items.forEach(function(i) { catItems.push(i); enchAll.push(i); });
+                    lines.push(formatList(sub + ' ' + r.name, items));
+                });
+                if (catItems.length > 0) lines.push(formatList(sub + ' ' + allLbl, catItems));
+            });
+            lines.push(formatList('6.0 ALL ENCHANTING', enchAll));
+
+            // 7.x Leatherworking
+            var lwAll = [];
+            LW_RECIPES.forEach(function(r) {
+                var items = [r.name];
+                r.ingredients.forEach(function(ing) {
+                    if (ing.type === 'vendor' || ing.type === 'bop') return;
+                    items.push(ing.item);
+                    if (ing.craftFrom && ing.craftFrom.item) items.push(ing.craftFrom.item);
+                });
+                items.forEach(function(i) { lwAll.push(i); });
+                lines.push(formatList('7.1 ' + r.name, items));
+            });
+            lines.push(formatList('7.0 ALL LEATHERWORKING', lwAll));
+
             // 0.0 EVERYTHING (all AH items across all tabs, no dupes)
             var everythingItems = [];
             BAGS_EXPORT_ITEMS.forEach(function(i) { everythingItems.push(i); });
@@ -6050,6 +6266,8 @@
             alchAll.forEach(function(i) { everythingItems.push(i); });
             txAll.forEach(function(i) { everythingItems.push(i); });
             cookAll.forEach(function(i) { everythingItems.push(i); });
+            enchAll.forEach(function(i) { everythingItems.push(i); });
+            lwAll.forEach(function(i) { everythingItems.push(i); });
             lines.unshift(formatList('0.0 EVERYTHING', everythingItems));
 
             var output = lines.filter(function(l) { return l; }).join('\n');
@@ -6060,6 +6278,8 @@
         // ===== COOKING: UI GENERATION =====
 
         const cookNameToInput = {};
+        const enchNameToInput = {};
+        const lwNameToInput = {};
 
         function cookInit() {
             var ahItemsSet = {};
@@ -6397,6 +6617,546 @@
             document.getElementById('cons-grid-container').innerHTML = html;
         }
 
+        // ===== ENCHANTING: UI GENERATION =====
+
+        function buildEnchRecipeDropdownHTML() {
+            var html = '<div class="recipe-dropdown-wrapper">' +
+                '<div class="recipe-dropdown" id="ench-recipe-dropdown">' +
+                '<button class="recipe-dropdown-trigger" id="ench-recipe-dropdown-trigger">' +
+                    '<span id="ench-recipe-dropdown-label">All (Profit Overview)</span>' +
+                    '<span class="dd-arrow">&#9660;</span>' +
+                '</button>' +
+                '<div class="recipe-dropdown-menu">';
+            html += '<div class="recipe-item active" data-recipe="all">All (Profit Overview)</div>';
+            ENCHANTING_CATEGORY_ORDER.forEach(function(cat) {
+                var recipes = ENCHANTING_RECIPES.filter(function(r) { return cat.includes.indexOf(r.category) !== -1; });
+                if (recipes.length === 0) return;
+                html += '<div class="recipe-category">' + cat.label + '</div>';
+                recipes.forEach(function(r) {
+                    html += '<div class="recipe-item" data-recipe="' + r.id + '">' + r.name + '</div>';
+                });
+            });
+            html += '</div></div>' +
+                '<button class="recipe-back-btn" id="ench-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
+                '</div>';
+            return html;
+        }
+
+        function buildEnchAllViewHTML() {
+            return '<div id="ench-view-all">' +
+                '<div class="tier-label">Profit Overview <span class="sort-toggle">' +
+                    '<button id="ench-sort-profit" class="sort-btn active" onclick="setSortBy(\'ench\',\'profit\')">Gold</button>' +
+                    '<button id="ench-sort-pct" class="sort-btn" onclick="setSortBy(\'ench\',\'pct\')">% Margin</button>' +
+                '</span></div>' +
+                '<table class="gear-summary">' +
+                    '<thead><tr><th>Recipe</th><th>Craft Cost</th><th>Sale Price</th><th>Profit</th><th>Margin</th><th style="color:#a78bfa">Daily Sold</th><th style="color:#a78bfa">Avg Price</th></tr></thead>' +
+                    '<tbody id="ench-summary-body"></tbody>' +
+                '</table>' +
+            '</div>';
+        }
+
+        function buildEnchRecipeDetailHTML(recipe) {
+            var html = '<div id="ench-view-' + recipe.id + '" class="ench-view" style="display:none">';
+            html += '<div class="card"><h3>' + recipe.name + '</h3>';
+            html += '<div class="sourcing"><div class="sourcing-title">Ingredients</div>';
+            recipe.ingredients.forEach(function(ing) {
+                var baseId = 'ench_' + recipe.id + '_ing_' + sanitizeId(ing.item);
+                if (ing.type === 'vendor') {
+                    html += '<div class="sourcing-row fixed"><span>' + ing.qty + 'x ' + ing.item + ' (vendor)</span><span class="cost" id="' + baseId + '">-</span></div>';
+                } else {
+                    html += '<div class="sourcing-row fixed"><span>' + ing.qty + 'x ' + ing.item + '</span><span class="cost" id="' + baseId + '">-</span></div>';
+                }
+            });
+            html += '</div>';
+            html += '<div class="card-row"><span class="label">Craft cost</span><span class="value" id="ench_' + recipe.id + '_craft_cost">-</span></div>';
+            html += '<div class="card-row"><span class="label">Sale price</span><span class="value" id="ench_' + recipe.id + '_sale_display">-</span></div>';
+            html += '<div class="card-row"><span class="label">AH cut</span><span class="value" id="ench_' + recipe.id + '_ah_cut_display">-</span></div>';
+            html += '<div class="card-row highlight"><span class="label">Net profit</span><span class="value" id="ench_' + recipe.id + '_profit">-</span></div>';
+            html += '<div class="deposit-note" id="ench_' + recipe.id + '_deposit_note">-</div>';
+            html += '</div></div>';
+            return html;
+        }
+
+        function enchInit() {
+            var ahItemsSet = {};
+            var vendorItemsSet = {};
+            var itemToRecipes = {};
+            ENCHANTING_RECIPES.forEach(function(r) {
+                r.ingredients.forEach(function(ing) {
+                    if (ing.type === 'ah') {
+                        ahItemsSet[ing.item] = true;
+                        if (!itemToRecipes[ing.item]) itemToRecipes[ing.item] = [];
+                        if (itemToRecipes[ing.item].indexOf(r.id) === -1) itemToRecipes[ing.item].push(r.id);
+                    } else if (ing.type === 'vendor') {
+                        vendorItemsSet[ing.item] = true;
+                        if (!itemToRecipes[ing.item]) itemToRecipes[ing.item] = [];
+                        if (itemToRecipes[ing.item].indexOf(r.id) === -1) itemToRecipes[ing.item].push(r.id);
+                    }
+                });
+            });
+            var allAhItems = Object.keys(ahItemsSet).sort();
+            var vendorItems = Object.keys(vendorItemsSet).sort();
+
+            function enchTableRow(label, inputId, defaultValue, hasLock, locksKey, recipeIds) {
+                var recipesAttr = recipeIds ? ' data-recipes="' + recipeIds.join(',') + '"' : '';
+                var lockHTML = hasLock ? '<button class="lock-btn" data-input="' + inputId + '" data-locks-key="' + locksKey + '">&#x1f513;</button>' : '';
+                return '<div class="price-table-row"' + recipesAttr + '>' +
+                    '<span class="pt-name">' + label + '</span>' + lockHTML +
+                    '<div class="price-control"><input type="number" id="' + inputId + '" value="' + defaultValue + '" step="0.0001"></div>' +
+                    '<div class="gsc-group" data-input="' + inputId + '"><span class="gsc-val gold">0g</span><span class="gsc-val silver">0s</span><span class="gsc-val copper">0c</span></div>' +
+                '</div>';
+            }
+
+            function enchH2(label, panelId) {
+                return '<h2 class="collapsible" data-panel="ench-' + panelId + '">' + label + '<span class="collapse-arrow">&#9660;</span></h2>';
+            }
+
+            var colLeft = buildEnchRecipeDropdownHTML();
+            if (allAhItems.length > 0) {
+                colLeft += '<div class="panel ench-filterable">' + enchH2('AH Materials', 'ah-mats') + '<div class="panel-body" data-panel-body="ench-ah-mats"><div class="price-table">';
+                allAhItems.forEach(function(item) {
+                    var inputId = 'ench_mat_' + sanitizeId(item);
+                    enchNameToInput[item] = inputId;
+                    colLeft += enchTableRow(item, inputId, 0, true, ENCH_LOCKS_KEY, itemToRecipes[item]);
+                });
+                colLeft += '</div></div></div>';
+            }
+
+            var colRight = '<div class="panel ench-filterable">' + enchH2('Product Sale Prices', 'sale-prices') + '<div class="panel-body" data-panel-body="ench-sale-prices"><div class="price-table">';
+            ENCHANTING_RECIPES.forEach(function(r) {
+                var inputId = 'ench_sale_' + r.id;
+                enchNameToInput[r.name] = inputId;
+                colRight += enchTableRow(r.name, inputId, 0, true, ENCH_LOCKS_KEY, [r.id]);
+            });
+            colRight += '</div></div></div>';
+
+            colRight += '<div class="panel ench-filterable">' + enchH2('Deposits & Settings', 'deposits') + '<div class="panel-body" data-panel-body="ench-deposits"><div class="price-table">';
+            ENCHANTING_RECIPES.forEach(function(r) {
+                colRight += enchTableRow(r.name + ' (deposit)', 'ench_deposit_' + r.id, 0, false, null, [r.id]);
+            });
+            if (vendorItems.length > 0) {
+                vendorItems.forEach(function(item) {
+                    var inputId = 'ench_vendor_' + sanitizeId(item);
+                    colRight += enchTableRow(item + ' (vendor)', inputId, VENDOR_DEFAULTS[item] || 0, false, null, itemToRecipes[item]);
+                });
+            }
+            colRight += '<div class="price-table-row"><span class="pt-name">AH Cut</span><div class="price-control"><input type="number" id="ench_ah_cut" value="5" step="0.1"><span style="color: #888; font-size: 0.82em; margin-left: 2px;">%</span></div></div>';
+            colRight += '</div></div></div>';
+
+            document.getElementById('ench-col-left').innerHTML = colLeft;
+            document.getElementById('ench-col-right').innerHTML = colRight;
+
+            var main = buildEnchAllViewHTML();
+            ENCHANTING_RECIPES.forEach(function(r) { main += buildEnchRecipeDetailHTML(r); });
+            document.getElementById('ench-main').innerHTML = main;
+        }
+
+        // ===== ENCHANTING: CALCULATE =====
+        function enchCalculate() {
+            var ahCutEl = document.getElementById('ench_ah_cut');
+            if (!ahCutEl) return;
+            var ahCutPct = parseFloat(ahCutEl.value) / 100 || 0.05;
+            var results = [];
+
+            ENCHANTING_RECIPES.forEach(function(r) {
+                var craftCost = 0;
+                r.ingredients.forEach(function(ing) {
+                    var price = ing.type === 'vendor'
+                        ? (parseFloat((document.getElementById('ench_vendor_' + sanitizeId(ing.item)) || {}).value) || 0)
+                        : (parseFloat((document.getElementById('ench_mat_' + sanitizeId(ing.item)) || {}).value) || 0);
+                    var ingCost = price * ing.qty;
+                    craftCost += ingCost;
+                    var baseId = 'ench_' + r.id + '_ing_' + sanitizeId(ing.item);
+                    var costEl = document.getElementById(baseId);
+                    if (costEl) costEl.textContent = gold(ingCost);
+                });
+
+                var saleEl    = document.getElementById('ench_sale_' + r.id);
+                var salePrice = saleEl ? (parseFloat(saleEl.value) || 0) : 0;
+                var ahCut     = salePrice * ahCutPct;
+                var deposit   = parseFloat((document.getElementById('ench_deposit_' + r.id) || {}).value) || 0;
+                var profit    = salePrice - ahCut - craftCost;
+
+                var el = function(id) { return document.getElementById(id); };
+                var craftEl  = el('ench_' + r.id + '_craft_cost');    if (craftEl)  craftEl.textContent  = gold(craftCost);
+                var saleDEl  = el('ench_' + r.id + '_sale_display');  if (saleDEl)  saleDEl.textContent  = gold(salePrice);
+                var cutEl    = el('ench_' + r.id + '_ah_cut_display');if (cutEl)    cutEl.textContent    = gold(ahCut);
+                var profitEl = el('ench_' + r.id + '_profit');
+                if (profitEl) profitEl.innerHTML = '<span class="' + profitClass(profit) + '">' + (profit >= 0 ? '+' : '') + gold(profit) + '</span>';
+                var depEl    = el('ench_' + r.id + '_deposit_note');  if (depEl) depEl.textContent = 'Deposit: ' + gold(deposit) + ' (lost if unsold)';
+
+                results.push({ recipe: r, craftCost: craftCost, salePrice: salePrice, profit: profit });
+            });
+
+            enchResults = results;
+            sortResults(results, enchSortBy);
+            var tbody = '';
+            results.forEach(function(r) {
+                var cls = profitClass(r.profit);
+                var pct = profitPctStr(r.profit, r.craftCost);
+                tbody += '<tr class="ench-summary-row" data-recipe="' + r.recipe.id + '">' +
+                    '<td>' + stalenessDotHtml(getEnchRecipeStalenessInputs(r.recipe)) + r.recipe.name + '</td>' +
+                    '<td>' + gold(r.craftCost) + '</td>' +
+                    '<td>' + gold(r.salePrice) + '</td>' +
+                    '<td class="' + cls + '">' + (r.profit >= 0 ? '+' : '') + gold(r.profit) + '</td>' +
+                    '<td class="' + cls + '">' + pct + '</td>' +
+                    '<td onclick="event.stopPropagation()">' + tsmInputHtml(enchTsm, r.recipe.id, 'daily', 'ench') + '</td>' +
+                    '<td onclick="event.stopPropagation()">' + tsmInputHtml(enchTsm, r.recipe.id, 'avgPrice', 'ench') + '</td>' +
+                '</tr>';
+            });
+            var summaryBody = document.getElementById('ench-summary-body');
+            if (summaryBody && !(summaryBody.contains(document.activeElement) && document.activeElement.classList.contains('tsm-input'))) {
+                summaryBody.innerHTML = tbody;
+            }
+            enchSaveToStorage();
+            evCalculate();
+        }
+
+        // ===== ENCHANTING: SELECT =====
+        function enchSelectRecipe(recipeId) {
+            var dropdown = document.getElementById('ench-recipe-dropdown');
+            var label    = document.getElementById('ench-recipe-dropdown-label');
+            document.querySelectorAll('#ench-recipe-dropdown .recipe-item').forEach(function(el) {
+                var isActive = el.dataset.recipe === recipeId;
+                el.classList.toggle('active', isActive);
+                if (isActive && label) label.textContent = el.textContent;
+            });
+            if (dropdown) dropdown.classList.remove('open');
+            var backBtn = document.getElementById('ench-recipe-back');
+            if (backBtn) backBtn.style.display = recipeId === 'all' ? 'none' : '';
+
+            var allView = document.getElementById('ench-view-all');
+            if (allView) allView.style.display = recipeId === 'all' ? '' : 'none';
+            document.querySelectorAll('.ench-view').forEach(function(v) {
+                v.style.display = v.id === 'ench-view-' + recipeId ? '' : 'none';
+            });
+
+            var enchTab = document.getElementById('tab-enchanting');
+            enchTab.querySelectorAll('.price-table-row[data-recipes]').forEach(function(row) {
+                if (recipeId === 'all') { row.style.display = 'flex'; return; }
+                row.style.display = row.dataset.recipes.split(',').indexOf(recipeId) !== -1 ? 'flex' : 'none';
+            });
+            enchTab.querySelectorAll('.ench-filterable').forEach(function(panel) {
+                var anyVisible = false;
+                panel.querySelectorAll('.price-table-row[data-recipes]').forEach(function(row) {
+                    if (row.style.display !== 'none') anyVisible = true;
+                });
+                panel.style.display = anyVisible ? '' : 'none';
+            });
+
+            localStorage.setItem(ENCH_RECIPE_KEY, recipeId);
+        }
+
+        // ===== ENCHANTING: SAVE / LOAD =====
+        function enchSaveToStorage() {
+            var data = {};
+            document.querySelectorAll('#tab-enchanting input').forEach(function(input) { if (input.id) data[input.id] = input.value; });
+            localStorage.setItem(ENCH_STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function enchLoadFromStorage() {
+            var stored = localStorage.getItem(ENCH_STORAGE_KEY);
+            if (stored) {
+                try {
+                    var data = JSON.parse(stored);
+                    Object.keys(data).forEach(function(id) {
+                        var input = document.getElementById(id);
+                        if (input && input.closest('#tab-enchanting')) input.value = data[id];
+                    });
+                } catch (e) { console.error('Failed to load enchanting data:', e); }
+            }
+        }
+
+        // ===== LEATHERWORKING: UI GENERATION =====
+
+        function buildLwRecipeDropdownHTML() {
+            var html = '<div class="recipe-dropdown-wrapper">' +
+                '<div class="recipe-dropdown" id="lw-recipe-dropdown">' +
+                '<button class="recipe-dropdown-trigger" id="lw-recipe-dropdown-trigger">' +
+                    '<span id="lw-recipe-dropdown-label">All (Profit Overview)</span>' +
+                    '<span class="dd-arrow">&#9660;</span>' +
+                '</button>' +
+                '<div class="recipe-dropdown-menu">';
+            html += '<div class="recipe-item active" data-recipe="all">All (Profit Overview)</div>';
+            LW_CATEGORY_ORDER.forEach(function(cat) {
+                var recipes = LW_RECIPES.filter(function(r) { return cat.includes.indexOf(r.category) !== -1; });
+                if (recipes.length === 0) return;
+                html += '<div class="recipe-category">' + cat.label + '</div>';
+                recipes.forEach(function(r) {
+                    html += '<div class="recipe-item" data-recipe="' + r.id + '">' + r.name + '</div>';
+                });
+            });
+            html += '</div></div>' +
+                '<button class="recipe-back-btn" id="lw-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
+                '</div>';
+            return html;
+        }
+
+        function buildLwAllViewHTML() {
+            return '<div id="lw-view-all">' +
+                '<div class="tier-label">Profit Overview <span class="sort-toggle">' +
+                    '<button id="lw-sort-profit" class="sort-btn active" onclick="setSortBy(\'lw\',\'profit\')">Gold</button>' +
+                    '<button id="lw-sort-pct" class="sort-btn" onclick="setSortBy(\'lw\',\'pct\')">% Margin</button>' +
+                '</span></div>' +
+                '<table class="gear-summary">' +
+                    '<thead><tr><th>Recipe</th><th>Craft Cost</th><th>Sale Price</th><th>Profit</th><th>Margin</th><th style="color:#a78bfa">Daily Sold</th><th style="color:#a78bfa">Avg Price</th></tr></thead>' +
+                    '<tbody id="lw-summary-body"></tbody>' +
+                '</table>' +
+            '</div>';
+        }
+
+        function buildLwIngHTML(ing, recipeId, totalQty, depth) {
+            depth = depth || 0;
+            var indent = depth > 0 ? ' style="padding-left:' + (depth * 14) + 'px"' : '';
+            var baseId = 'lw_' + recipeId + '_ing_' + sanitizeId(ing.item);
+            var html = '';
+
+            if (ing.craftFrom && ing.craftFrom.item) {
+                html += '<div class="sourcing-row"' + indent + '><span class="opt" id="' + baseId + '_buy_label">' + totalQty + 'x ' + ing.item + ' (buy)</span><span class="opt" id="' + baseId + '_buy_price">-</span></div>';
+                html += '<div class="sourcing-row"' + indent + '><span class="opt" id="' + baseId + '_craft_label">' + (totalQty * ing.craftFrom.qty) + 'x ' + ing.craftFrom.item + '</span><span class="opt" id="' + baseId + '_craft_price">-</span></div>';
+            } else {
+                var suffix = ing.type === 'vendor' ? ' (vendor)' : '';
+                html += '<div class="sourcing-row fixed"' + indent + '><span>' + totalQty + 'x ' + ing.item + suffix + '</span><span class="cost" id="' + baseId + '">-</span></div>';
+            }
+            return html;
+        }
+
+        function buildLwRecipeDetailHTML(recipe) {
+            var html = '<div id="lw-view-' + recipe.id + '" class="lw-view" style="display:none">';
+            html += '<div class="card"><h3>' + recipe.name + '</h3>';
+            html += '<div class="sourcing"><div class="sourcing-title">Ingredients</div>';
+            recipe.ingredients.forEach(function(ing) {
+                html += buildLwIngHTML(ing, recipe.id, ing.qty, 0);
+            });
+            html += '</div>';
+            html += '<div class="card-row"><span class="label">Craft cost</span><span class="value" id="lw_' + recipe.id + '_craft_cost">-</span></div>';
+            html += '<div class="card-row"><span class="label">Sale price</span><span class="value" id="lw_' + recipe.id + '_sale_display">-</span></div>';
+            html += '<div class="card-row"><span class="label">AH cut</span><span class="value" id="lw_' + recipe.id + '_ah_cut_display">-</span></div>';
+            html += '<div class="card-row highlight"><span class="label">Net profit</span><span class="value" id="lw_' + recipe.id + '_profit">-</span></div>';
+            html += '<div class="deposit-note" id="lw_' + recipe.id + '_deposit_note">-</div>';
+            html += '</div></div>';
+            return html;
+        }
+
+        function lwInit() {
+            var ahItemsSet = {};
+            var vendorItemsSet = {};
+            var itemToRecipes = {};
+            function collectLwItems(ing, recipeId) {
+                if (ing.type === 'ah') {
+                    ahItemsSet[ing.item] = true;
+                    if (!itemToRecipes[ing.item]) itemToRecipes[ing.item] = [];
+                    if (itemToRecipes[ing.item].indexOf(recipeId) === -1) itemToRecipes[ing.item].push(recipeId);
+                } else if (ing.type === 'vendor') {
+                    vendorItemsSet[ing.item] = true;
+                    if (!itemToRecipes[ing.item]) itemToRecipes[ing.item] = [];
+                    if (itemToRecipes[ing.item].indexOf(recipeId) === -1) itemToRecipes[ing.item].push(recipeId);
+                }
+                if (ing.craftFrom && ing.craftFrom.item) {
+                    ahItemsSet[ing.craftFrom.item] = true;
+                    if (!itemToRecipes[ing.craftFrom.item]) itemToRecipes[ing.craftFrom.item] = [];
+                    if (itemToRecipes[ing.craftFrom.item].indexOf(recipeId) === -1) itemToRecipes[ing.craftFrom.item].push(recipeId);
+                }
+            }
+            LW_RECIPES.forEach(function(r) { r.ingredients.forEach(function(ing) { collectLwItems(ing, r.id); }); });
+
+            var allAhItems = Object.keys(ahItemsSet).sort();
+            var vendorItems = Object.keys(vendorItemsSet).sort();
+
+            function lwTableRow(label, inputId, defaultValue, hasLock, locksKey, recipeIds) {
+                var recipesAttr = recipeIds ? ' data-recipes="' + recipeIds.join(',') + '"' : '';
+                var lockHTML = hasLock ? '<button class="lock-btn" data-input="' + inputId + '" data-locks-key="' + locksKey + '">&#x1f513;</button>' : '';
+                return '<div class="price-table-row"' + recipesAttr + '>' +
+                    '<span class="pt-name">' + label + '</span>' + lockHTML +
+                    '<div class="price-control"><input type="number" id="' + inputId + '" value="' + defaultValue + '" step="0.0001"></div>' +
+                    '<div class="gsc-group" data-input="' + inputId + '"><span class="gsc-val gold">0g</span><span class="gsc-val silver">0s</span><span class="gsc-val copper">0c</span></div>' +
+                '</div>';
+            }
+
+            function lwH2(label, panelId) {
+                return '<h2 class="collapsible" data-panel="lw-' + panelId + '">' + label + '<span class="collapse-arrow">&#9660;</span></h2>';
+            }
+
+            var colLeft = buildLwRecipeDropdownHTML();
+            if (allAhItems.length > 0) {
+                colLeft += '<div class="panel lw-filterable">' + lwH2('AH Materials', 'ah-mats') + '<div class="panel-body" data-panel-body="lw-ah-mats"><div class="price-table">';
+                allAhItems.forEach(function(item) {
+                    var inputId = 'lw_mat_' + sanitizeId(item);
+                    lwNameToInput[item] = inputId;
+                    colLeft += lwTableRow(item, inputId, 0, true, LW_LOCKS_KEY, itemToRecipes[item]);
+                });
+                colLeft += '</div></div></div>';
+            }
+
+            var colRight = '<div class="panel lw-filterable">' + lwH2('Product Sale Prices', 'sale-prices') + '<div class="panel-body" data-panel-body="lw-sale-prices"><div class="price-table">';
+            LW_RECIPES.forEach(function(r) {
+                var inputId = 'lw_sale_' + r.id;
+                lwNameToInput[r.name] = inputId;
+                colRight += lwTableRow(r.name, inputId, 0, true, LW_LOCKS_KEY, [r.id]);
+            });
+            colRight += '</div></div></div>';
+
+            colRight += '<div class="panel lw-filterable">' + lwH2('Deposits & Settings', 'deposits') + '<div class="panel-body" data-panel-body="lw-deposits"><div class="price-table">';
+            LW_RECIPES.forEach(function(r) {
+                colRight += lwTableRow(r.name + ' (deposit)', 'lw_deposit_' + r.id, 0, false, null, [r.id]);
+            });
+            if (vendorItems.length > 0) {
+                vendorItems.forEach(function(item) {
+                    var inputId = 'lw_vendor_' + sanitizeId(item);
+                    colRight += lwTableRow(item + ' (vendor)', inputId, VENDOR_DEFAULTS[item] || 0, false, null, itemToRecipes[item]);
+                });
+            }
+            colRight += '<div class="price-table-row"><span class="pt-name">AH Cut</span><div class="price-control"><input type="number" id="lw_ah_cut" value="5" step="0.1"><span style="color: #888; font-size: 0.82em; margin-left: 2px;">%</span></div></div>';
+            colRight += '</div></div></div>';
+
+            document.getElementById('lw-col-left').innerHTML = colLeft;
+            document.getElementById('lw-col-right').innerHTML = colRight;
+
+            var main = buildLwAllViewHTML();
+            LW_RECIPES.forEach(function(r) { main += buildLwRecipeDetailHTML(r); });
+            document.getElementById('lw-main').innerHTML = main;
+        }
+
+        // ===== LEATHERWORKING: CALCULATE =====
+
+        function computeLwIngCost(ing, recipeId, totalQty) {
+            var baseId = 'lw_' + recipeId + '_ing_' + sanitizeId(ing.item);
+
+            if (ing.craftFrom && ing.craftFrom.item) {
+                var buyCost   = getVal('lw_mat_' + sanitizeId(ing.item)) * totalQty;
+                var craftCost = getVal('lw_mat_' + sanitizeId(ing.craftFrom.item)) * ing.craftFrom.qty * totalQty;
+                var useCraft  = craftCost < buyCost;
+                var buyLbl = document.getElementById(baseId + '_buy_label');
+                if (buyLbl) {
+                    var buyPEl   = document.getElementById(baseId + '_buy_price');
+                    var craftLbl = document.getElementById(baseId + '_craft_label');
+                    var craftPEl = document.getElementById(baseId + '_craft_price');
+                    buyLbl.className   = 'opt' + (!useCraft ? ' active' : '');
+                    buyPEl.className   = 'opt' + (!useCraft ? ' active' : '');
+                    buyPEl.innerHTML   = gold(buyCost)   + (!useCraft ? '<span class="using">USING</span>' : '');
+                    craftLbl.className = 'opt' + (useCraft  ? ' active' : '');
+                    craftPEl.className = 'opt' + (useCraft  ? ' active' : '');
+                    craftPEl.innerHTML = gold(craftCost) + (useCraft  ? '<span class="using">USING</span>' : '');
+                }
+                return useCraft ? craftCost : buyCost;
+            }
+
+            var price = ing.type === 'vendor'
+                ? getVal('lw_vendor_' + sanitizeId(ing.item))
+                : getVal('lw_mat_' + sanitizeId(ing.item));
+            var cost = (price || 0) * totalQty;
+            var costEl = document.getElementById(baseId);
+            if (costEl) costEl.textContent = gold(cost);
+            return cost;
+        }
+
+        function lwCalculate() {
+            var ahCutEl = document.getElementById('lw_ah_cut');
+            if (!ahCutEl) return;
+            var ahCutPct = parseFloat(ahCutEl.value) / 100 || 0.05;
+            var results = [];
+
+            LW_RECIPES.forEach(function(r) {
+                var craftCost = 0;
+                r.ingredients.forEach(function(ing) {
+                    craftCost += computeLwIngCost(ing, r.id, ing.qty);
+                });
+
+                var salePrice = getVal('lw_sale_' + r.id);
+                var ahCut     = salePrice * ahCutPct;
+                var deposit   = getVal('lw_deposit_' + r.id);
+                var profit    = salePrice - ahCut - craftCost;
+
+                var el = function(id) { return document.getElementById(id); };
+                var craftEl  = el('lw_' + r.id + '_craft_cost');    if (craftEl)  craftEl.textContent  = gold(craftCost);
+                var saleDEl  = el('lw_' + r.id + '_sale_display');  if (saleDEl)  saleDEl.textContent  = gold(salePrice);
+                var cutEl    = el('lw_' + r.id + '_ah_cut_display');if (cutEl)    cutEl.textContent    = gold(ahCut);
+                var profitEl = el('lw_' + r.id + '_profit');
+                if (profitEl) profitEl.innerHTML = '<span class="' + profitClass(profit) + '">' + (profit >= 0 ? '+' : '') + gold(profit) + '</span>';
+                var depEl    = el('lw_' + r.id + '_deposit_note');  if (depEl) depEl.textContent = 'Deposit: ' + gold(deposit) + ' (lost if unsold)';
+
+                results.push({ recipe: r, craftCost: craftCost, salePrice: salePrice, profit: profit });
+            });
+
+            lwResults = results;
+            sortResults(results, lwSortBy);
+            var tbody = '';
+            results.forEach(function(r) {
+                var cls = profitClass(r.profit);
+                var pct = profitPctStr(r.profit, r.craftCost);
+                tbody += '<tr class="lw-summary-row" data-recipe="' + r.recipe.id + '">' +
+                    '<td>' + stalenessDotHtml(getLwRecipeStalenessInputs(r.recipe)) + r.recipe.name + '</td>' +
+                    '<td>' + gold(r.craftCost) + '</td>' +
+                    '<td>' + gold(r.salePrice) + '</td>' +
+                    '<td class="' + cls + '">' + (r.profit >= 0 ? '+' : '') + gold(r.profit) + '</td>' +
+                    '<td class="' + cls + '">' + pct + '</td>' +
+                    '<td onclick="event.stopPropagation()">' + tsmInputHtml(lwTsm, r.recipe.id, 'daily', 'lw') + '</td>' +
+                    '<td onclick="event.stopPropagation()">' + tsmInputHtml(lwTsm, r.recipe.id, 'avgPrice', 'lw') + '</td>' +
+                '</tr>';
+            });
+            var summaryBody = document.getElementById('lw-summary-body');
+            if (summaryBody && !(summaryBody.contains(document.activeElement) && document.activeElement.classList.contains('tsm-input'))) {
+                summaryBody.innerHTML = tbody;
+            }
+            lwSaveToStorage();
+            evCalculate();
+        }
+
+        // ===== LEATHERWORKING: SELECT =====
+        function lwSelectRecipe(recipeId) {
+            var dropdown = document.getElementById('lw-recipe-dropdown');
+            var label    = document.getElementById('lw-recipe-dropdown-label');
+            document.querySelectorAll('#lw-recipe-dropdown .recipe-item').forEach(function(el) {
+                var isActive = el.dataset.recipe === recipeId;
+                el.classList.toggle('active', isActive);
+                if (isActive && label) label.textContent = el.textContent;
+            });
+            if (dropdown) dropdown.classList.remove('open');
+            var backBtn = document.getElementById('lw-recipe-back');
+            if (backBtn) backBtn.style.display = recipeId === 'all' ? 'none' : '';
+
+            var allView = document.getElementById('lw-view-all');
+            if (allView) allView.style.display = recipeId === 'all' ? '' : 'none';
+            document.querySelectorAll('.lw-view').forEach(function(v) {
+                v.style.display = v.id === 'lw-view-' + recipeId ? '' : 'none';
+            });
+
+            var lwTab = document.getElementById('tab-leatherworking');
+            lwTab.querySelectorAll('.price-table-row[data-recipes]').forEach(function(row) {
+                if (recipeId === 'all') { row.style.display = 'flex'; return; }
+                row.style.display = row.dataset.recipes.split(',').indexOf(recipeId) !== -1 ? 'flex' : 'none';
+            });
+            lwTab.querySelectorAll('.lw-filterable').forEach(function(panel) {
+                var anyVisible = false;
+                panel.querySelectorAll('.price-table-row[data-recipes]').forEach(function(row) {
+                    if (row.style.display !== 'none') anyVisible = true;
+                });
+                panel.style.display = anyVisible ? '' : 'none';
+            });
+
+            localStorage.setItem(LW_RECIPE_KEY, recipeId);
+        }
+
+        // ===== LEATHERWORKING: SAVE / LOAD =====
+        function lwSaveToStorage() {
+            var data = {};
+            document.querySelectorAll('#tab-leatherworking input').forEach(function(input) { if (input.id) data[input.id] = input.value; });
+            localStorage.setItem(LW_STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function lwLoadFromStorage() {
+            var stored = localStorage.getItem(LW_STORAGE_KEY);
+            if (stored) {
+                try {
+                    var data = JSON.parse(stored);
+                    Object.keys(data).forEach(function(id) {
+                        var input = document.getElementById(id);
+                        if (input && input.closest('#tab-leatherworking')) input.value = data[id];
+                    });
+                } catch (e) { console.error('Failed to load leatherworking data:', e); }
+            }
+        }
+
         // ===== TAB SWITCHING =====
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(function(btn) {
@@ -6422,6 +7182,8 @@
         txInit();
         consumablesInit();
         cookInit();
+        enchInit();
+        lwInit();
         cdInit();
 
         // 3. Load saved data
@@ -6429,6 +7191,8 @@
         gearLoadFromStorage();
         txLoadFromStorage();
         cookLoadFromStorage();
+        enchLoadFromStorage();
+        lwLoadFromStorage();
 
         // 3b. Sync shared prices across tabs
         syncAllSharedPrices();
@@ -6540,6 +7304,10 @@
                     gearSelectRecipe('all');
                 } else if (backBtn.closest('#tab-cooking')) {
                     cookSelectRecipe('all');
+                } else if (backBtn.closest('#tab-enchanting')) {
+                    enchSelectRecipe('all');
+                } else if (backBtn.closest('#tab-leatherworking')) {
+                    lwSelectRecipe('all');
                 } else {
                     alchSelectRecipe('all');
                 }
@@ -6563,6 +7331,10 @@
                     gearSelectRecipe(recipeItem.dataset.recipe);
                 } else if (recipeItem.closest('#tab-cooking')) {
                     cookSelectRecipe(recipeItem.dataset.recipe);
+                } else if (recipeItem.closest('#tab-enchanting')) {
+                    enchSelectRecipe(recipeItem.dataset.recipe);
+                } else if (recipeItem.closest('#tab-leatherworking')) {
+                    lwSelectRecipe(recipeItem.dataset.recipe);
                 } else {
                     alchSelectRecipe(recipeItem.dataset.recipe);
                 }
@@ -6578,9 +7350,13 @@
             if (txDropdown && !txDropdown.contains(e.target)) txDropdown.classList.remove('open');
             var cookDropdown = document.getElementById('cook-recipe-dropdown');
             if (cookDropdown && !cookDropdown.contains(e.target)) cookDropdown.classList.remove('open');
+            var enchDropdown = document.getElementById('ench-recipe-dropdown');
+            if (enchDropdown && !enchDropdown.contains(e.target)) enchDropdown.classList.remove('open');
+            var lwDropdown   = document.getElementById('lw-recipe-dropdown');
+            if (lwDropdown && !lwDropdown.contains(e.target)) lwDropdown.classList.remove('open');
 
             // Summary table rows
-            var summaryRow = e.target.closest('.alch-summary-row, .gear-summary-row, .tx-summary-row, .cook-summary-row');
+            var summaryRow = e.target.closest('.alch-summary-row, .gear-summary-row, .tx-summary-row, .cook-summary-row, .ench-summary-row, .lw-summary-row');
             if (summaryRow) {
                 if (summaryRow.closest('#tab-transmutes')) {
                     txSelectRecipe(summaryRow.dataset.recipe);
@@ -6588,6 +7364,10 @@
                     gearSelectRecipe(summaryRow.dataset.recipe);
                 } else if (summaryRow.closest('#tab-cooking')) {
                     cookSelectRecipe(summaryRow.dataset.recipe);
+                } else if (summaryRow.closest('#tab-enchanting')) {
+                    enchSelectRecipe(summaryRow.dataset.recipe);
+                } else if (summaryRow.closest('#tab-leatherworking')) {
+                    lwSelectRecipe(summaryRow.dataset.recipe);
                 } else {
                     alchSelectRecipe(summaryRow.dataset.recipe);
                 }
@@ -6625,6 +7405,8 @@
                 else if (tab === 'gear') saveTsmField(gearTsm, GEAR_TSM_KEY, recipe, field, val);
                 else if (tab === 'tx') saveTsmField(txTsm, TX_TSM_KEY, recipe, field, val);
                 else if (tab === 'cook') saveTsmField(cookTsm, COOK_TSM_KEY, recipe, field, val);
+                else if (tab === 'ench') saveTsmField(enchTsm, ENCH_TSM_KEY, recipe, field, val);
+                else if (tab === 'lw') saveTsmField(lwTsm, LW_TSM_KEY, recipe, field, val);
                 // Update gsc preview for avg price
                 if (field === 'avgPrice') {
                     var gscEl = e.target.nextElementSibling;
@@ -6692,6 +7474,21 @@
                     cookCalculate();
                 }
             });
+            document.getElementById('tab-enchanting').addEventListener(eventType, function(e) {
+                if (e.target.tagName === 'INPUT' && e.target.id) {
+                    updateGSCDisplay(e.target.id);
+                    autoSizeInput(e.target);
+                    syncSharedPrice(e.target.id);
+                    enchCalculate();
+                }
+            });
+            document.getElementById('tab-leatherworking').addEventListener(eventType, function(e) {
+                if (e.target.tagName === 'INPUT' && e.target.id) {
+                    updateGSCDisplay(e.target.id);
+                    autoSizeInput(e.target);
+                    lwCalculate();
+                }
+            });
         });
 
         // 5. Update all displays
@@ -6711,7 +7508,10 @@
         try { gearTsm = JSON.parse(localStorage.getItem(GEAR_TSM_KEY) || '{}'); } catch(e) { gearTsm = {}; }
         try { txTsm = JSON.parse(localStorage.getItem(TX_TSM_KEY) || '{}'); } catch(e) { txTsm = {}; }
         try { cookTsm = JSON.parse(localStorage.getItem(COOK_TSM_KEY) || '{}'); } catch(e) { cookTsm = {}; }
+        try { enchTsm = JSON.parse(localStorage.getItem(ENCH_TSM_KEY) || '{}'); } catch(e) { enchTsm = {}; }
+        try { lwTsm = JSON.parse(localStorage.getItem(LW_TSM_KEY) || '{}'); } catch(e) { lwTsm = {}; }
         buildAhInputMap();
+        buildAllNameToInputs();
 
         // 7. Initial calculations (summary row dots use timestamps loaded above)
         calculate();
@@ -6720,6 +7520,8 @@
         gearCalculate();
         txCalculate();
         cookCalculate();
+        enchCalculate();
+        lwCalculate();
 
         // 8. Inject price-row staleness dots (after DOM is fully built by init + calculate)
         injectStalenessDotsToRows();
@@ -6736,13 +7538,15 @@
         // Periodic staleness refresh (every 30s)
         setInterval(function() {
             updateStalenessDotsOnRows();
-            calculate(); alchCalculate(); gearCalculate(); txCalculate(); cookCalculate();
+            calculate(); alchCalculate(); gearCalculate(); txCalculate(); cookCalculate(); enchCalculate(); lwCalculate();
         }, 30000);
 
         alchSelectRecipe(localStorage.getItem(ALCH_RECIPE_KEY) || 'all');
         gearSelectRecipe(localStorage.getItem(GEAR_RECIPE_KEY) || 'all');
         txSelectRecipe(localStorage.getItem(TX_RECIPE_KEY) || 'all');
         cookSelectRecipe(localStorage.getItem(COOK_RECIPE_KEY) || 'all');
+        enchSelectRecipe(localStorage.getItem(ENCH_RECIPE_KEY) || 'all');
+        lwSelectRecipe(localStorage.getItem(LW_RECIPE_KEY) || 'all');
 
         // 8. Apply hidden recipe state
         applyHiddenRecipes();
