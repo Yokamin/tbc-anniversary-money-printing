@@ -4,6 +4,20 @@
 
 ---
 
+## Source of truth (current)
+
+- **Runtime app**: `index.html` is the deployed GitHub Pages artifact and the current source of truth (HTML + CSS + JS + data).
+- **No active build step**: the repo currently does **not** contain a `main.html` template or any script/wiring that regenerates `index.html` as part of a pipeline.
+- **Archived helpers**: any old code-generation helpers are kept only as historical context under `legacy/` (see `legacy/README.md`).
+
+## Runtime assumptions
+
+- Primary environment is a **single-user desktop workflow** (Edge browser, desktop layout).
+- Mobile/other-browser parity is not a product goal unless explicitly requested later.
+- Local data persistence intentionally uses `localStorage` so values survive reloads and normal GitHub Pages updates.
+- Release/versioning rules are documented in `docs/VERSIONING.md`.
+- Netherweave cloth handling is documented in `docs/NETHERWEAVE_POLICY.md`.
+
 ## Auctionator Buy-List Export
 
 ### Format
@@ -90,6 +104,15 @@ Items that appear across multiple tabs are synced automatically via the `ALL_NAM
 `buildAllNameToInputs()` aggregates all per-tab `xxxNameToInput` maps into `{ itemName: [inputId1, inputId2, ...] }`, excluding AH cut and deposit inputs. `syncSharedPrice(id)` propagates a single change; `syncAllSharedPrices()` reconciles all groups at once (called after import and on init).
 
 `globalImportPrices()` also uses `ALL_NAME_TO_INPUTS` directly — when an item name is found, all matching inputs across all tabs are updated in one pass. No new tab requires any manual sync wiring; just populate the tab's `xxxNameToInput` map and add it to `buildAllNameToInputs()`'s `allMaps` array.
+
+### Extension contract (avoid shared-price sync regressions)
+
+When adding a new tab (or a new set of inputs) that should participate in shared-price syncing:
+
+- **Ensure the tab has a per-tab name→input map**: e.g. `const enchNameToInput = {}` that is populated during `xxxInit()` when inputs are created.
+- **Register the map with the global sync builder**: add that map to the `allMaps` array inside `buildAllNameToInputs()` (in `index.html`). If you forget this, the tab’s inputs will not be updated when the same item changes elsewhere.
+- **Use consistent item names**: the key is the *display item name* (e.g. `Arcane Dust`). If the same item is spelled differently across tabs, it will not sync.
+- **Prefer `syncSharedPrice(inputId)` on input changes**: if you add custom inputs or custom handlers, make sure they call `syncSharedPrice()` (or rely on the global delegated handler that already does).
 
 Key synced items: Netherweave Cloth, Arcane Dust (Bags/Gear/TX/Enchanting), Bolts of Netherweave, Rune Thread, Motes of Fire/Earth (Alchemy + Gear + TX), Mote/Primal of Mana/Shadow/Fire/Earth (Gear ↔ TX), Lesser/Greater Planar Essence (Bags ↔ TX), Primal Air / Mote of Air (TX ↔ LW), Netherbloom / Nightmare Vine (Alchemy ↔ Enchanting).
 

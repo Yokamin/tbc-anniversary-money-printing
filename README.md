@@ -4,6 +4,31 @@
 
 Single-page HTML app for calculating crafting profitability in WoW TBC Anniversary.
 
+## Note on authorship and tooling
+
+This project was made with AI-assisted tooling (started in Claude Code, now Cursor). I do not work in web stacks (HTML/CSS/JS) that much, so a lot of the code is AI-generated and then reviewed/tweaked until the result works the way I want.
+
+## Project structure (current)
+
+- **App**: `index.html` (single-file app: HTML + CSS + JS + recipe data)
+- **Design notes**: `DECISIONS.md`
+- **Samples**: `export_example.txt` (example Auctionator buy-list export output)
+- **Legacy / archived**: `legacy/` (old helpers and OS artifacts; see `legacy/README.md`)
+
+## Development & deploy workflow
+
+- **Source of truth**: `index.html` is edited directly.
+- **Local testing**: open `index.html` in a browser and sanity-check calculations/import/export before pushing.
+- **Deploy**: pushing to GitHub updates GitHub Pages (repo configured with `origin` at `git@github.com:Yokamin/tbc-anniversary-money-printing.git`).
+
+If a future refactor reintroduces a build step, it should be documented in `DECISIONS.md` and reflected here.
+
+## Versioning
+
+- Versioning and stable release policy: `docs/VERSIONING.md`
+- Current plan: next major architecture era starts at `2.0.0`.
+- Netherweave cloth handling policy: `docs/NETHERWEAVE_POLICY.md`
+
 ### Tabs
 
 **Everything** *(default tab)*
