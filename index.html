@@ -1382,6 +1382,7 @@
     <script src="src/tabs/cookingView.js"></script>
     <script src="src/tabs/transmutesView.js"></script>
     <script src="src/tabs/consumablesView.js"></script>
+    <script src="src/tabs/alchemyView.js"></script>
     <script>
         // ===== STORAGE KEYS =====
         const {
@@ -3874,6 +3875,24 @@
         }
 
         function alchInit() {
+            Object.keys(alchNameToInput).forEach(function(k) { delete alchNameToInput[k]; });
+            var alchView = window.AppAlchemyView.build({
+                recipes: ALCHEMY_RECIPES,
+                categoryOrder: CATEGORY_ORDER,
+                vendorDefaults: VENDOR_DEFAULTS,
+                nameToInput: alchNameToInput,
+                sanitizeId: sanitizeId,
+                locksKey: ALCH_LOCKS_KEY,
+                procRate: alchProcRate,
+                hidden: getHiddenRecipes()
+            });
+            document.getElementById('alch-col-left').innerHTML = alchView.colLeft;
+            document.getElementById('alch-col-right').innerHTML = alchView.colRight;
+            document.getElementById('alch-main').innerHTML = alchView.main;
+            document.getElementById('tab-alchemy').insertAdjacentHTML('beforeend', alchView.manageHtml);
+            document.getElementById('tab-alchemy').insertAdjacentHTML('beforeend', alchView.procModalHtml);
+            return;
+
             var ahItemsSet = {};
             var vendorItemsSet = {};
             var itemToRecipes = {};
