@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
     <title>TBC Crafting Calculator</title>
+    <link rel="stylesheet" href="styles/main.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -1221,7 +1222,6 @@
 
         <div class="tab-bar">
             <button class="tab-btn" data-tab="everything">Everything</button>
-            <button class="tab-btn" data-tab="bags">Bags</button>
             <button class="tab-btn" data-tab="gear">Tailoring Gear</button>
             <button class="tab-btn" data-tab="alchemy">Alchemy</button>
             <button class="tab-btn" data-tab="transmutes">Transmutes / Dailies</button>
@@ -1784,6 +1784,10 @@
         </div>
     </div>
 
+    <script src="src/core/priceStore.js"></script>
+    <script src="src/core/tabRegistry.js"></script>
+    <script src="src/core/runtimeTabs.js"></script>
+    <script src="src/core/uiUtils.js"></script>
     <script>
         // ===== STORAGE KEYS =====
         const STORAGE_KEY = 'tbc_bag_calculator';
@@ -2069,22 +2073,22 @@
         function buildEvSections() {
             return [
                 {
-                    tabId: 'bags', tabLabel: 'Bags',
-                    cats: [
-                        { catId: 'bags_nw_bag', catLabel: 'Netherweave Bag', items: [{ id: 'bags_nw_bag', name: 'Netherweave Bag' }] },
-                        { catId: 'bags_imbued_bag', catLabel: 'Imbued Netherweave Bag', items: [{ id: 'bags_imbued_bag', name: 'Imbued Netherweave Bag' }] }
-                    ]
-                },
-                {
                     tabId: 'gear', tabLabel: 'Tailoring Gear',
-                    cats: GEAR_CATEGORY_ORDER.map(function(cat) {
+                    cats: [{
+                        catId: 'gear_bags',
+                        catLabel: 'Bags',
+                        items: [
+                            { id: 'bags_nw_bag', name: 'Netherweave Bag' },
+                            { id: 'bags_imbued_bag', name: 'Imbued Netherweave Bag' }
+                        ]
+                    }].concat(GEAR_CATEGORY_ORDER.map(function(cat) {
                         return {
                             catId: 'gear_' + cat.includes[0],
                             catLabel: cat.label,
                             items: GEAR_RECIPES.filter(function(r) { return cat.includes.indexOf(r.category) !== -1; })
                                 .map(function(r) { return { id: 'gear_' + r.id, name: r.name }; })
                         };
-                    }).filter(function(cat) { return cat.items.length > 0; })
+                    }).filter(function(cat) { return cat.items.length > 0; }))
                 },
                 {
                     tabId: 'alchemy', tabLabel: 'Alchemy',
@@ -2239,9 +2243,9 @@
             var rows = [];
             var hidden = getHiddenRecipes();
 
-            // Bags
+            // Bags (merged under Tailoring Gear)
             bagsResults.forEach(function(b) {
-                rows.push({ id: b.id, name: b.name, tab: 'bags', tabLabel: 'Bags', catId: b.id, catLabel: b.name, craftCost: b.craftCost, revenue: b.revenue, profit: b.profit, tsmTab: null, tsmId: null });
+                rows.push({ id: b.id, name: b.name, tab: 'gear', tabLabel: 'Tailoring Gear', catId: 'gear_bags', catLabel: 'Bags', craftCost: b.craftCost, revenue: b.revenue, profit: b.profit, tsmTab: null, tsmId: null });
             });
 
             // Gear
@@ -2456,7 +2460,7 @@
                 });
             });
 
-            // Bags (static)
+            // Bags (static, merged under Tailoring Gear)
             var bagsIng = [
                 { item: 'Netherweave Cloth',         recipeId: 'bags_nw_bag',     recipeName: 'Netherweave Bag',         qty: 24 },
                 { item: 'Rune Thread',               recipeId: 'bags_nw_bag',     recipeName: 'Netherweave Bag',         qty: 1  },
@@ -2470,7 +2474,7 @@
                 { item: 'Greater Planar Essence',    recipeId: 'bags_imbued_bag', recipeName: 'Imbued Netherweave Bag',  qty: 1  }
             ];
             bagsIng.forEach(function(b) {
-                add(b.item, { recipeId: b.recipeId, recipeName: b.recipeName, tab: 'bags', tabLabel: 'Bags', qty: b.qty });
+                add(b.item, { recipeId: b.recipeId, recipeName: b.recipeName, tab: 'gear', tabLabel: 'Tailoring Gear', qty: b.qty });
             });
 
             return index;
@@ -2482,7 +2486,9 @@
                 return r ? r.profit : null;
             } else if (tab === 'gear') {
                 var r = gearResults.find(function(x) { return x.recipe.id === recipeId; });
-                return r ? r.profit : null;
+                if (r) return r.profit;
+                var br = bagsResults.find(function(x) { return x.id === recipeId; });
+                return br ? br.profit : null;
             } else if (tab === 'cooking') {
                 var r = cookResults.find(function(x) { return x.recipe.id === recipeId; });
                 return r ? r.profit : null;
@@ -2511,6 +2517,7 @@
                 });
             } else if (tab === 'gear') {
                 var r = GEAR_RECIPES.find(function(x) { return x.id === recipeId; });
+                if (!r) r = GEAR_BAG_RECIPES.find(function(x) { return x.id === recipeId; });
                 if (!r) return [];
                 return r.ingredients.map(function(ing) {
                     return ing.qty + '\u00d7 ' + ing.item + (ing.type === 'vendor' ? ' (vendor)' : ing.type === 'bop' ? ' (BOP)' : '');
@@ -2616,12 +2623,12 @@
                     else if (rec.tab === 'gear') { var rx = gearResults.find(function(x){return x.recipe.id===rec.recipeId;}); if(rx) craftCostVal = rx.craftCost; }
                     else if (rec.tab === 'cooking') { var rx = cookResults.find(function(x){return x.recipe.id===rec.recipeId;}); if(rx) craftCostVal = rx.craftCost; }
                     else if (rec.tab === 'tx') { var rx = txSummaryRows.find(function(x){return x.recipeId===rec.recipeId;}); if(rx) craftCostVal = rx.cost; }
-                    else if (rec.tab === 'bags') { var rx = bagsResults.find(function(x){return x.id===rec.recipeId;}); if(rx) craftCostVal = rx.craftCost; }
+                    if (rec.recipeId === 'bags_nw_bag' || rec.recipeId === 'bags_imbued_bag') { var rx = bagsResults.find(function(x){return x.id===rec.recipeId;}); if(rx) craftCostVal = rx.craftCost; }
                     var statsHtml = craftCostVal !== null
                         ? '<div class="is-detail-stats"><span>Cost: <b>' + gold(craftCostVal) + '</b></span><span>Profit: <b>' + (profit !== null ? (profit>=0?'+':'') + gold(profit) : '\u2014') + '</b></span></div>'
                         : '';
-                    var gotoTab = rec.tab === 'bags' ? 'bags' : rec.tab;
-                    var gotoId = rec.tab === 'bags' ? '' : rec.recipeId;
+                    var gotoTab = rec.tab === 'gear' ? 'gear' : rec.tab;
+                    var gotoId = rec.recipeId;
                     var gotoBtnHtml = gotoId
                         ? '<button class="is-goto-btn" onclick="ingGotoRecipe(\'' + gotoTab + '\',\'' + gotoId + '\');event.stopPropagation();">\u2192 Go to recipe</button>'
                         : '<button class="is-goto-btn" onclick="ingGotoRecipe(\'' + gotoTab + '\',\'\');event.stopPropagation();">\u2192 Go to tab</button>';
@@ -2720,6 +2727,24 @@
                     }
                 }
             });
+            return ids;
+        }
+
+        function getBagRecipeStalenessInputs(bagId) {
+            var ids = [];
+            function pushIfTracked(inputId) {
+                if (inputId && AH_INPUT_TO_NAME[inputId]) ids.push(inputId);
+            }
+            if (bagId === 'bags_nw_bag') {
+                pushIfTracked('price_nw_bag');
+                pushIfTracked('price_bolt');
+                pushIfTracked('price_thread');
+            } else if (bagId === 'bags_imbued_bag') {
+                pushIfTracked('price_imbued_bag');
+                pushIfTracked('price_imbued_bolt');
+                pushIfTracked('price_silk');
+                pushIfTracked('price_greater');
+            }
             return ids;
         }
 
@@ -3352,7 +3377,7 @@
             { spec: 'Feral Tank', items: [
               { cat: 'Battle',   name: 'Elixir of Major Agility' },
               { cat: 'Guardian', name: 'Gift of Arthas' },
-              { cat: 'Food',     name: "Fisherman's Feast / Spicy Crawdad" },
+              { cat: 'Food',     name: "Spicy Crawdad" },
               { cat: 'Potion',   name: 'Ironshield Potion' },
               { cat: 'Potion',   name: 'Haste Potion',            alt: true, note: '400 Haste — when armour capped' },
               { cat: 'Battle',   name: 'Elixir of Demonslaying',  alt: true, note: 'Demons only' },
@@ -3424,7 +3449,7 @@
             { spec: 'Tank', items: [
               { cat: 'Battle',   name: 'Greater Arcane Elixir' },
               { cat: 'Guardian', name: 'Gift of Arthas' },
-              { cat: 'Food',     name: "Fisherman's Feast / Spicy Crawdad" },
+              { cat: 'Food',     name: "Spicy Crawdad" },
               { cat: 'Food',     name: 'Blackened Basilisk / Crunchy Serpent / Poached Bluefish' },
               { cat: 'Potion',   name: 'Ironshield Potion' },
               { cat: 'Potion',   name: 'Super Mana Potion' },
@@ -3515,7 +3540,7 @@
               { cat: 'Battle',   name: 'Elixir of Major Agility' },
               { cat: 'Guardian', name: 'Spirit of Zanza' },
               { cat: 'Guardian', name: 'Gift of Arthas' },
-              { cat: 'Food',     name: "Fisherman's Feast / Spicy Crawdad" },
+              { cat: 'Food',     name: "Spicy Crawdad" },
               { cat: 'Potion',   name: 'Ironshield Potion' },
               { cat: 'Flask',    name: 'Flask of Fortification',  alt: true },
             ]},
@@ -3525,16 +3550,6 @@
         // ===== COOKING DATA =====
         const COOKING_RECIPES = [
             // === +30 Stamina ===
-            {
-                id: 'fishermans_feast',
-                name: "Fisherman's Feast",
-                category: 'stamina',
-                ingredients: [
-                    { item: 'Huge Spotted Feltail', qty: 1, type: 'ah' },
-                    { item: 'Goldenbark Apple', qty: 5, type: 'vendor' },
-                    { item: 'Soothing Spices', qty: 5, type: 'vendor' },
-                ]
-            },
             {
                 id: 'spicy_crawdad',
                 name: 'Spicy Crawdad',
@@ -3756,6 +3771,43 @@
             { label: 'Rare Gear', includes: ['rare'] },
             { label: 'Uncommon Gear', includes: ['uncommon'] }
         ];
+        const GEAR_BAG_RECIPES = [
+            {
+                id: 'bags_nw_bag',
+                name: 'Netherweave Bag',
+                category: 'bags',
+                ingredients: [
+                    {
+                        item: 'Bolt of Netherweave', qty: 4, type: 'ah',
+                        craftFrom: { mats: [
+                            { item: 'Netherweave Cloth', qty: 6, type: 'ah' }
+                        ]}
+                    },
+                    { item: 'Rune Thread', qty: 1, type: 'vendor' }
+                ]
+            },
+            {
+                id: 'bags_imbued_bag',
+                name: 'Imbued Netherweave Bag',
+                category: 'bags',
+                ingredients: [
+                    {
+                        item: 'Bolt of Imbued Netherweave', qty: 4, type: 'ah',
+                        craftFrom: { mats: [
+                            {
+                                item: 'Bolt of Netherweave', qty: 3, type: 'ah',
+                                craftFrom: { mats: [
+                                    { item: 'Netherweave Cloth', qty: 6, type: 'ah' }
+                                ]}
+                            },
+                            { item: 'Arcane Dust', qty: 2, type: 'ah' }
+                        ]}
+                    },
+                    { item: 'Netherweb Spider Silk', qty: 2, type: 'ah' },
+                    { item: 'Greater Planar Essence', qty: 1, type: 'ah', craftFrom: { item: 'Lesser Planar Essence', qty: 3 } }
+                ]
+            }
+        ];
 
         // Built dynamically by alchInit: maps item/product names to input IDs
         const alchNameToInput = {};
@@ -3766,67 +3818,41 @@
         // Maps item name → every input ID across all tabs that holds that item's price.
         // Any new tab/recipe automatically participates — no manual maintenance needed.
         var ALL_NAME_TO_INPUTS = {};
+        var PRICE_STORE = window.AppPriceStore.create();
+        var TAB_REGISTRY = window.AppTabRegistry.create();
 
         function buildAllNameToInputs() {
-            ALL_NAME_TO_INPUTS = {};
             var excludePattern = /(_ah_cut|_deposit_)/;
             var allMaps = [NAME_TO_INPUT, alchNameToInput, gearNameToInput, txNameToInput, cookNameToInput, enchNameToInput, lwNameToInput];
-            allMaps.forEach(function(map) {
-                for (var name in map) {
-                    var id = map[name];
-                    if (!id || excludePattern.test(id)) continue;
-                    if (!ALL_NAME_TO_INPUTS[name]) ALL_NAME_TO_INPUTS[name] = [];
-                    if (ALL_NAME_TO_INPUTS[name].indexOf(id) === -1) ALL_NAME_TO_INPUTS[name].push(id);
-                }
-            });
+            PRICE_STORE.build(allMaps, excludePattern);
+            ALL_NAME_TO_INPUTS = PRICE_STORE.getGroups();
         }
 
         function syncSharedPrice(changedId) {
-            var input = document.getElementById(changedId);
-            if (!input) return;
-            var value = input.value;
-            // Find all inputs for the same item name and sync them
-            for (var name in ALL_NAME_TO_INPUTS) {
-                var group = ALL_NAME_TO_INPUTS[name];
-                if (group.indexOf(changedId) === -1) continue;
-                group.forEach(function(id) {
-                    if (id === changedId) return;
-                    var sibling = document.getElementById(id);
-                    if (sibling && sibling.value !== value) {
-                        sibling.value = value;
-                        updateGSCDisplay(id);
-                        autoSizeInput(sibling);
-                    }
-                });
-                break;
-            }
+            PRICE_STORE.syncChanged(changedId, function(id) {
+                return document.getElementById(id);
+            }, function(id, inputEl) {
+                updateGSCDisplay(id);
+                autoSizeInput(inputEl);
+            });
         }
 
         function syncAllSharedPrices() {
-            for (var name in ALL_NAME_TO_INPUTS) {
-                var group = ALL_NAME_TO_INPUTS[name];
-                if (group.length < 2) continue;
-                // Find first input with a non-zero value and sync from it
-                var sourceId = null;
-                var sourceVal = null;
+            PRICE_STORE.syncAll(function(id) {
+                return document.getElementById(id);
+            }, function(group, getInputById) {
+                var source = null;
                 group.forEach(function(id) {
-                    var el = document.getElementById(id);
-                    if (el && parseFloat(el.value) && sourceId === null) {
-                        sourceId = id;
-                        sourceVal = el.value;
+                    var el = getInputById(id);
+                    if (el && parseFloat(el.value) && source === null) {
+                        source = { id: id, value: el.value };
                     }
                 });
-                if (sourceId === null) continue;
-                group.forEach(function(id) {
-                    if (id === sourceId) return;
-                    var el = document.getElementById(id);
-                    if (el && el.value !== sourceVal) {
-                        el.value = sourceVal;
-                        updateGSCDisplay(id);
-                        autoSizeInput(el);
-                    }
-                });
-            }
+                return source;
+            }, function(id, inputEl) {
+                updateGSCDisplay(id);
+                autoSizeInput(inputEl);
+            });
         }
 
         // ===== LOCK FUNCTIONS =====
@@ -3914,10 +3940,7 @@
             }
 
             syncAllSharedPrices();
-            calculate();
-            alchCalculate();
-            gearCalculate();
-            txCalculate();
+            calculateCoreTabs();
 
             var msg = 'Updated ' + updated + ' price' + (updated !== 1 ? 's' : '');
             if (skipped > 0) {
@@ -3928,67 +3951,25 @@
         }
 
         // ===== SHARED UTILITY FUNCTIONS =====
-        function getVal(id) {
-            return parseFloat(document.getElementById(id).value) || 0;
-        }
+        function getVal(id) { return window.AppUiUtils.getVal(id); }
 
-        function toGSC(value) {
-            const totalCopper = Math.round(Math.abs(value) * 10000);
-            const g = Math.floor(totalCopper / 10000);
-            const s = Math.floor((totalCopper % 10000) / 100);
-            const c = totalCopper % 100;
-            return { g, s, c, negative: value < 0 };
-        }
+        function toGSC(value) { return window.AppUiUtils.toGSC(value); }
 
-        function goldGSC(amount) {
-            const { g, s, c, negative } = toGSC(amount);
-            let parts = [];
-            if (g > 0) parts.push(g + 'g');
-            if (s > 0 || g > 0) parts.push(s + 's');
-            parts.push(c + 'c');
-            return (negative ? '-' : '') + parts.join(' ');
-        }
+        function goldGSC(amount) { return window.AppUiUtils.goldGSC(amount); }
 
-        function gold(amount) {
-            return goldGSC(amount);
-        }
+        function gold(amount) { return window.AppUiUtils.gold(amount); }
 
-        function updateGSCDisplay(inputId) {
-            const value = getVal(inputId);
-            const { g, s, c } = toGSC(value);
-            const group = document.querySelector('.gsc-group[data-input="' + inputId + '"]');
-            if (group) {
-                const vals = group.querySelectorAll('.gsc-val');
-                vals[0].textContent = g + 'g';
-                vals[1].textContent = s + 's';
-                vals[2].textContent = c + 'c';
-            }
-        }
+        function updateGSCDisplay(inputId) { return window.AppUiUtils.updateGSCDisplay(inputId); }
 
-        function updateAllGSCDisplays() {
-            document.querySelectorAll('.gsc-group').forEach(group => {
-                updateGSCDisplay(group.dataset.input);
-            });
-        }
+        function updateAllGSCDisplays() { return window.AppUiUtils.updateAllGSCDisplays(); }
 
-        function autoSizeInput(input) {
-            const length = input.value.length || 1;
-            input.style.width = (length * 9 + 16) + 'px';
-        }
+        function autoSizeInput(input) { return window.AppUiUtils.autoSizeInput(input); }
 
-        function autoSizeAllInputs() {
-            document.querySelectorAll('.price-control input').forEach(autoSizeInput);
-        }
+        function autoSizeAllInputs() { return window.AppUiUtils.autoSizeAllInputs(); }
 
-        function profitClass(amount) {
-            if (amount > 0.001) return 'profit';
-            if (amount < -0.001) return 'loss';
-            return 'neutral';
-        }
+        function profitClass(amount) { return window.AppUiUtils.profitClass(amount); }
 
-        function sanitizeId(name) {
-            return name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
-        }
+        function sanitizeId(name) { return window.AppUiUtils.sanitizeId(name); }
 
         // ===== GLOBAL IMPORT =====
         function globalImportPrices() {
@@ -4024,7 +4005,7 @@
                 allIds.forEach(function(inputId) {
                     var locks = getLocks(getLocksKey(inputId));
                     if (locks[inputId]) { anySkipped = true; return; }
-                    var iName = AH_INPUT_TO_NAME[inputId] || name;
+                    var iName = PRICE_STORE.getItemName(inputId) || AH_INPUT_TO_NAME[inputId] || name;
                     priceTimestamps[iName] = batchTime;
                     var input = document.getElementById(inputId);
                     if (input) { input.value = goldPrice; updateGSCDisplay(inputId); autoSizeInput(input); anyUpdated = true; }
@@ -4037,7 +4018,7 @@
             localStorage.setItem(PRICE_TIMESTAMPS_KEY, JSON.stringify(priceTimestamps));
             localStorage.setItem(LAST_IMPORT_BATCH_KEY, String(batchTime));
             syncAllSharedPrices();
-            calculate(); alchCalculate(); gearCalculate(); txCalculate(); cookCalculate(); enchCalculate(); lwCalculate();
+            calculateAllTabs();
             updateStalenessDotsOnRows();
 
             var msg = 'Updated ' + updated + ' price' + (updated !== 1 ? 's' : '');
@@ -4173,10 +4154,7 @@
                 autoSizeInput(input);
             });
 
-            calculate();
-            alchCalculate();
-            gearCalculate();
-            txCalculate();
+            calculateAllTabs();
         }
 
         // ===== TAILORING SAVE / LOAD =====
@@ -4858,10 +4836,7 @@
             }
 
             syncAllSharedPrices();
-            alchCalculate();
-            calculate();
-            gearCalculate();
-            txCalculate();
+            calculateCoreTabs();
 
             var msg = 'Updated ' + updated + ' price' + (updated !== 1 ? 's' : '');
             if (skipped > 0) {
@@ -5075,6 +5050,10 @@
                 '</button>' +
                 '<div class="recipe-dropdown-menu">';
             html += '<div class="recipe-item active" data-recipe="all">All (Profit Overview)</div>';
+            html += '<div class="recipe-category">Bags</div>';
+            GEAR_BAG_RECIPES.forEach(function(r) {
+                html += '<div class="recipe-item" data-recipe="' + r.id + '">' + r.name + '</div>';
+            });
             GEAR_CATEGORY_ORDER.forEach(function(cat) {
                 var recipes = GEAR_RECIPES.filter(function(r) { return cat.includes.indexOf(r.category) !== -1; });
                 if (recipes.length === 0) return;
@@ -5173,6 +5152,9 @@
             GEAR_RECIPES.forEach(function(r) {
                 r.ingredients.forEach(function(ing) { collectGearItems(ing, r.id); });
             });
+            GEAR_BAG_RECIPES.forEach(function(r) {
+                r.ingredients.forEach(function(ing) { collectGearItems(ing, r.id); });
+            });
 
             var allAhItems = Object.keys(ahItemsSet).sort();
             var vendorItems = Object.keys(vendorItemsSet).sort();
@@ -5214,10 +5196,21 @@
                 gearNameToInput[productName] = inputId;
                 colRight += gearTableRow(productName, inputId, 0, true, GEAR_LOCKS_KEY, [r.id]);
             });
+            GEAR_BAG_RECIPES.forEach(function(r) {
+                var inputId = 'gear_sale_' + r.id;
+                var productName = r.product || r.name;
+                gearNameToInput[productName] = inputId;
+                colRight += gearTableRow(productName, inputId, 0, true, GEAR_LOCKS_KEY, [r.id]);
+            });
             colRight += '</div></div></div>';
 
             colRight += '<div class="panel gear-filterable">' + gearCollapsibleH2('Deposits & Settings', 'deposits') + '<div class="panel-body" data-panel-body="gear-deposits"><div class="price-table">';
             GEAR_RECIPES.forEach(function(r) {
+                var inputId = 'gear_deposit_' + r.id;
+                var productName = r.product || r.name;
+                colRight += gearTableRow(productName + ' (deposit)', inputId, DEPOSIT_DEFAULTS[inputId] || 0, false, null, [r.id]);
+            });
+            GEAR_BAG_RECIPES.forEach(function(r) {
                 var inputId = 'gear_deposit_' + r.id;
                 var productName = r.product || r.name;
                 colRight += gearTableRow(productName + ' (deposit)', inputId, DEPOSIT_DEFAULTS[inputId] || 0, false, null, [r.id]);
@@ -5237,6 +5230,7 @@
 
             var main = buildGearAllViewHTML();
             GEAR_RECIPES.forEach(function(r) { main += buildGearRecipeDetailHTML(r); });
+            GEAR_BAG_RECIPES.forEach(function(r) { main += buildGearRecipeDetailHTML(r); });
             document.getElementById('gear-main').innerHTML = main;
         }
 
@@ -5265,10 +5259,7 @@
             }
 
             syncAllSharedPrices();
-            gearCalculate();
-            calculate();
-            alchCalculate();
-            txCalculate();
+            calculateCoreTabs();
             var msg = 'Updated ' + updated + ' price' + (updated !== 1 ? 's' : '');
             if (skipped > 0) msg += ', ' + skipped + ' locked (' + skippedNames.join(', ') + ')';
             status.textContent = msg;
@@ -5397,19 +5388,58 @@
             });
 
             gearResults = results;
-            sortResults(results, gearSortBy);
+            var summaryRows = results.map(function(r) {
+                return {
+                    recipeId: r.recipe.id,
+                    recipeName: r.recipe.name,
+                    craftCost: r.craftCost,
+                    salePrice: r.salePrice,
+                    profit: r.profit,
+                    stalenessInputs: getGearRecipeStalenessInputs(r.recipe),
+                    tsmId: r.recipe.id
+                };
+            });
+            bagsResults.forEach(function(b) {
+                summaryRows.push({
+                    recipeId: b.id,
+                    recipeName: b.name,
+                    craftCost: b.craftCost,
+                    salePrice: b.revenue / (1 - ahCutPct),
+                    profit: b.profit,
+                    stalenessInputs: getBagRecipeStalenessInputs(b.id),
+                    tsmId: null
+                });
+            });
+            bagsResults.forEach(function(b) {
+                var bagRecipe = GEAR_BAG_RECIPES.find(function(x) { return x.id === b.id; });
+                if (bagRecipe) {
+                    bagRecipe.ingredients.forEach(function(ing) {
+                        computeGearIngCost(ing, bagRecipe.id, ing.qty);
+                    });
+                }
+                var salePrice = b.revenue / (1 - ahCutPct);
+                var ahCut = salePrice * ahCutPct;
+                var cEl = document.getElementById('gear_' + b.id + '_craft_cost'); if (cEl) cEl.textContent = gold(b.craftCost);
+                var sEl = document.getElementById('gear_' + b.id + '_sale_display'); if (sEl) sEl.textContent = gold(salePrice);
+                var aEl = document.getElementById('gear_' + b.id + '_ah_cut_display'); if (aEl) aEl.textContent = gold(ahCut);
+                var pEl = document.getElementById('gear_' + b.id + '_profit');
+                if (pEl) pEl.innerHTML = '<span class="' + profitClass(b.profit) + '">' + (b.profit >= 0 ? '+' : '') + gold(b.profit) + '</span>';
+            });
+            sortResults(summaryRows, gearSortBy);
             var tbody = '';
-            results.forEach(function(r) {
+            summaryRows.forEach(function(r) {
                 var cls = profitClass(r.profit);
                 var pct = profitPctStr(r.profit, r.craftCost);
-                tbody += '<tr class="gear-summary-row" data-recipe="' + r.recipe.id + '">' +
-                    '<td>' + stalenessDotHtml(getGearRecipeStalenessInputs(r.recipe)) + r.recipe.name + '</td>' +
+                var tsmDaily = r.tsmId ? tsmInputHtml(gearTsm, r.tsmId, 'daily', 'gear') : '—';
+                var tsmAvg = r.tsmId ? tsmInputHtml(gearTsm, r.tsmId, 'avgPrice', 'gear') : '—';
+                tbody += '<tr class="gear-summary-row" data-recipe="' + r.recipeId + '">' +
+                    '<td>' + stalenessDotHtml(r.stalenessInputs) + r.recipeName + '</td>' +
                     '<td>' + gold(r.craftCost) + '</td>' +
                     '<td>' + gold(r.salePrice) + '</td>' +
                     '<td class="' + cls + '">' + (r.profit >= 0 ? '+' : '') + gold(r.profit) + '</td>' +
                     '<td class="' + cls + '">' + pct + '</td>' +
-                    '<td onclick="event.stopPropagation()">' + tsmInputHtml(gearTsm, r.recipe.id, 'daily', 'gear') + '</td>' +
-                    '<td onclick="event.stopPropagation()">' + tsmInputHtml(gearTsm, r.recipe.id, 'avgPrice', 'gear') + '</td>' +
+                    '<td onclick="event.stopPropagation()">' + tsmDaily + '</td>' +
+                    '<td onclick="event.stopPropagation()">' + tsmAvg + '</td>' +
                 '</tr>';
             });
             var summaryBody = document.getElementById('gear-summary-body');
@@ -5437,6 +5467,10 @@
             var allView = document.getElementById('gear-view-all');
             if (allView) allView.style.display = recipeId === 'all' ? '' : 'none';
             GEAR_RECIPES.forEach(function(r) {
+                var view = document.getElementById('gear-view-' + r.id);
+                if (view) view.style.display = r.id === recipeId ? '' : 'none';
+            });
+            GEAR_BAG_RECIPES.forEach(function(r) {
                 var view = document.getElementById('gear-view-' + r.id);
                 if (view) view.style.display = r.id === recipeId ? '' : 'none';
             });
@@ -6067,10 +6101,7 @@
             }
 
             syncAllSharedPrices();
-            txCalculate();
-            calculate();
-            alchCalculate();
-            gearCalculate();
+            calculateCoreTabs();
             var msg = 'Updated ' + updated + ' price' + (updated !== 1 ? 's' : '');
             if (skipped > 0) msg += ', ' + skipped + ' locked (' + skippedNames.join(', ') + ')';
             status.textContent = msg;
@@ -7170,6 +7201,14 @@
             localStorage.setItem(TAB_STORAGE_KEY, tabName);
         }
 
+        function calculateCoreTabs() {
+            window.AppRuntimeTabs.calculateCoreTabs(TAB_REGISTRY);
+        }
+
+        function calculateAllTabs() {
+            window.AppRuntimeTabs.calculateAllTabs(TAB_REGISTRY);
+        }
+
         // ===== INITIALIZATION =====
 
         // 1. Load tailoring saved data
@@ -7177,22 +7216,34 @@
 
         // 2. Generate alchemy UI, gear UI, and transmutes/dailies UI
         evInit();
-        alchInit();
-        gearInit();
-        txInit();
+        window.AppRuntimeTabs.registerDefaultTabs(TAB_REGISTRY, {
+            loadFromStorage: loadFromStorage,
+            calculate: calculate,
+            alchInit: alchInit,
+            alchLoadFromStorage: alchLoadFromStorage,
+            alchCalculate: alchCalculate,
+            gearInit: gearInit,
+            gearLoadFromStorage: gearLoadFromStorage,
+            gearCalculate: gearCalculate,
+            txInit: txInit,
+            txLoadFromStorage: txLoadFromStorage,
+            txCalculate: txCalculate,
+            cookInit: cookInit,
+            cookLoadFromStorage: cookLoadFromStorage,
+            cookCalculate: cookCalculate,
+            enchInit: enchInit,
+            enchLoadFromStorage: enchLoadFromStorage,
+            enchCalculate: enchCalculate,
+            lwInit: lwInit,
+            lwLoadFromStorage: lwLoadFromStorage,
+            lwCalculate: lwCalculate
+        });
+        TAB_REGISTRY.initAll();
         consumablesInit();
-        cookInit();
-        enchInit();
-        lwInit();
         cdInit();
 
         // 3. Load saved data
-        alchLoadFromStorage();
-        gearLoadFromStorage();
-        txLoadFromStorage();
-        cookLoadFromStorage();
-        enchLoadFromStorage();
-        lwLoadFromStorage();
+        TAB_REGISTRY.loadAll();
 
         // 3b. Sync shared prices across tabs
         syncAllSharedPrices();
@@ -7235,10 +7286,7 @@
                 updateGSCDisplay(inputId);
                 autoSizeInput(input);
                 syncSharedPrice(inputId);
-                calculate();
-                alchCalculate();
-                gearCalculate();
-                txCalculate();
+                calculateCoreTabs();
                 return;
             }
 
@@ -7428,10 +7476,7 @@
                     updateGSCDisplay(e.target.id);
                     autoSizeInput(e.target);
                     syncSharedPrice(e.target.id);
-                    calculate();
-                    alchCalculate();
-                    gearCalculate();
-                    txCalculate();
+                    calculateCoreTabs();
                 }
             });
             document.getElementById('tab-alchemy').addEventListener(eventType, function(e) {
@@ -7439,10 +7484,7 @@
                     updateGSCDisplay(e.target.id);
                     autoSizeInput(e.target);
                     syncSharedPrice(e.target.id);
-                    alchCalculate();
-                    calculate();
-                    gearCalculate();
-                    txCalculate();
+                    calculateCoreTabs();
                 }
             });
             document.getElementById('tab-gear').addEventListener(eventType, function(e) {
@@ -7450,10 +7492,7 @@
                     updateGSCDisplay(e.target.id);
                     autoSizeInput(e.target);
                     syncSharedPrice(e.target.id);
-                    gearCalculate();
-                    calculate();
-                    alchCalculate();
-                    txCalculate();
+                    calculateCoreTabs();
                 }
             });
             document.getElementById('tab-transmutes').addEventListener(eventType, function(e) {
@@ -7461,10 +7500,7 @@
                     updateGSCDisplay(e.target.id);
                     autoSizeInput(e.target);
                     syncSharedPrice(e.target.id);
-                    txCalculate();
-                    calculate();
-                    alchCalculate();
-                    gearCalculate();
+                    calculateCoreTabs();
                 }
             });
             document.getElementById('tab-cooking').addEventListener(eventType, function(e) {
@@ -7514,14 +7550,8 @@
         buildAllNameToInputs();
 
         // 7. Initial calculations (summary row dots use timestamps loaded above)
-        calculate();
-        alchCalculate();
+        calculateAllTabs();
         if (alchBatchSize !== 1) setAlchBatch(alchBatchSize);
-        gearCalculate();
-        txCalculate();
-        cookCalculate();
-        enchCalculate();
-        lwCalculate();
 
         // 8. Inject price-row staleness dots (after DOM is fully built by init + calculate)
         injectStalenessDotsToRows();
@@ -7531,14 +7561,16 @@
         });
 
         // 9. Restore last tab and recipe selection
-        switchTab(localStorage.getItem(TAB_STORAGE_KEY) || 'everything');
+        var initialTab = localStorage.getItem(TAB_STORAGE_KEY) || 'everything';
+        if (initialTab === 'bags') initialTab = 'gear';
+        switchTab(initialTab);
         // Restore ev toolbar button states
         document.querySelectorAll('.ev-sort-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.sort === evSortBy); });
         document.querySelectorAll('.ev-view-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.view === evView); });
         // Periodic staleness refresh (every 30s)
         setInterval(function() {
             updateStalenessDotsOnRows();
-            calculate(); alchCalculate(); gearCalculate(); txCalculate(); cookCalculate(); enchCalculate(); lwCalculate();
+            calculateAllTabs();
         }, 30000);
 
         alchSelectRecipe(localStorage.getItem(ALCH_RECIPE_KEY) || 'all');

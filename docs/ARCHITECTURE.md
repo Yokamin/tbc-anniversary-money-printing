@@ -1,11 +1,21 @@
 # Architecture (current)
 
-This project is a **single-file** GitHub Pages app: everything (UI, styles, logic, data) lives in `index.html`.
+This project is in a **single-file to modular migration** for GitHub Pages.
+
+Current state:
+- Main app shell and most logic still live in `index.html`.
+- Core architecture pieces have been extracted into plain JS modules under `src/core/`.
+- UI polish overrides are in `styles/main.css` (non-redesign, usability-focused layer).
+- Standalone Bags navigation has been merged into Tailoring-facing flows (with compatibility data paths retained during transition).
 
 ## Source of truth
 
-- **`index.html`**: runtime + data (recipe arrays/constants, UI generation, calculations, persistence).
-- There is **no active build step** in the repo at the moment (see `DECISIONS.md` for details).
+- **`index.html`**: runtime shell + main wiring + current tab implementations.
+- **`src/core/priceStore.js`**: centralized shared-price grouping/sync engine.
+- **`src/core/tabRegistry.js`**: tab lifecycle registration and grouped recalculation.
+- **`src/core/runtimeTabs.js`**: default tab wiring and grouped recalc helpers used by bootstrap.
+- **`src/core/uiUtils.js`**: shared numeric/UI helpers (g/s/c formatting, sizing, input display).
+- There is **no build step** (plain files directly served by GitHub Pages).
 
 ## High-level flow
 
@@ -37,15 +47,14 @@ flowchart TD
 
 ## Shared price sync (why “some items update everywhere”)
 
-Shared sync is driven by a global map:
+Shared sync is now driven by the `PriceStore` module, with compatibility exposure via `ALL_NAME_TO_INPUTS`:
 
-- **`ALL_NAME_TO_INPUTS`**: `{ itemName: [inputId1, inputId2, ...] }`
-- Built by **`buildAllNameToInputs()`** using per-tab `xxxNameToInput` maps.
-- Used by:
-  - **`syncSharedPrice(changedId)`**: propagate a single item update.
-  - **`globalImportPrices()`**: when importing Auctionator CSV, update all matching inputs across all tabs.
+- `buildAllNameToInputs()` builds the store from per-tab `xxxNameToInput` maps.
+- `syncSharedPrice(changedId)` delegates to `PriceStore.syncChanged(...)`.
+- `syncAllSharedPrices()` delegates to `PriceStore.syncAll(...)`.
+- `globalImportPrices()` resolves canonical item names through `PriceStore` before stamping timestamps.
 
-If you add a new tab and its inputs don’t update when another tab changes the same item, the most common cause is: **the tab’s `xxxNameToInput` map wasn’t included in `buildAllNameToInputs()`**.
+If you add a new tab and its inputs don’t update when another tab changes the same item, the most common cause is still: **the tab’s `xxxNameToInput` map wasn’t included in `buildAllNameToInputs()`**.
 
 ## Persistence
 

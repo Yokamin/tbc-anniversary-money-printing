@@ -6,7 +6,8 @@
 
 ## Source of truth (current)
 
-- **Runtime app**: `index.html` is the deployed GitHub Pages artifact and the current source of truth (HTML + CSS + JS + data).
+- **Runtime app**: `index.html` is the deployed GitHub Pages artifact and current app shell.
+- **Modular migration in progress**: core logic is being extracted into plain JS modules under `src/` while keeping no-build GitHub Pages deployment.
 - **No active build step**: the repo currently does **not** contain a `main.html` template or any script/wiring that regenerates `index.html` as part of a pipeline.
 - **Archived helpers**: any old code-generation helpers are kept only as historical context under `legacy/` (see `legacy/README.md`).
 
@@ -73,8 +74,7 @@ To ensure subcategory `ALL` always sorts before individual items, items use a ca
 | Tab | Contents |
 |-----|----------|
 | **Everything** | Default first tab. Combined profit overview of all craftable items across all tabs. |
-| Bags | Static crafting tree for Netherweave bags. Hardcoded HTML + JS (`calculate()`) |
-| Tailoring Gear | Dynamic UI from `GEAR_RECIPES` array |
+| Tailoring Gear | Dynamic UI from `GEAR_RECIPES` array + merged Netherweave bag economics |
 | Alchemy | Dynamic UI from `ALCHEMY_RECIPES` array — elixirs, potions, flasks ONLY |
 | Transmutes / Dailies | Mote→Primal profit table, Planar Essence, alchemy transmutes, tailoring cloth dailies |
 | Enchanting | Dynamic UI from `ENCHANTING_RECIPES` array — shard conversions, consumable oils |

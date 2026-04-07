@@ -10,7 +10,9 @@ This project was made with AI-assisted tooling (started in Claude Code, now Curs
 
 ## Project structure (current)
 
-- **App**: `index.html` (single-file app: HTML + CSS + JS + recipe data)
+- **App shell**: `index.html`
+- **Core modules**: `src/core/` (shared price store + tab registry)
+- **UI polish layer**: `styles/main.css`
 - **Design notes**: `DECISIONS.md`
 - **Samples**: `export_example.txt` (example Auctionator buy-list export output)
 - **Legacy / archived**: `legacy/` (old helpers and OS artifacts; see `legacy/README.md`)
@@ -38,18 +40,10 @@ If a future refactor reintroduces a build step, it should be documented in `DECI
 - **Filter popup**: 3-level checkbox tree (tab → category → individual recipe) — hide anything you don't need; state persists across reloads
 - Read-only Daily Sold / Avg Price columns pulled from per-tab TSM data
 
-**Bags**
-- Calculates craft vs buy decisions across a 3-tier crafting chain
-- Tier 1: Bolt of Netherweave (6x Cloth), Greater Planar Essence (3x Lesser)
-- Tier 2: Bolt of Imbued Netherweave (3x Bolt + 2x Arcane Dust)
-- Final Products: Netherweave Bag, Imbued Netherweave Bag
-- Smart sourcing: automatically picks cheapest option at each tier and cascades up
-- Margin % shown on NW Bag and Imbued Bag profit rows
-- **Best Use: Netherweave Cloth** card — profit per cloth for all 6 uses: Vendor (bandage), Sell raw, Bolt of NW, Bolt of Imbued NW, NW Bag, Imbued Bag — verdict shows the best option
-
 **Tailoring Gear**
 - Dynamically generated UI from recipe data array
 - Recipes tracked:
+  - Netherweave Bag, Imbued Netherweave Bag (migrated from standalone Bags tab)
   - Spellstrike Pants, Spellstrike Hood (Primal Might, Spellcloth, Primal Nether BOP)
   - Runic Spellthread (Rune Thread, Primal Mana, Primal Nether BOP)
   - Mystic Spellthread (Rune Thread, Primal Mana)
@@ -60,6 +54,7 @@ If a future refactor reintroduces a build step, it should be documented in `DECI
 - Buy vs craft comparison at every tier, auto-selects cheapest source
 - BOP items (Primal Nether) show profit-per-BOP metric instead of cost
 - AH import supports item level suffixes e.g. "(112)"
+- Historical bag economics (including cloth/buy-vs-craft logic) are now treated under Tailoring context.
 
 **Alchemy**
 - Dynamically generated UI from recipe data array
@@ -125,7 +120,7 @@ If a future refactor reintroduces a build step, it should be documented in `DECI
 **Cooking**
 - Dynamically generated UI from recipe data array, same structure as Alchemy
 - Recipes tracked by buff category:
-  - +30 Stamina: Fisherman's Feast, Spicy Crawdad
+  - +30 Stamina: Spicy Crawdad
   - +20 Agility: Warp Burger, Grilled Mudfish
   - +20 Strength: Roasted Clefthoof, Smoked Desert Dumplings ⚠ (worse option — see tooltip in profit overview)
   - +20 Hit Rating: Spicy Hot Talbuk

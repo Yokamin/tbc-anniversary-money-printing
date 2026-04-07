@@ -13,6 +13,19 @@ This doc is intentionally practical: when you’re adding content, follow this c
   - craft cost and profit update when you change an ingredient price,
   - staleness dot logic behaves as expected (import updates dots, manual edits don’t).
 
+## Moving/merging existing recipes across tabs
+
+When migrating recipes (example: Bags -> Tailoring), keep feature parity deliberately:
+
+- **Staleness parity**: migrated rows must still show staleness dots using equivalent tracked inputs/sale price.
+- **Everything parity**: rows should still appear in Everything with correct tab/category grouping.
+- **Search parity**: ingredient search should still find the recipe and navigate to a valid destination.
+- **Navigation parity**: old tab keys/routes should have fallback aliases (avoid broken saved state).
+- **Import/sync parity**: existing item imports and shared-price sync behavior should remain unchanged.
+- **Detail-view parity**: migrated recipes must retain access to full detail context (left-side relevant inputs, not just summary cards).
+- **Sourcing-depth parity**: if a recipe previously showed buy-vs-craft chain decisions (including recursive sub-crafts), the migrated view must keep equivalent decision detail.
+- **Recipe-specific context parity**: preserve any unique per-recipe helper information (e.g. additional breakdown notes/cards) before removing old paths.
+
 ## Adding a new tab (minimum wiring)
 
 ### 1) Create data + per-tab maps
@@ -43,8 +56,9 @@ If you forget this, the exact symptom is:
 
 Ensure the tab’s calculate function is triggered when needed:
 
-- If you rely on the existing global delegated handlers, make sure your tab’s input IDs follow the expected patterns and that your tab is included where the code calls `...Calculate()` after imports/nudges/resets.
-- Otherwise, add the call to your `xxxCalculate()` in the same spots other tabs are called (imports, reset, and input change handlers).
+- Register the tab lifecycle in `registerTabs()` so `TAB_REGISTRY` knows how to init/load/calc it.
+- If you rely on delegated handlers, ensure handlers call your tab calc function where appropriate.
+- Prefer registry-driven grouped recalc paths (`calculateCoreTabs()` / `calculateAllTabs()`) instead of adding new ad-hoc manual chains.
 
 ### 5) Everything tab integration (optional but recommended)
 
@@ -59,4 +73,5 @@ If you want the Everything tab to show your new tab’s recipes:
 - **Global import**: importing Auctionator prices updates all matching inputs in the new tab.
 - **Persistence**: reload keeps inputs (if the tab is intended to persist).
 - **Everything tab**: new tab’s recipes show up (if intended).
+- **Navigation aliases**: if a tab was renamed/merged (e.g. Bags -> Tailoring), add routing fallback in `switchTab()` so old persisted tab keys do not break startup.
 
