@@ -21,6 +21,7 @@ Current state:
 - **`src/tabs/enchantingView.js`**: extracted Enchanting view builders used by `enchInit()`.
 - **`src/tabs/leatherworkingView.js`**: extracted Leatherworking view builders used by `lwInit()`.
 - **`src/tabs/cookingView.js`**: extracted Cooking view builders used by `cookInit()`.
+- **`src/tabs/transmutesView.js`**: extracted Transmutes/Dailies view builders used by `txInit()`.
 - There is **no build step** (plain files directly served by GitHub Pages).
 
 ## High-level flow

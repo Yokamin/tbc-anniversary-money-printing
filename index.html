@@ -1380,6 +1380,7 @@
     <script src="src/tabs/enchantingView.js"></script>
     <script src="src/tabs/leatherworkingView.js"></script>
     <script src="src/tabs/cookingView.js"></script>
+    <script src="src/tabs/transmutesView.js"></script>
     <script>
         // ===== STORAGE KEYS =====
         const {
@@ -4711,6 +4712,21 @@
         const txNameToInput = {};
 
         function txInit() {
+            Object.keys(txNameToInput).forEach(function(k) { delete txNameToInput[k]; });
+            var view = window.AppTransmutesView.buildView({
+                txPrimals: TX_PRIMALS,
+                transmuteRecipes: TRANSMUTE_RECIPES,
+                clothDailies: CLOTH_DAILIES,
+                txNameToInput: txNameToInput,
+                sanitizeId: sanitizeId,
+                depositDefaults: DEPOSIT_DEFAULTS,
+                txLocksKey: TX_LOCKS_KEY
+            });
+            document.getElementById('tx-col-left').innerHTML = view.colLeft;
+            document.getElementById('tx-col-right').innerHTML = view.colRight;
+            document.getElementById('tx-main').innerHTML = view.main;
+            return;
+
             var itemToRecipes = {};
             function txTag(item, recipeId) {
                 if (!itemToRecipes[item]) itemToRecipes[item] = [];
