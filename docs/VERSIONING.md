@@ -41,6 +41,17 @@ When preparing a stable push:
 5. Create an annotated tag with the same version (`v2.1.0`).
 6. Push commit and tag.
 
+### Patch hardening checklist (`2.0.x`)
+
+For low-risk patch releases, keep this as the default smoke pass:
+
+1. Import a known Auctionator sample and confirm no blank/NaN profit cells appear.
+2. Manually edit one shared ingredient (example: `Arcane Dust`) and verify cross-tab sync.
+3. Open one recipe detail in each major calculator tab, then click the active tab button to return to overview.
+4. Confirm summary-row hover + keyboard focus visuals are consistent in all recipe tabs.
+5. Generate Auctionator export and confirm expected section prefixes are present.
+6. Reload and verify tab/recipe selection + numeric inputs persist as intended.
+
 ### Tagging rule (default)
 
 Use annotated tags as release markers whenever it makes sense:

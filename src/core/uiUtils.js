@@ -2,7 +2,10 @@
     "use strict";
 
     function getVal(id) {
-        return parseFloat(document.getElementById(id).value) || 0;
+        var el = document.getElementById(id);
+        if (!el) return 0;
+        var parsed = parseFloat(el.value);
+        return Number.isFinite(parsed) ? parsed : 0;
     }
 
     function toGSC(value) {

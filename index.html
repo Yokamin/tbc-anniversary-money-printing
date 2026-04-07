@@ -44,6 +44,10 @@
             font-family: 'Segoe UI', Tahoma, sans-serif;
         }
         .tab-btn:hover { color: #ccc; }
+        .tab-btn:focus-visible {
+            outline: 2px solid #7c6fcd;
+            outline-offset: 2px;
+        }
         .tab-btn.active { color: #ffd700; border-bottom-color: #ffd700; }
         .layout {
             display: grid;
@@ -518,6 +522,13 @@
         }
         .recipe-dropdown-trigger:hover {
             border-color: #ffd700;
+        }
+        .recipe-dropdown-trigger:focus-visible,
+        .sort-btn:focus-visible,
+        .toolbar-btn:focus-visible,
+        .toolbar-reset-btn:focus-visible {
+            outline: 2px solid #7c6fcd;
+            outline-offset: 2px;
         }
         .recipe-dropdown-trigger .dd-arrow {
             font-size: 0.7em;
@@ -1650,7 +1661,7 @@
                     tabId: 'gear', tabLabel: 'Tailoring Gear',
                     cats: [{
                         catId: 'gear_bags',
-                        catLabel: 'Bags',
+                        catLabel: 'Tailoring Bags',
                         items: [
                             { id: 'bags_nw_bag', name: 'Netherweave Bag' },
                             { id: 'bags_imbued_bag', name: 'Imbued Netherweave Bag' }
@@ -4263,15 +4274,19 @@
             alchSaveToStorage();
         }
 
-        // ===== ALCHEMY: RECIPE SELECTION =====
-        function alchSelectRecipe(recipeId) {
-            var dropdown = document.getElementById('recipe-dropdown');
-            var label = document.getElementById('recipe-dropdown-label');
-            document.querySelectorAll('#recipe-dropdown .recipe-item').forEach(function(el) {
+        function syncRecipeDropdownSelection(dropdownSelector, labelId, recipeId) {
+            var label = document.getElementById(labelId);
+            document.querySelectorAll(dropdownSelector + ' .recipe-item').forEach(function(el) {
                 var isActive = el.dataset.recipe === recipeId;
                 el.classList.toggle('active', isActive);
                 if (isActive && label) label.textContent = el.textContent;
             });
+        }
+
+        // ===== ALCHEMY: RECIPE SELECTION =====
+        function alchSelectRecipe(recipeId) {
+            var dropdown = document.getElementById('recipe-dropdown');
+            syncRecipeDropdownSelection('#recipe-dropdown', 'recipe-dropdown-label', recipeId);
             if (dropdown) dropdown.classList.remove('open');
             var backBtn = document.getElementById('alch-recipe-back');
             if (backBtn) backBtn.style.display = recipeId === 'all' ? 'none' : '';
@@ -4674,12 +4689,7 @@
         // ===== GEAR: RECIPE SELECTION =====
         function gearSelectRecipe(recipeId) {
             var dropdown = document.getElementById('gear-recipe-dropdown');
-            var label = document.getElementById('gear-recipe-dropdown-label');
-            document.querySelectorAll('#gear-recipe-dropdown .recipe-item').forEach(function(el) {
-                var isActive = el.dataset.recipe === recipeId;
-                el.classList.toggle('active', isActive);
-                if (isActive && label) label.textContent = el.textContent;
-            });
+            syncRecipeDropdownSelection('#gear-recipe-dropdown', 'gear-recipe-dropdown-label', recipeId);
             if (dropdown) dropdown.classList.remove('open');
             var backBtn = document.getElementById('gear-recipe-back');
             if (backBtn) backBtn.style.display = recipeId === 'all' ? 'none' : '';
@@ -5257,12 +5267,7 @@
         // ===== TRANSMUTES / DAILIES: SELECT =====
         function txSelectRecipe(recipeId) {
             var dropdown = document.getElementById('tx-recipe-dropdown');
-            var label    = document.getElementById('tx-recipe-dropdown-label');
-            document.querySelectorAll('#tx-recipe-dropdown .recipe-item').forEach(function(el) {
-                var isActive = el.dataset.recipe === recipeId;
-                el.classList.toggle('active', isActive);
-                if (isActive && label) label.textContent = el.textContent;
-            });
+            syncRecipeDropdownSelection('#tx-recipe-dropdown', 'tx-recipe-dropdown-label', recipeId);
             if (dropdown) dropdown.classList.remove('open');
             var backBtn = document.getElementById('tx-recipe-back');
             if (backBtn) backBtn.style.display = recipeId === 'all' ? 'none' : '';
@@ -5724,12 +5729,7 @@
         // ===== COOKING: SELECT =====
         function cookSelectRecipe(recipeId) {
             var dropdown = document.getElementById('cook-recipe-dropdown');
-            var label    = document.getElementById('cook-recipe-dropdown-label');
-            document.querySelectorAll('#cook-recipe-dropdown .recipe-item').forEach(function(el) {
-                var isActive = el.dataset.recipe === recipeId;
-                el.classList.toggle('active', isActive);
-                if (isActive && label) label.textContent = el.textContent;
-            });
+            syncRecipeDropdownSelection('#cook-recipe-dropdown', 'cook-recipe-dropdown-label', recipeId);
             if (dropdown) dropdown.classList.remove('open');
             var backBtn = document.getElementById('cook-recipe-back');
             if (backBtn) backBtn.style.display = recipeId === 'all' ? 'none' : '';
@@ -6061,12 +6061,7 @@
         // ===== ENCHANTING: SELECT =====
         function enchSelectRecipe(recipeId) {
             var dropdown = document.getElementById('ench-recipe-dropdown');
-            var label    = document.getElementById('ench-recipe-dropdown-label');
-            document.querySelectorAll('#ench-recipe-dropdown .recipe-item').forEach(function(el) {
-                var isActive = el.dataset.recipe === recipeId;
-                el.classList.toggle('active', isActive);
-                if (isActive && label) label.textContent = el.textContent;
-            });
+            syncRecipeDropdownSelection('#ench-recipe-dropdown', 'ench-recipe-dropdown-label', recipeId);
             if (dropdown) dropdown.classList.remove('open');
             var backBtn = document.getElementById('ench-recipe-back');
             if (backBtn) backBtn.style.display = recipeId === 'all' ? 'none' : '';
@@ -6351,12 +6346,7 @@
         // ===== LEATHERWORKING: SELECT =====
         function lwSelectRecipe(recipeId) {
             var dropdown = document.getElementById('lw-recipe-dropdown');
-            var label    = document.getElementById('lw-recipe-dropdown-label');
-            document.querySelectorAll('#lw-recipe-dropdown .recipe-item').forEach(function(el) {
-                var isActive = el.dataset.recipe === recipeId;
-                el.classList.toggle('active', isActive);
-                if (isActive && label) label.textContent = el.textContent;
-            });
+            syncRecipeDropdownSelection('#lw-recipe-dropdown', 'lw-recipe-dropdown-label', recipeId);
             if (dropdown) dropdown.classList.remove('open');
             var backBtn = document.getElementById('lw-recipe-back');
             if (backBtn) backBtn.style.display = recipeId === 'all' ? 'none' : '';
@@ -6445,12 +6435,12 @@
 
         function readStoredNumber(key, fallback) {
             var v = parseFloat(localStorage.getItem(key));
-            return isNaN(v) ? fallback : v;
+            return Number.isFinite(v) ? v : fallback;
         }
 
         function readStoredInt(key, fallback) {
             var v = parseInt(localStorage.getItem(key), 10);
-            return isNaN(v) ? fallback : v;
+            return Number.isFinite(v) ? v : fallback;
         }
 
         function handleRecipeNavigationClick(target) {

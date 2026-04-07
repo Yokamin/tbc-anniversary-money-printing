@@ -1,6 +1,6 @@
 # TBC Crafting Calculator
 
-## Version: 2.0.0
+## Version: 2.0.1
 
 Single-page HTML app for calculating crafting profitability in WoW TBC Anniversary.
 
@@ -28,7 +28,7 @@ If a future refactor reintroduces a build step, it should be documented in `DECI
 ## Versioning
 
 - Versioning and stable release policy: `docs/VERSIONING.md`
-- Current plan: next major architecture era starts at `2.0.0`.
+- Current stable release line: `2.0.x`.
 - Netherweave cloth handling policy: `docs/NETHERWEAVE_POLICY.md`
 
 ### Tabs
@@ -134,7 +134,7 @@ If a future refactor reintroduces a build step, it should be documented in `DECI
 - Recipes tracked:
   - Shards: Large Prismatic Shard (3× Small Prismatic Shard → 1× Large)
   - Oils: Superior Mana Oil (Netherbloom + Arcane Dust + Imbued Vial), Superior Wizard Oil (Arcane Dust + Nightmare Vine + Imbued Vial)
-- Arcane Dust price syncs automatically with Bags, Tailoring Gear, and Transmutes tabs
+- Arcane Dust price syncs automatically with Tailoring Gear, Enchanting, and Transmutes tabs
 - Full profit overview with Gold / % Margin sort, TSM note columns, staleness dots, back button
 
 **Leatherworking**
@@ -159,7 +159,7 @@ The Transmutes / Dailies tab includes an in-app export generator. Click "Generat
 | Prefix | Category |
 |--------|----------|
 | `0.0`  | **Everything** — all AH items across all tabs, deduplicated |
-| `1.x`  | Bags |
+| `1.x`  | Tailoring bags |
 | `2.x`  | Tailoring Gear |
 | `3.x`  | Alchemy (3.1=Elixirs, 3.2=Potions, 3.3=Flasks) |
 | `4.x`  | Transmutes/Dailies (4.1=Mote→Primals, 4.2=Transmutes, 4.3=Cloth) |
