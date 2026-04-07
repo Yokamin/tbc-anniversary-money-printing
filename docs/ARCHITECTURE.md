@@ -12,11 +12,13 @@ Current state:
 
 - **`index.html`**: runtime shell + main wiring + current tab implementations.
 - **`src/core/priceStore.js`**: centralized shared-price grouping/sync engine.
+- **`src/core/constants.js`**: centralized storage-key constants used by runtime wiring.
 - **`src/core/tabRegistry.js`**: tab lifecycle registration and grouped recalculation.
 - **`src/core/runtimeTabs.js`**: default tab wiring and grouped recalc helpers used by bootstrap.
 - **`src/core/tabNavigation.js`**: tab switching + active-tab re-click reset behavior.
 - **`src/core/recipeRouting.js`**: shared recipe-selection routing by tab context.
 - **`src/core/uiUtils.js`**: shared numeric/UI helpers (g/s/c formatting, sizing, input display).
+- **`src/tabs/enchantingView.js`**: extracted Enchanting view builders used by `enchInit()`.
 - There is **no build step** (plain files directly served by GitHub Pages).
 
 ## High-level flow

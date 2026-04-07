@@ -1,6 +1,6 @@
 # TBC Crafting Calculator
 
-## Version: 2.0.1
+## Version: 2.0.2
 
 Single-page HTML app for calculating crafting profitability in WoW TBC Anniversary.
 
@@ -11,7 +11,8 @@ This project was made with AI-assisted tooling (started in Claude Code, now Curs
 ## Project structure (current)
 
 - **App shell**: `index.html`
-- **Core modules**: `src/core/` (shared price store + tab registry)
+- **Core modules**: `src/core/` (shared price store, tab registry, shared constants)
+- **Tab modules**: `src/tabs/` (incremental tab-specific extraction, no build step)
 - **UI polish layer**: `styles/main.css`
 - **Design notes**: `DECISIONS.md`
 - **Samples**: `export_example.txt` (example Auctionator buy-list export output)
@@ -28,6 +29,7 @@ If a future refactor reintroduces a build step, it should be documented in `DECI
 ## Versioning
 
 - Versioning and stable release policy: `docs/VERSIONING.md`
+- Patch smoke runbook: `docs/SMOKE_TEST_CHECKLIST.md`
 - Current stable release line: `2.0.x`.
 - Netherweave cloth handling policy: `docs/NETHERWEAVE_POLICY.md`
 
