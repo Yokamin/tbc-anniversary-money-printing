@@ -37,13 +37,13 @@ When preparing a stable push:
    - export generation.
 3. Update docs if behavior/assumptions changed.
 4. Create a release commit with the version in message, for example:
-   - `release: v2.1.0 - add output quantity planner`
-5. Create an annotated tag with the same version (`v2.1.0`).
+   - `release: v2.2.0 - craft amount, export compare, defaults UX`
+5. Create an annotated tag with the same version (`v2.2.0`).
 6. Push commit and tag.
 
-### Patch hardening checklist (`2.0.x`)
+### Smoke test checklist
 
-Use `docs/SMOKE_TEST_CHECKLIST.md` as the release runbook for low-risk patch releases.
+Use `docs/SMOKE_TEST_CHECKLIST.md` before stable pushes (patch or minor releases, for example `2.1.x`, `2.2.x`).
 
 ### Tagging rule (default)
 
@@ -63,14 +63,15 @@ Documentation is part of the release criteria, not optional cleanup. Any behavio
 
 ## Bump guidance examples
 
-- Add one or more recipes only: `2.1.0` -> `2.1.1`
-- Add a new feature (no architecture break): `2.1.1` -> `2.2.0`
-- Perform major structural overhaul: `2.2.3` -> `3.0.0`
+- Add one or more recipes only: `2.2.0` -> `2.2.1`
+- Add a new feature (no architecture break): `2.2.1` -> `2.3.0`
+- Perform major structural overhaul: `2.3.3` -> `3.0.0`
 
-## New-era sequence (current plan)
+## New-era sequence (history)
 
 1. Release current baseline as `v2.0.0-prep.1`.
 2. Do refactor/overhaul work on top of that checkpoint.
 3. When stable, release `v2.0.0`.
 4. Refactor-completion milestone release: `v2.1.0` (runtime parity with modularized tabs/core/data layout).
+5. Feature release: `v2.2.0` (centered recipe controls, detail craft amount + reset, missing-default reminders, manual snapshot export, Auctionator export compare, Leatherworking nested-chain export coverage).
 

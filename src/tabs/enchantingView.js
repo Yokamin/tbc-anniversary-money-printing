@@ -3,6 +3,7 @@
 
     function buildRecipeDropdownHTML(recipes, categoryOrder) {
         var html = '<div class="recipe-dropdown-wrapper">' +
+            '<button class="recipe-back-btn" id="ench-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
             '<div class="recipe-dropdown" id="ench-recipe-dropdown">' +
             '<button class="recipe-dropdown-trigger" id="ench-recipe-dropdown-trigger">' +
                 '<span id="ench-recipe-dropdown-label">All (Profit Overview)</span>' +
@@ -18,9 +19,7 @@
                 html += '<div class="recipe-item" data-recipe="' + r.id + '">' + r.name + "</div>";
             });
         });
-        html += '</div></div>' +
-            '<button class="recipe-back-btn" id="ench-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
-            "</div>";
+        html += '</div></div></div>';
         return html;
     }
 
@@ -39,14 +38,17 @@
 
     function buildRecipeDetailHTML(recipe, sanitizeId) {
         var html = '<div id="ench-view-' + recipe.id + '" class="ench-view" style="display:none">';
-        html += '<div class="card"><h3>' + recipe.name + "</h3>";
+        html += '<div class="card"><h3>' + recipe.name + '</h3><div class="craft-amount-row">' +
+            '<label class="craft-amount-label" for="ench_qty_' + recipe.id + '">Crafting amount</label>' +
+            '<div class="price-control"><input type="number" id="ench_qty_' + recipe.id + '" value="1" min="1" step="1"></div>' +
+            '<button type="button" class="craft-amount-reset-btn" onclick="resetCraftQtyToOne(' + "'" + 'ench_qty_' + recipe.id + "'" + ',' + "'" + 'ench' + "'" + ')" title="Reset to 1">Reset</button></div>';
         html += '<div class="sourcing"><div class="sourcing-title">Ingredients</div>';
         recipe.ingredients.forEach(function(ing) {
             var baseId = "ench_" + recipe.id + "_ing_" + sanitizeId(ing.item);
             if (ing.type === "vendor") {
-                html += '<div class="sourcing-row fixed"><span>' + ing.qty + "x " + ing.item + ' (vendor)</span><span class="cost" id="' + baseId + '">-</span></div>';
+                html += '<div class="sourcing-row fixed"><span id="' + baseId + '_qty">' + ing.qty + "x " + ing.item + ' (vendor)</span><span class="cost" id="' + baseId + '">-</span></div>';
             } else {
-                html += '<div class="sourcing-row fixed"><span>' + ing.qty + "x " + ing.item + '</span><span class="cost" id="' + baseId + '">-</span></div>';
+                html += '<div class="sourcing-row fixed"><span id="' + baseId + '_qty">' + ing.qty + "x " + ing.item + '</span><span class="cost" id="' + baseId + '">-</span></div>';
             }
         });
         html += "</div>";
@@ -98,7 +100,8 @@
             return '<h2 class="collapsible" data-panel="ench-' + panelId + '">' + label + '<span class="collapse-arrow">&#9660;</span></h2>';
         }
 
-        var colLeft = buildRecipeDropdownHTML(recipes, categoryOrder);
+        var controls = buildRecipeDropdownHTML(recipes, categoryOrder);
+        var colLeft = "";
         if (allAhItems.length > 0) {
             colLeft += '<div class="panel ench-filterable">' + enchH2("AH Materials", "ah-mats") + '<div class="panel-body" data-panel-body="ench-ah-mats"><div class="price-table">';
             allAhItems.forEach(function(item) {
@@ -128,7 +131,7 @@
         colRight += '<div class="price-table-row"><span class="pt-name">AH Cut</span><div class="price-control"><input type="number" id="ench_ah_cut" value="5" step="0.1"><span style="color: #888; font-size: 0.82em; margin-left: 2px;">%</span></div></div>';
         colRight += "</div></div></div>";
 
-        var main = buildAllViewHTML();
+        var main = controls + buildAllViewHTML();
         recipes.forEach(function(r) {
             main += buildRecipeDetailHTML(r, sanitizeId);
         });

@@ -2,6 +2,26 @@
     "use strict";
 
     function createGearLogic(config) {
+        function getCraftAmount(recipeId) {
+            var el = document.getElementById("gear_qty_" + recipeId);
+            var qty = el ? parseInt(el.value, 10) : 1;
+            return qty > 0 ? qty : 1;
+        }
+
+        function updateIngQtyLabels(ing, recipeId, totalQty) {
+            var baseId = "gear_" + recipeId + "_ing_" + config.sanitizeId(ing.item);
+            var fixedQty = document.getElementById(baseId + "_qty");
+            if (fixedQty) fixedQty.textContent = totalQty + "x " + ing.item;
+            var buyQty = document.getElementById(baseId + "_buy_qty");
+            if (buyQty) buyQty.textContent = totalQty + "x " + ing.item;
+            var craftQty = document.getElementById(baseId + "_craft_qty");
+            if (craftQty && ing.craftFrom && ing.craftFrom.item) craftQty.textContent = (totalQty * ing.craftFrom.qty) + "x " + ing.craftFrom.item;
+            else if (craftQty) craftQty.textContent = totalQty + "x " + ing.item;
+            if (ing.craftFrom && ing.craftFrom.mats) {
+                ing.craftFrom.mats.forEach(function(mat) { updateIngQtyLabels(mat, recipeId, totalQty * mat.qty); });
+            }
+        }
+
         function computeIngCost(ing, recipeId, totalQty) {
             var baseId = "gear_" + recipeId + "_ing_" + config.sanitizeId(ing.item);
             if (ing.type === "bop") return 0;
@@ -56,9 +76,13 @@
             var ahCutPct = config.getVal("gear_ah_cut") / 100;
             var results = [];
             config.getAllGearRecipes().forEach(function(r) {
+                var craftAmount = getCraftAmount(r.id);
                 var craftCost = 0;
-                r.ingredients.forEach(function(ing) { craftCost += computeIngCost(ing, r.id, ing.qty); });
-                var salePrice = config.getVal("gear_sale_" + r.id);
+                r.ingredients.forEach(function(ing) {
+                    updateIngQtyLabels(ing, r.id, ing.qty * craftAmount);
+                    craftCost += computeIngCost(ing, r.id, ing.qty * craftAmount);
+                });
+                var salePrice = config.getVal("gear_sale_" + r.id) * craftAmount;
                 var ahCut = salePrice * ahCutPct;
                 var deposit = config.getVal("gear_deposit_" + r.id);
                 var profit = salePrice - ahCut - craftCost;
@@ -69,7 +93,7 @@
                 var profitEl = elById("gear_" + r.id + "_profit");
                 if (profitEl) profitEl.innerHTML = "<span class=\"" + config.profitClass(profit) + "\">" + (profit >= 0 ? "+" : "") + config.gold(profit) + "</span>";
                 var depositEl = elById("gear_" + r.id + "_deposit_note");
-                if (depositEl) depositEl.textContent = "Deposit: " + config.gold(deposit) + " (lost if unsold)";
+                if (depositEl) depositEl.textContent = "Deposit: " + config.gold(deposit) + " each (lost if unsold)";
 
                 var bopIng = r.ingredients.find(function(i) { return i.type === "bop"; });
                 if (bopIng && depositEl) {
@@ -110,6 +134,7 @@
             var summaryBody = document.getElementById("gear-summary-body");
             if (summaryBody && !(summaryBody.contains(document.activeElement) && document.activeElement.classList.contains("tsm-input"))) summaryBody.innerHTML = tbody;
             config.saveToStorage();
+            if (window.updateMissingDefaultWarnings) window.updateMissingDefaultWarnings();
             config.evCalculate();
         }
 

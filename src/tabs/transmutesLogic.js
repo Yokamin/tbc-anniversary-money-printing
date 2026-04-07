@@ -2,6 +2,12 @@
     "use strict";
 
     function createTransmutesLogic(config) {
+        function getCraftAmount(recipeId) {
+            var el = document.getElementById("tx_qty_" + recipeId);
+            var qty = el ? parseInt(el.value, 10) : 1;
+            return qty > 0 ? qty : 1;
+        }
+
         function getVal(id) { var el = document.getElementById(id); return el ? (parseFloat(el.value) || 0) : 0; }
         function setHtml(id, html) { var el = document.getElementById(id); if (el) el.innerHTML = html; }
         function setText(id, text) { var el = document.getElementById(id); if (el) el.textContent = text; }
@@ -66,13 +72,15 @@
             summaryRows.push({ label: "Planar Essence", cost: lesserCost, revenue: planarRev, profit: planarProf, recipeId: "planar_essence" });
 
             config.transmuteRecipes.forEach(function(r) {
+                var craftAmount = getCraftAmount(r.id);
                 var craftCost = 0;
                 r.ingredients.forEach(function(ing) {
                     var baseId = "tx_" + r.id + "_ing_" + config.sanitizeId(ing.item);
+                    var reqQty = ing.qty * craftAmount;
                     if (ing.type === "primal") {
-                        var buyPrice = getVal("tx_primal_" + ing.primalId) * ing.qty;
+                        var buyPrice = getVal("tx_primal_" + ing.primalId) * reqQty;
                         var p = config.txPrimals.find(function(pr) { return pr.id === ing.primalId; });
-                        var motePrice = p ? getVal("tx_mote_" + ing.primalId) * 10 * ing.qty : buyPrice;
+                        var motePrice = p ? getVal("tx_mote_" + ing.primalId) * 10 * reqQty : buyPrice;
                         var useMotes = motePrice < buyPrice;
                         craftCost += useMotes ? motePrice : buyPrice;
                         var buyLbl = document.getElementById(baseId + "_buy_label");
@@ -86,14 +94,20 @@
                             craftLbl.className = "opt" + (useMotes ? " active" : "");
                             craftPEl.className = "opt" + (useMotes ? " active" : "");
                             craftPEl.innerHTML = config.gold(motePrice) + (useMotes ? "<span class=\"using\">USING</span>" : "");
+                            var buyQtyEl = document.getElementById(baseId + "_buy_qty");
+                            if (buyQtyEl) buyQtyEl.textContent = reqQty + "x " + ing.item;
+                            var craftQtyEl = document.getElementById(baseId + "_craft_qty");
+                            if (craftQtyEl && p) craftQtyEl.textContent = (reqQty * 10) + "x " + p.mote;
                         }
                     } else {
-                        var gemCost = getVal("tx_gem_" + config.sanitizeId(ing.item)) * ing.qty;
+                        var gemCost = getVal("tx_gem_" + config.sanitizeId(ing.item)) * reqQty;
                         craftCost += gemCost;
                         setText(baseId, config.gold(gemCost));
+                        var qtyEl = document.getElementById(baseId + "_qty");
+                        if (qtyEl) qtyEl.textContent = reqQty + "x " + ing.item;
                     }
                 });
-                var salePrice = getVal("tx_sale_" + r.id);
+                var salePrice = getVal("tx_sale_" + r.id) * craftAmount;
                 var ahCut = salePrice * ahCutPct;
                 var deposit = getVal("tx_deposit_" + r.id);
                 var profit = salePrice - ahCut - craftCost;
@@ -106,11 +120,12 @@
             });
 
             config.clothDailies.forEach(function(r) {
+                var craftAmount2 = getCraftAmount(r.id);
                 var craftCost = 0;
                 r.ingredients.forEach(function(ing) {
                     var baseId = "tx_" + r.id + "_ing_" + config.sanitizeId(ing.item);
                     if (ing.type === "imbued_bolt") {
-                        craftCost += imbuedBest;
+                        craftCost += imbuedBest * craftAmount2;
                         var buyLbl = document.getElementById(baseId + "_buy_label");
                         if (buyLbl) {
                             var buyPEl = document.getElementById(baseId + "_buy_price");
@@ -118,17 +133,26 @@
                             var craftPEl = document.getElementById(baseId + "_craft_price");
                             buyLbl.className = "opt" + (!useImbuedCraft ? " active" : "");
                             buyPEl.className = "opt" + (!useImbuedCraft ? " active" : "");
-                            buyPEl.innerHTML = config.gold(imbuedBoltAH) + (!useImbuedCraft ? "<span class=\"using\">USING</span>" : "");
+                            buyPEl.innerHTML = config.gold(imbuedBoltAH * craftAmount2) + (!useImbuedCraft ? "<span class=\"using\">USING</span>" : "");
                             craftLbl.className = "opt" + (useImbuedCraft ? " active" : "");
                             craftPEl.className = "opt" + (useImbuedCraft ? " active" : "");
-                            craftPEl.innerHTML = config.gold(imbuedCraft) + (useImbuedCraft ? "<span class=\"using\">USING</span>" : "");
-                            setText(baseId + "_bolt_cost", config.gold(boltNwBest * 3));
-                            setText(baseId + "_dust_cost", config.gold(dustPrice * 2));
+                            craftPEl.innerHTML = config.gold(imbuedCraft * craftAmount2) + (useImbuedCraft ? "<span class=\"using\">USING</span>" : "");
+                            setText(baseId + "_bolt_cost", config.gold(boltNwBest * 3 * craftAmount2));
+                            setText(baseId + "_dust_cost", config.gold(dustPrice * 2 * craftAmount2));
+                            var imbuedBuyQty = document.getElementById(baseId + "_buy_qty");
+                            if (imbuedBuyQty) imbuedBuyQty.textContent = craftAmount2 + "x Bolt of Imbued Netherweave";
+                            var imbuedCraftQty = document.getElementById(baseId + "_craft_qty");
+                            if (imbuedCraftQty) imbuedCraftQty.textContent = craftAmount2 + "x Bolt of Imbued Netherweave";
+                            var boltQty = document.getElementById(baseId + "_bolt_qty");
+                            if (boltQty) boltQty.textContent = "-> " + (3 * craftAmount2) + "x Bolt of Netherweave";
+                            var dustQty = document.getElementById(baseId + "_dust_qty");
+                            if (dustQty) dustQty.textContent = "-> " + (2 * craftAmount2) + "x Arcane Dust";
                         }
                     } else if (ing.type === "primal") {
-                        var buyPrice2 = getVal("tx_primal_" + ing.primalId) * ing.qty;
+                        var reqQty2 = ing.qty * craftAmount2;
+                        var buyPrice2 = getVal("tx_primal_" + ing.primalId) * reqQty2;
                         var p2 = config.txPrimals.find(function(pr) { return pr.id === ing.primalId; });
-                        var motePrice2 = p2 ? getVal("tx_mote_" + ing.primalId) * 10 * ing.qty : buyPrice2;
+                        var motePrice2 = p2 ? getVal("tx_mote_" + ing.primalId) * 10 * reqQty2 : buyPrice2;
                         var useMotes2 = motePrice2 < buyPrice2;
                         craftCost += useMotes2 ? motePrice2 : buyPrice2;
                         var buyLbl2 = document.getElementById(baseId + "_buy_label");
@@ -142,12 +166,16 @@
                             craftLbl2.className = "opt" + (useMotes2 ? " active" : "");
                             craftPEl2.className = "opt" + (useMotes2 ? " active" : "");
                             craftPEl2.innerHTML = config.gold(motePrice2) + (useMotes2 ? "<span class=\"using\">USING</span>" : "");
+                            var buyQtyEl2 = document.getElementById(baseId + "_buy_qty");
+                            if (buyQtyEl2) buyQtyEl2.textContent = reqQty2 + "x " + ing.item;
+                            var craftQtyEl2 = document.getElementById(baseId + "_craft_qty");
+                            if (craftQtyEl2 && p2) craftQtyEl2.textContent = (reqQty2 * 10) + "x " + p2.mote;
                         }
                     }
                 });
                 var salePerUnit = getVal("tx_sale_" + r.id);
-                var totalRevenue = salePerUnit * r.yieldQty * (1 - ahCutPct);
-                var totalAhCut = salePerUnit * r.yieldQty * ahCutPct;
+                var totalRevenue = salePerUnit * r.yieldQty * craftAmount2 * (1 - ahCutPct);
+                var totalAhCut = salePerUnit * r.yieldQty * craftAmount2 * ahCutPct;
                 var deposit2 = getVal("tx_deposit_" + r.id);
                 var totalProfit = totalRevenue - craftCost;
                 var profitPer = totalProfit / r.yieldQty;
@@ -158,7 +186,7 @@
                 if (r.yieldQty > 1) {
                     setText("tx_" + r.id + "_revenue", config.gold(totalRevenue));
                     setHtml("tx_" + r.id + "_profit_per", "<span class=\"" + config.profitClass(profitPer) + "\">" + (profitPer >= 0 ? "+" : "") + config.gold(profitPer) + "</span>");
-                } else setText("tx_" + r.id + "_sale_display", config.gold(salePerUnit));
+                } else setText("tx_" + r.id + "_sale_display", config.gold(salePerUnit * craftAmount2));
                 var summaryLabel = r.name + (r.yieldQty > 1 ? " (\u00d7" + r.yieldQty + ")" : "");
                 summaryRows.push({ label: summaryLabel, cost: craftCost, revenue: totalRevenue, profit: totalProfit, recipeId: r.id });
             });
@@ -181,6 +209,7 @@
             var summaryBody = document.getElementById("tx-summary-body");
             if (summaryBody && !(summaryBody.contains(document.activeElement) && document.activeElement.classList.contains("tsm-input"))) summaryBody.innerHTML = tbody;
             config.saveToStorage();
+            if (window.updateMissingDefaultWarnings) window.updateMissingDefaultWarnings();
             config.evCalculate();
         }
 
@@ -230,6 +259,17 @@
                 if (recipe.category === "misc") return name;
                 return name;
             }
+            function collectAhItemsRecursive(ing, items) {
+                if (ing.type !== "vendor" && ing.type !== "bop") items.push(ing.item);
+                if (!ing.craftFrom) return;
+                if (ing.craftFrom.item) {
+                    items.push(ing.craftFrom.item);
+                    return;
+                }
+                if (ing.craftFrom.mats) {
+                    ing.craftFrom.mats.forEach(function(mat) { collectAhItemsRecursive(mat, items); });
+                }
+            }
 
             var lines = [];
             lines.push(formatList("1.0 ALL BAGS", config.bagsExportItems));
@@ -250,11 +290,7 @@
                 var catItems = [];
                 config.alchemyRecipes.filter(function(r) { return r.category === cat; }).forEach(function(r) {
                     var items = [r.product || r.name];
-                    r.ingredients.forEach(function(ing) {
-                        if (ing.type === "vendor" || ing.type === "bop") return;
-                        items.push(ing.item);
-                        if (ing.craftFrom && ing.craftFrom.item) items.push(ing.craftFrom.item);
-                    });
+                    r.ingredients.forEach(function(ing) { collectAhItemsRecursive(ing, items); });
                     items.forEach(function(i) { catItems.push(i); alchAll.push(i); });
                     lines.push(formatList(sub + " " + alchName(r), items));
                 });
@@ -325,11 +361,7 @@
             var lwAll = [];
             config.lwRecipes.forEach(function(r) {
                 var items = [r.name];
-                r.ingredients.forEach(function(ing) {
-                    if (ing.type === "vendor" || ing.type === "bop") return;
-                    items.push(ing.item);
-                    if (ing.craftFrom && ing.craftFrom.item) items.push(ing.craftFrom.item);
-                });
+                r.ingredients.forEach(function(ing) { collectAhItemsRecursive(ing, items); });
                 items.forEach(function(i) { lwAll.push(i); });
                 lines.push(formatList("7.1 " + r.name, items));
             });

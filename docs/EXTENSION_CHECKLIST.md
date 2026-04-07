@@ -15,6 +15,15 @@ Use this when adding new recipes, categories, or tabs so changes are complete on
 9. Confirm ingredient search finds the new recipe and "Go to recipe" routes correctly.
 10. Confirm Auctionator export includes/excludes the new recipe as intended.
 11. If the recipe belongs to the Bags subset, keep it under the dedicated `1.0/1.x` Bags export grouping (even though Bags are merged into Tailoring UI).
+12. If the recipe adds deeper craft chains (`craftFrom.mats` / nested alternatives), confirm export generation includes all relevant AH-searchable sub-materials.
+13. For nested craft chains, verify detail-view structure at every tier:
+   - each craftable tier shows both `buy` and `craft` rows,
+   - deeper materials are indented under the parent `craft` branch,
+   - active `USING` highlight correctly reflects the cheapest option at each tier.
+
+## UI conventions (HTML/CSS)
+
+1. **Numeric inputs**: Use the same dark theme as existing price fields (see `.price-control input` in `index.html`). Native stepper arrows are **disabled globally** for `input[type="number"]` — do not re-enable them on new fields unless there is an explicit, documented exception.
 
 ## Add a new tab
 
@@ -59,5 +68,6 @@ When implementation misses a step and causes a bug:
 2. Identify the missing checklist step that would have prevented it.
 3. Add that step to this file in the correct section.
 4. Note the change in release notes/docs update.
+5. Add a short entry in `docs/DEV_LOG.md` even if the fix was not a tracked TODO item.
 
 Do not treat checklist updates as optional cleanup. Missing-step discoveries should always improve this runbook.

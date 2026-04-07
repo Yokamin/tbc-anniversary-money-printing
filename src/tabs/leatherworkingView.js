@@ -3,6 +3,7 @@
 
     function buildRecipeDropdownHTML(recipes, categoryOrder) {
         var html = '<div class="recipe-dropdown-wrapper">' +
+            '<button class="recipe-back-btn" id="lw-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
             '<div class="recipe-dropdown" id="lw-recipe-dropdown">' +
             '<button class="recipe-dropdown-trigger" id="lw-recipe-dropdown-trigger">' +
                 '<span id="lw-recipe-dropdown-label">All (Profit Overview)</span>' +
@@ -18,9 +19,7 @@
                 html += '<div class="recipe-item" data-recipe="' + r.id + '">' + r.name + "</div>";
             });
         });
-        html += '</div></div>' +
-            '<button class="recipe-back-btn" id="lw-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
-            "</div>";
+        html += '</div></div></div>';
         return html;
     }
 
@@ -43,19 +42,28 @@
         var baseId = "lw_" + recipeId + "_ing_" + sanitizeId(ing.item);
         var html = "";
 
-        if (ing.craftFrom && ing.craftFrom.item) {
-            html += '<div class="sourcing-row"' + indent + '><span class="opt" id="' + baseId + '_buy_label">' + totalQty + "x " + ing.item + ' (buy)</span><span class="opt" id="' + baseId + '_buy_price">-</span></div>';
-            html += '<div class="sourcing-row"' + indent + '><span class="opt" id="' + baseId + '_craft_label">' + (totalQty * ing.craftFrom.qty) + "x " + ing.craftFrom.item + '</span><span class="opt" id="' + baseId + '_craft_price">-</span></div>';
+        if (ing.type === "bop") {
+            html += '<div class="sourcing-row fixed"' + indent + '><span id="' + baseId + '_qty">' + totalQty + "x " + ing.item + '</span><span class="cost" style="color:#f59e0b">BOP</span></div>';
+        } else if (ing.craftFrom && ing.craftFrom.item) {
+            html += '<div class="sourcing-row"' + indent + '><span class="opt" id="' + baseId + '_buy_label"><span id="' + baseId + '_buy_qty">' + totalQty + "x " + ing.item + '</span> (buy)</span><span class="opt" id="' + baseId + '_buy_price">-</span></div>';
+            html += '<div class="sourcing-row"' + indent + '><span class="opt" id="' + baseId + '_craft_label"><span id="' + baseId + '_craft_qty">' + (totalQty * ing.craftFrom.qty) + "x " + ing.craftFrom.item + '</span></span><span class="opt" id="' + baseId + '_craft_price">-</span></div>';
+        } else if (ing.craftFrom && ing.craftFrom.mats) {
+            html += '<div class="sourcing-row"' + indent + '><span class="opt" id="' + baseId + '_buy_label"><span id="' + baseId + '_buy_qty">' + totalQty + "x " + ing.item + '</span> (buy)</span><span class="opt" id="' + baseId + '_buy_price">-</span></div>';
+            html += '<div class="sourcing-row"' + indent + '><span class="opt" id="' + baseId + '_craft_label"><span id="' + baseId + '_craft_qty">' + totalQty + "x " + ing.item + '</span> (craft)</span><span class="opt" id="' + baseId + '_craft_price">-</span></div>';
+            ing.craftFrom.mats.forEach(function(mat) { html += buildIngHTML(mat, recipeId, totalQty * mat.qty, depth + 1, sanitizeId); });
         } else {
             var suffix = ing.type === "vendor" ? " (vendor)" : "";
-            html += '<div class="sourcing-row fixed"' + indent + "><span>" + totalQty + "x " + ing.item + suffix + '</span><span class="cost" id="' + baseId + '">-</span></div>';
+            html += '<div class="sourcing-row fixed"' + indent + '><span id="' + baseId + '_qty">' + totalQty + "x " + ing.item + suffix + '</span><span class="cost" id="' + baseId + '">-</span></div>';
         }
         return html;
     }
 
     function buildRecipeDetailHTML(recipe, sanitizeId) {
         var html = '<div id="lw-view-' + recipe.id + '" class="lw-view" style="display:none">';
-        html += '<div class="card"><h3>' + recipe.name + "</h3>";
+        html += '<div class="card"><h3>' + recipe.name + '</h3><div class="craft-amount-row">' +
+            '<label class="craft-amount-label" for="lw_qty_' + recipe.id + '">Crafting amount</label>' +
+            '<div class="price-control"><input type="number" id="lw_qty_' + recipe.id + '" value="1" min="1" step="1"></div>' +
+            '<button type="button" class="craft-amount-reset-btn" onclick="resetCraftQtyToOne(' + "'" + 'lw_qty_' + recipe.id + "'" + ',' + "'" + 'lw' + "'" + ')" title="Reset to 1">Reset</button></div>';
         html += '<div class="sourcing"><div class="sourcing-title">Ingredients</div>';
         recipe.ingredients.forEach(function(ing) {
             html += buildIngHTML(ing, recipe.id, ing.qty, 0, sanitizeId);
@@ -91,10 +99,14 @@
                 if (!itemToRecipes[ing.item]) itemToRecipes[ing.item] = [];
                 if (itemToRecipes[ing.item].indexOf(recipeId) === -1) itemToRecipes[ing.item].push(recipeId);
             }
-            if (ing.craftFrom && ing.craftFrom.item) {
-                ahItemsSet[ing.craftFrom.item] = true;
-                if (!itemToRecipes[ing.craftFrom.item]) itemToRecipes[ing.craftFrom.item] = [];
-                if (itemToRecipes[ing.craftFrom.item].indexOf(recipeId) === -1) itemToRecipes[ing.craftFrom.item].push(recipeId);
+            if (ing.craftFrom) {
+                if (ing.craftFrom.item) {
+                    ahItemsSet[ing.craftFrom.item] = true;
+                    if (!itemToRecipes[ing.craftFrom.item]) itemToRecipes[ing.craftFrom.item] = [];
+                    if (itemToRecipes[ing.craftFrom.item].indexOf(recipeId) === -1) itemToRecipes[ing.craftFrom.item].push(recipeId);
+                } else if (ing.craftFrom.mats) {
+                    ing.craftFrom.mats.forEach(function(mat) { collectItems(mat, recipeId); });
+                }
             }
         }
 
@@ -116,7 +128,8 @@
             return '<h2 class="collapsible" data-panel="lw-' + panelId + '">' + label + '<span class="collapse-arrow">&#9660;</span></h2>';
         }
 
-        var colLeft = buildRecipeDropdownHTML(recipes, categoryOrder);
+        var controls = buildRecipeDropdownHTML(recipes, categoryOrder);
+        var colLeft = "";
         if (allAhItems.length > 0) {
             colLeft += '<div class="panel lw-filterable">' + lwH2("AH Materials", "ah-mats") + '<div class="panel-body" data-panel-body="lw-ah-mats"><div class="price-table">';
             allAhItems.forEach(function(item) {
@@ -146,7 +159,7 @@
         colRight += '<div class="price-table-row"><span class="pt-name">AH Cut</span><div class="price-control"><input type="number" id="lw_ah_cut" value="5" step="0.1"><span style="color: #888; font-size: 0.82em; margin-left: 2px;">%</span></div></div>';
         colRight += "</div></div></div>";
 
-        var main = buildAllViewHTML();
+        var main = controls + buildAllViewHTML();
         recipes.forEach(function(r) {
             main += buildRecipeDetailHTML(r, sanitizeId);
         });

@@ -10,17 +10,20 @@
 
     function buildRecipeView(r, sanitizeId, primals) {
         var html = '<div id="tx-view-' + r.id + '" class="tx-view" style="display:none">';
-        html += '<div class="card"><h3>' + r.name + "</h3>";
-        html += '<div class="recipe">Transmute - ' + r.cooldown + " cooldown</div>";
+        html += '<div class="card"><h3>' + r.name + '</h3><div class="craft-amount-row">' +
+                '<label class="craft-amount-label" for="tx_qty_' + r.id + '">Crafting amount</label>' +
+            '<div class="price-control"><input type="number" id="tx_qty_' + r.id + '" value="1" min="1" step="1"></div>' +
+            '<button type="button" class="craft-amount-reset-btn" onclick="resetCraftQtyToOne(' + "'" + 'tx_qty_' + r.id + "'" + ',' + "'" + 'tx' + "'" + ')" title="Reset to 1">Reset</button></div>';
+        html += '<div class="recipe">Transmute - ' + r.cooldown + ' cooldown</div>';
         html += '<div class="sourcing"><div class="sourcing-title">Ingredients</div>';
         r.ingredients.forEach(function(ing) {
             var baseId = "tx_" + r.id + "_ing_" + sanitizeId(ing.item);
             if (ing.type === "primal") {
-                html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_buy_label">' + ing.qty + "x " + ing.item + ' (buy)</span><span class="opt" id="' + baseId + '_buy_price">-</span></div>';
+                html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_buy_label"><span id="' + baseId + '_buy_qty">' + ing.qty + "x " + ing.item + '</span> (buy)</span><span class="opt" id="' + baseId + '_buy_price">-</span></div>';
                 var p = findPrimalById(primals, ing.primalId);
-                if (p) html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_craft_label">' + (ing.qty * 10) + "x " + p.mote + '</span><span class="opt" id="' + baseId + '_craft_price">-</span></div>';
+                if (p) html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_craft_label"><span id="' + baseId + '_craft_qty">' + (ing.qty * 10) + "x " + p.mote + '</span></span><span class="opt" id="' + baseId + '_craft_price">-</span></div>';
             } else {
-                html += '<div class="sourcing-row fixed"><span>' + ing.qty + "x " + ing.item + '</span><span class="cost" id="' + baseId + '">-</span></div>';
+                html += '<div class="sourcing-row fixed"><span id="' + baseId + '_qty">' + ing.qty + "x " + ing.item + '</span><span class="cost" id="' + baseId + '">-</span></div>';
             }
         });
         html += "</div>";
@@ -35,20 +38,23 @@
 
     function buildClothView(r, sanitizeId, primals) {
         var html = '<div id="tx-view-' + r.id + '" class="tx-view" style="display:none">';
-        html += '<div class="card"><h3>' + r.name + (r.yieldQty > 1 ? ' <span style="color:#888;font-size:0.8em;">(yields ' + r.yieldQty + "x)</span>" : "") + "</h3>";
+        html += '<div class="card"><h3>' + r.name + (r.yieldQty > 1 ? ' <span style="color:#888;font-size:0.8em;">(yields ' + r.yieldQty + "x)</span>" : "") + '</h3><div class="craft-amount-row">' +
+            '<label class="craft-amount-label" for="tx_qty_' + r.id + '">Crafting amount</label>' +
+            '<div class="price-control"><input type="number" id="tx_qty_' + r.id + '" value="1" min="1" step="1"></div>' +
+            '<button type="button" class="craft-amount-reset-btn" onclick="resetCraftQtyToOne(' + "'" + 'tx_qty_' + r.id + "'" + ',' + "'" + 'tx' + "'" + ')" title="Reset to 1">Reset</button></div>';
         html += '<div class="recipe">Tailoring cloth - ' + r.cooldown + " cooldown</div>";
         html += '<div class="sourcing"><div class="sourcing-title">Ingredients (per craft)</div>';
         r.ingredients.forEach(function(ing) {
             var baseId = "tx_" + r.id + "_ing_" + sanitizeId(ing.item);
             if (ing.type === "imbued_bolt") {
-                html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_buy_label">1x Bolt of Imbued Netherweave (buy)</span><span class="opt" id="' + baseId + '_buy_price">-</span></div>';
-                html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_craft_label">1x Bolt of Imbued Netherweave (craft)</span><span class="opt" id="' + baseId + '_craft_price">-</span></div>';
-                html += '<div class="sourcing-row fixed" style="padding-left:14px"><span>-> 3x Bolt of Netherweave</span><span class="cost" id="' + baseId + '_bolt_cost">-</span></div>';
-                html += '<div class="sourcing-row fixed" style="padding-left:14px"><span>-> 2x Arcane Dust</span><span class="cost" id="' + baseId + '_dust_cost">-</span></div>';
+                html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_buy_label"><span id="' + baseId + '_buy_qty">1x Bolt of Imbued Netherweave</span> (buy)</span><span class="opt" id="' + baseId + '_buy_price">-</span></div>';
+                html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_craft_label"><span id="' + baseId + '_craft_qty">1x Bolt of Imbued Netherweave</span> (craft)</span><span class="opt" id="' + baseId + '_craft_price">-</span></div>';
+                html += '<div class="sourcing-row fixed" style="padding-left:14px"><span id="' + baseId + '_bolt_qty">-> 3x Bolt of Netherweave</span><span class="cost" id="' + baseId + '_bolt_cost">-</span></div>';
+                html += '<div class="sourcing-row fixed" style="padding-left:14px"><span id="' + baseId + '_dust_qty">-> 2x Arcane Dust</span><span class="cost" id="' + baseId + '_dust_cost">-</span></div>';
             } else if (ing.type === "primal") {
                 var p = findPrimalById(primals, ing.primalId);
-                html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_buy_label">' + ing.qty + "x " + ing.item + ' (buy)</span><span class="opt" id="' + baseId + '_buy_price">-</span></div>';
-                if (p) html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_craft_label">' + (ing.qty * 10) + "x " + p.mote + '</span><span class="opt" id="' + baseId + '_craft_price">-</span></div>';
+                html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_buy_label"><span id="' + baseId + '_buy_qty">' + ing.qty + "x " + ing.item + '</span> (buy)</span><span class="opt" id="' + baseId + '_buy_price">-</span></div>';
+                if (p) html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_craft_label"><span id="' + baseId + '_craft_qty">' + (ing.qty * 10) + "x " + p.mote + '</span></span><span class="opt" id="' + baseId + '_craft_price">-</span></div>';
             }
         });
         html += "</div>";
@@ -149,6 +155,7 @@
 
         function buildTxDropdownHTML() {
             var html = '<div class="recipe-dropdown-wrapper">' +
+                '<button class="recipe-back-btn" id="tx-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
                 '<div class="recipe-dropdown" id="tx-recipe-dropdown">' +
                 '<button class="recipe-dropdown-trigger" id="tx-recipe-dropdown-trigger">' +
                     '<span id="tx-recipe-dropdown-label">All (Profit Overview)</span>' +
@@ -163,11 +170,12 @@
             transmuteRecipes.forEach(function(r) { html += '<div class="recipe-item" data-recipe="' + r.id + '">' + r.name + "</div>"; });
             html += '<div class="recipe-category">Cloth Dailies (3d 20h CD)</div>';
             clothDailies.forEach(function(r) { html += '<div class="recipe-item" data-recipe="' + r.id + '">' + r.name + (r.yieldQty > 1 ? " ×" + r.yieldQty : "") + "</div>"; });
-            html += '</div></div><button class="recipe-back-btn" id="tx-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button></div>';
+            html += '</div></div></div>';
             return html;
         }
 
-        var colLeft = buildTxDropdownHTML();
+        var controls = buildTxDropdownHTML();
+        var colLeft = "";
         colLeft += '<div class="panel"><h2>Cooldown Tracker</h2><div class="cd-tracker-label">Cloth Dailies (3d 20h)</div><div class="cd-tracker-row"><div class="cd-tracker-field"><input type="number" id="cd_cloth_days" value="0" min="0" max="4"><span>d</span></div><div class="cd-tracker-field"><input type="number" id="cd_cloth_hours" value="0" min="0" max="23"><span>h</span></div><div class="cd-tracker-field"><input type="number" id="cd_cloth_mins" value="0" min="0" max="59"><span>m</span></div><button class="cd-set-btn" onclick="cdUpdate(\'cloth\')">Set</button><button class="cd-craft-btn" onclick="cdJustCrafted(\'cloth\')">Just Crafted!</button></div><div class="cd-tracker-label" style="border-top:1px solid #2a2a44;padding-top:8px;margin-top:4px">Transmute (1d)</div><div class="cd-tracker-row"><div class="cd-tracker-field"><input type="number" id="cd_transmute_hours" value="0" min="0" max="23"><span>h</span></div><div class="cd-tracker-field"><input type="number" id="cd_transmute_mins" value="0" min="0" max="59"><span>m</span></div><button class="cd-set-btn" onclick="cdUpdate(\'transmute\')">Set</button><button class="cd-craft-btn" onclick="cdJustCrafted(\'transmute\')">Just Crafted!</button></div></div>';
 
         colLeft += '<div class="panel tx-filterable">' + txCollH2("Mote Prices", "motes") + '<div class="panel-body" data-panel-body="tx-motes"><div class="price-table">';
@@ -236,7 +244,7 @@
         colRight += '<div class="price-table-row"><span class="pt-name">AH Cut</span><div class="price-control"><input type="number" id="tx_ah_cut" value="5" step="0.1"><span style="color:#888;font-size:0.82em;margin-left:2px;">%</span></div></div>';
         colRight += "</div></div></div>";
 
-        var main = '<div id="tx-view-all"><div class="tier-label">Profit Overview <span class="sort-toggle"><button id="tx-sort-profit" class="sort-btn active" onclick="setSortBy(\'tx\',\'profit\')">Gold</button><button id="tx-sort-pct" class="sort-btn" onclick="setSortBy(\'tx\',\'pct\')">% Margin</button></span></div><table class="alch-summary"><thead><tr><th>Item / Recipe</th><th>Cost</th><th>Revenue</th><th>Profit</th><th>Margin</th><th style="color:#a78bfa">Daily Sold</th><th style="color:#a78bfa">Avg Price</th></tr></thead><tbody id="tx-summary-body"></tbody></table></div>';
+        var main = controls + '<div id="tx-view-all"><div class="tier-label">Profit Overview <span class="sort-toggle"><button id="tx-sort-profit" class="sort-btn active" onclick="setSortBy(\'tx\',\'profit\')">Gold</button><button id="tx-sort-pct" class="sort-btn" onclick="setSortBy(\'tx\',\'pct\')">% Margin</button></span></div><table class="alch-summary"><thead><tr><th>Item / Recipe</th><th>Cost</th><th>Revenue</th><th>Profit</th><th>Margin</th><th style="color:#a78bfa">Daily Sold</th><th style="color:#a78bfa">Avg Price</th></tr></thead><tbody id="tx-summary-body"></tbody></table></div>';
         main += '<div id="tx-view-mote_primals" class="tx-view" style="display:none"><div class="tier-label">Mote → Primal Conversions</div><table class="alch-summary"><thead><tr><th>Primal</th><th>10× Mote Cost</th><th>Primal Price</th><th>Revenue (−AH%)</th><th>Deposit</th><th>Profit</th></tr></thead><tbody id="tx-mote-table-body"></tbody></table><div class="tier-label" style="margin-top:16px">Planar Essence Conversion</div><table class="alch-summary"><thead><tr><th>Conversion</th><th>Cost (3× Lesser)</th><th>Greater Price</th><th>Revenue</th><th>Profit</th></tr></thead><tbody id="tx-planar-inline-body"></tbody></table></div>';
         main += '<div id="tx-view-planar_essence" class="tx-view" style="display:none"><div class="card"><h3>Planar Essence Conversion</h3><div class="sourcing"><div class="sourcing-title">Ingredients</div><div class="sourcing-row fixed"><span>3x Lesser Planar Essence</span><span class="cost" id="tx_planar_lesser_cost">-</span></div></div><div class="card-row"><span class="label">Craft cost (3× Lesser)</span><span class="value" id="tx_planar_craft_cost">-</span></div><div class="card-row"><span class="label">Greater Planar Essence price</span><span class="value" id="tx_planar_sale">-</span></div><div class="card-row"><span class="label">AH cut</span><span class="value" id="tx_planar_ah_cut">-</span></div><div class="card-row highlight"><span class="label">Profit</span><span class="value" id="tx_planar_profit">-</span></div></div></div>';
         transmuteRecipes.forEach(function(r) { main += buildRecipeView(r, sanitizeId, txPrimals); });

@@ -2,8 +2,29 @@
     "use strict";
 
     function createLeatherworkingLogic(config) {
+        function getCraftAmount(recipeId) {
+            var el = document.getElementById("lw_qty_" + recipeId);
+            var qty = el ? parseInt(el.value, 10) : 1;
+            return qty > 0 ? qty : 1;
+        }
+
+        function updateIngQtyLabels(ing, recipeId, totalQty) {
+            var baseId = "lw_" + recipeId + "_ing_" + config.sanitizeId(ing.item);
+            var fixedQty = document.getElementById(baseId + "_qty");
+            if (fixedQty) fixedQty.textContent = totalQty + "x " + ing.item + (ing.type === "vendor" ? " (vendor)" : "");
+            var buyQty = document.getElementById(baseId + "_buy_qty");
+            if (buyQty) buyQty.textContent = totalQty + "x " + ing.item;
+            var craftQty = document.getElementById(baseId + "_craft_qty");
+            if (craftQty && ing.craftFrom && ing.craftFrom.item) craftQty.textContent = (totalQty * ing.craftFrom.qty) + "x " + ing.craftFrom.item;
+            else if (craftQty) craftQty.textContent = totalQty + "x " + ing.item;
+            if (ing.craftFrom && ing.craftFrom.mats) {
+                ing.craftFrom.mats.forEach(function(mat) { updateIngQtyLabels(mat, recipeId, totalQty * mat.qty); });
+            }
+        }
+
         function computeIngCost(ing, recipeId, totalQty) {
             var baseId = "lw_" + recipeId + "_ing_" + config.sanitizeId(ing.item);
+            if (ing.type === "bop") return 0;
             if (ing.craftFrom && ing.craftFrom.item) {
                 var buyCost = config.getVal("lw_mat_" + config.sanitizeId(ing.item)) * totalQty;
                 var craftCost = config.getVal("lw_mat_" + config.sanitizeId(ing.craftFrom.item)) * ing.craftFrom.qty * totalQty;
@@ -22,6 +43,25 @@
                 }
                 return useCraft ? craftCost : buyCost;
             }
+            if (ing.craftFrom && ing.craftFrom.mats) {
+                var buyCost2 = config.getVal("lw_mat_" + config.sanitizeId(ing.item)) * totalQty;
+                var craftSubCost = 0;
+                ing.craftFrom.mats.forEach(function(mat) { craftSubCost += computeIngCost(mat, recipeId, totalQty * mat.qty); });
+                var useCraft2 = craftSubCost < buyCost2;
+                var buyLbl2 = document.getElementById(baseId + "_buy_label");
+                if (buyLbl2) {
+                    var buyPEl2 = document.getElementById(baseId + "_buy_price");
+                    var craftLbl2 = document.getElementById(baseId + "_craft_label");
+                    var craftPEl2 = document.getElementById(baseId + "_craft_price");
+                    buyLbl2.className = "opt" + (!useCraft2 ? " active" : "");
+                    buyPEl2.className = "opt" + (!useCraft2 ? " active" : "");
+                    buyPEl2.innerHTML = config.gold(buyCost2) + (!useCraft2 ? "<span class=\"using\">USING</span>" : "");
+                    craftLbl2.className = "opt" + (useCraft2 ? " active" : "");
+                    craftPEl2.className = "opt" + (useCraft2 ? " active" : "");
+                    craftPEl2.innerHTML = config.gold(craftSubCost) + (useCraft2 ? "<span class=\"using\">USING</span>" : "");
+                }
+                return useCraft2 ? craftSubCost : buyCost2;
+            }
             var price = ing.type === "vendor" ? config.getVal("lw_vendor_" + config.sanitizeId(ing.item)) : config.getVal("lw_mat_" + config.sanitizeId(ing.item));
             var cost = (price || 0) * totalQty;
             var costEl = document.getElementById(baseId);
@@ -35,9 +75,13 @@
             var ahCutPct = parseFloat(ahCutEl.value) / 100 || 0.05;
             var results = [];
             config.recipes.forEach(function(r) {
+                var craftAmount = getCraftAmount(r.id);
                 var craftCost = 0;
-                r.ingredients.forEach(function(ing) { craftCost += computeIngCost(ing, r.id, ing.qty); });
-                var salePrice = config.getVal("lw_sale_" + r.id);
+                r.ingredients.forEach(function(ing) {
+                    updateIngQtyLabels(ing, r.id, ing.qty * craftAmount);
+                    craftCost += computeIngCost(ing, r.id, ing.qty * craftAmount);
+                });
+                var salePrice = config.getVal("lw_sale_" + r.id) * craftAmount;
                 var ahCut = salePrice * ahCutPct;
                 var deposit = config.getVal("lw_deposit_" + r.id);
                 var profit = salePrice - ahCut - craftCost;
@@ -47,7 +91,7 @@
                 var cutEl = el("lw_" + r.id + "_ah_cut_display"); if (cutEl) cutEl.textContent = config.gold(ahCut);
                 var profitEl = el("lw_" + r.id + "_profit");
                 if (profitEl) profitEl.innerHTML = "<span class=\"" + config.profitClass(profit) + "\">" + (profit >= 0 ? "+" : "") + config.gold(profit) + "</span>";
-                var depEl = el("lw_" + r.id + "_deposit_note"); if (depEl) depEl.textContent = "Deposit: " + config.gold(deposit) + " (lost if unsold)";
+                var depEl = el("lw_" + r.id + "_deposit_note"); if (depEl) depEl.textContent = "Deposit: " + config.gold(deposit) + " each (lost if unsold)";
                 results.push({ recipe: r, craftCost: craftCost, salePrice: salePrice, profit: profit });
             });
             config.setResults(results);
@@ -71,6 +115,7 @@
                 summaryBody.innerHTML = tbody;
             }
             config.saveToStorage();
+            if (window.updateMissingDefaultWarnings) window.updateMissingDefaultWarnings();
             config.evCalculate();
         }
 

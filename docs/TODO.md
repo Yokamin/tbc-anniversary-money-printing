@@ -1,36 +1,35 @@
-# TODO / ideas
+# TODO / backlog
 
-This file is meant to track **future work**, not day-to-day experiments.
+This is the active backlog for upcoming work.
 
-## High priority (maintenance / correctness)
+## Next features (requested)
 
-- **Extensibility audit**: when adding a new tab, ensure it participates in:\n  - shared price sync (`buildAllNameToInputs()` registration)\n  - global import\n  - Everything tab aggregation (if desired)\n  - localStorage persistence\n- **Name normalization**: decide on one canonical name per item and enforce it (to prevent sync/import bugs from casing/spelling differences).
-- **Basic regression checklist** for each “stable” release:\n  - Global import updates shared items across all tabs\n  - Staleness dots update on import and age correctly\n  - Everything tab: Flat and By Section views render\n  - Export generator produces consistent list ordering
+1. **Docs / UX polish (optional)**
+   - Small **About / Help** section linking to import/export and toolbar actions (if desired in-app).
 
-## Medium priority (code health)
+## Nice-to-have
 
-- **Split `index.html` logically** (even if still shipped as one file):\n  - move data blocks into a dedicated “data section”\n  - move helpers into a dedicated “utils section”\n  - group each tab into a self-contained section\n- **Introduce a lightweight “tab registration” pattern** so adding tabs is declarative (reduces missed wiring).
+- Add a small `About / Help` section linking to import/export docs.
+- Optional export formats (CSV, JSON) if workflow benefits.
 
-## Low priority / nice-to-have
+## Deferred — start only when explicitly requested
 
-- Add a small “About / Help” section in the UI that links to docs and reminds users how to import Auctionator exports.
-- Add optional export formats (e.g. CSV) if it helps your workflow.
-- **TSM ledger lookup helper (TBC Anniversary context)**:
-  - Goal: make it easy to query specific items from accumulated TSM ledger data (expenses/revenue) without manual searching in addon UI.
-  - Scope discovery first: confirm which TSM files/exports are accessible and whether data is encrypted/encoded.
-  - If feasible, add a local parser/lookup utility that can answer item-level questions quickly (profit/cost history summaries).
-- **Auctionator export compare tool**:
-  - Add an input that accepts an in-game Auctionator export and compares it against the site's generated export.
-  - Comparison should be set-based (ignore ordering), and highlight missing items, extras/duplicates, and likely outdated lists.
-  - Include a small workflow hint for "manual in-game additions" so the diff can drive either site updates or in-game list cleanup.
-- **Move recipe dropdown/back controls to center/main view area**:
-  - Put recipe selector + back button above profit overview/detail area (instead of left input column) for shorter mouse travel and cleaner input column.
-- **Alchemy batch custom amount**:
-  - Extend ×1/×100/×1000 with a `Custom` mode + numeric input, used in main overview math/sorting.
-- **LocalStorage snapshot/export helper**:
-  - Add a way to export current local prices/settings (especially vendor prices + deposits) so defaults can be promoted into code more easily.
-- **Missing defaults indicators**:
-  - Add warnings for missing deposit/vendor values:
-    - lightweight row indicator in overview (e.g. `!`),
-    - clear banner/notice in recipe detail when required deposit/vendor values are missing.
+These stay on the backlog for visibility (e.g. when someone asks “what’s left?”) but **must not** be picked up unless you explicitly ask to work on them.
 
+- **TSM addon ledger data — investigation (large scope)**
+  - Investigate how TradeSkillMaster stores ledger-related data (formats, layout, whether anything is obfuscated or treated as opaque blobs).
+  - Clarify what is realistic for local tooling vs. what is impractical or disallowed (WoW add-on / ToS expectations, no reverse-engineering “crack” framing).
+  - Outcome goal: enough understanding to decide if a separate script or workflow could read or summarize ledger-style data for your own checks.
+  - **Do not start this** until you give a clear go-ahead; when discussing backlog, this item should still be mentioned so it is not forgotten.
+
+## Recently completed (moved from active backlog)
+
+- Modular extraction completed (`src/core`, `src/tabs/*Logic.js`, `src/data`).
+- Runtime parity checks completed via smoke checklist.
+- Extension workflow/checklist docs added (`docs/EXTENSION_CHECKLIST.md`).
+- Export contract documented (keep `1.0 ALL BAGS` separate even with Bags merged into Tailoring UI).
+- **v2.2.0**: Recipe controls moved to center content header across calculator tabs.
+- **v2.2.0**: Per-recipe craft amount + Reset in detail views; quantity-aware ingredient/cost/profit.
+- **v2.2.0**: Manual prices snapshot helper; missing-default reminders (overview + detail).
+- **v2.2.0**: Auctionator export compare (order-insensitive missing/extra/duplicate diff); Compare export next to Ingredients.
+- **v2.2.0**: Leatherworking nested craft chains + export recursion for nested AH materials.

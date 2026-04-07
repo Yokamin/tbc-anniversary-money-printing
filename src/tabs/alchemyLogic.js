@@ -2,6 +2,11 @@
     "use strict";
 
     function createAlchemyLogic(config) {
+        function getCraftAmount(recipeId) {
+            var el = document.getElementById("alch_qty_" + recipeId);
+            var qty = el ? parseInt(el.value, 10) : 1;
+            return qty > 0 ? qty : 1;
+        }
         function getHiddenRecipes() {
             try { return JSON.parse(localStorage.getItem(config.hiddenKey)) || {}; }
             catch (e) { return {}; }
@@ -87,6 +92,7 @@
             var ahCutPct = config.getVal("alch_ah_cut") / 100;
             var results = [];
             config.recipes.forEach(function(r) {
+                var craftAmount = getCraftAmount(r.id);
                 var craftCost = 0;
                 r.ingredients.forEach(function(ing) {
                     var baseId = "alch_" + r.id + "_ing_" + config.sanitizeId(ing.item);
@@ -94,8 +100,9 @@
                     if (ing.craftFrom) {
                         var buyPrice = config.getVal("alch_mat_" + config.sanitizeId(ing.item));
                         var motePrice = config.getVal("alch_mat_" + config.sanitizeId(ing.craftFrom.item));
-                        var buyCost = buyPrice * ing.qty;
-                        var moteCost = motePrice * ing.craftFrom.qty * ing.qty;
+                        var reqQty = ing.qty * craftAmount;
+                        var buyCost = buyPrice * reqQty;
+                        var moteCost = motePrice * ing.craftFrom.qty * reqQty;
                         var useMotes = moteCost < buyCost;
                         ingCost = useMotes ? moteCost : buyCost;
                         var buyLabel = document.getElementById(baseId + "_buy_label");
@@ -109,16 +116,23 @@
                             craftLabel.className = "opt" + (useMotes ? " active" : "");
                             craftPriceEl.className = "opt" + (useMotes ? " active" : "");
                             craftPriceEl.innerHTML = config.gold(moteCost) + (useMotes ? "<span class=\"using\">USING</span>" : "");
+                            var buyQtyEl = document.getElementById(baseId + "_buy_qty");
+                            if (buyQtyEl) buyQtyEl.textContent = reqQty + "x " + ing.item;
+                            var craftQtyEl = document.getElementById(baseId + "_craft_qty");
+                            if (craftQtyEl) craftQtyEl.textContent = (reqQty * ing.craftFrom.qty) + "x " + ing.craftFrom.item;
                         }
                     } else {
                         var price = ing.type === "ah" ? config.getVal("alch_mat_" + config.sanitizeId(ing.item)) : config.getVal("alch_vendor_" + config.sanitizeId(ing.item));
-                        ingCost = (price || 0) * ing.qty;
+                        var reqQty2 = ing.qty * craftAmount;
+                        ingCost = (price || 0) * reqQty2;
                         var costEl = document.getElementById(baseId);
                         if (costEl) costEl.textContent = config.gold(ingCost);
+                        var qtyEl = document.getElementById(baseId + "_qty");
+                        if (qtyEl) qtyEl.textContent = reqQty2 + "x " + ing.item;
                     }
                     craftCost += ingCost;
                 });
-                var salePrice = config.getVal("alch_sale_" + r.id);
+                var salePrice = config.getVal("alch_sale_" + r.id) * craftAmount;
                 var ahCut = salePrice * ahCutPct;
                 var deposit = config.getVal("alch_deposit_" + r.id);
                 var profit = salePrice - ahCut - craftCost;
@@ -128,7 +142,7 @@
                 var cutEl = el("alch_" + r.id + "_ah_cut_display"); if (cutEl) cutEl.textContent = config.gold(ahCut);
                 var profitEl = el("alch_" + r.id + "_profit");
                 if (profitEl) profitEl.innerHTML = "<span class=\"" + config.profitClass(profit) + "\">" + (profit >= 0 ? "+" : "") + config.gold(profit) + "</span>";
-                var depositEl = el("alch_" + r.id + "_deposit_note"); if (depositEl) depositEl.textContent = "Deposit: " + config.gold(deposit) + " (lost if unsold)";
+                var depositEl = el("alch_" + r.id + "_deposit_note"); if (depositEl) depositEl.textContent = "Deposit: " + config.gold(deposit) + " each (lost if unsold)";
                 results.push({ recipe: r, craftCost: craftCost, salePrice: salePrice, profit: profit });
             });
 
@@ -171,6 +185,7 @@
             var summaryBody = document.getElementById("alch-summary-body");
             if (summaryBody && !(summaryBody.contains(document.activeElement) && document.activeElement.classList.contains("tsm-input"))) summaryBody.innerHTML = tbody;
             config.saveToStorage();
+            if (window.updateMissingDefaultWarnings) window.updateMissingDefaultWarnings();
         }
 
         return {

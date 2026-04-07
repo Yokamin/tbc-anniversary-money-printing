@@ -2,6 +2,12 @@
     "use strict";
 
     function createCookingLogic(config) {
+        function getCraftAmount(recipeId) {
+            var el = document.getElementById("cook_qty_" + recipeId);
+            var qty = el ? parseInt(el.value, 10) : 1;
+            return qty > 0 ? qty : 1;
+        }
+
         function calculate() {
             var ahCutEl = document.getElementById("cook_ah_cut");
             if (!ahCutEl) return;
@@ -9,20 +15,24 @@
             var results = [];
 
             config.recipes.forEach(function(r) {
+                var craftAmount = getCraftAmount(r.id);
                 var craftCost = 0;
                 r.ingredients.forEach(function(ing) {
                     var baseId = "cook_" + r.id + "_ing_" + config.sanitizeId(ing.item);
                     var price = ing.type === "vendor"
                         ? (parseFloat(document.getElementById("cook_vendor_" + config.sanitizeId(ing.item)) ? document.getElementById("cook_vendor_" + config.sanitizeId(ing.item)).value : 0) || 0)
                         : (parseFloat(document.getElementById("cook_mat_" + config.sanitizeId(ing.item)) ? document.getElementById("cook_mat_" + config.sanitizeId(ing.item)).value : 0) || 0);
-                    var ingCost = price * ing.qty;
+                    var reqQty = ing.qty * craftAmount;
+                    var ingCost = price * reqQty;
                     craftCost += ingCost;
                     var costEl = document.getElementById(baseId);
                     if (costEl) costEl.textContent = config.gold(ingCost);
+                    var qtyEl = document.getElementById(baseId + "_qty");
+                    if (qtyEl) qtyEl.innerHTML = reqQty + "x " + ing.item + (ing.type === "vendor" ? ' <span style="color:#888;font-size:0.8em">(vendor)</span>' : "");
                 });
 
                 var saleEl = document.getElementById("cook_sale_" + r.id);
-                var salePrice = saleEl ? (parseFloat(saleEl.value) || 0) : 0;
+                var salePrice = (saleEl ? (parseFloat(saleEl.value) || 0) : 0) * craftAmount;
                 var ahCut = salePrice * ahCutPct;
                 var deposit = parseFloat((document.getElementById("cook_deposit_" + r.id) || {}).value) || 0;
                 var profit = salePrice - ahCut - craftCost;
@@ -64,6 +74,7 @@
             }
 
             config.saveToStorage();
+            if (window.updateMissingDefaultWarnings) window.updateMissingDefaultWarnings();
             config.evCalculate();
         }
 

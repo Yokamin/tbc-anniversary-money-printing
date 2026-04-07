@@ -2,7 +2,7 @@
 
 This project uses a **modular plain-file architecture** for GitHub Pages (no build step).
 
-Current state:
+Current state (release **v2.2.0**):
 - Main app shell and wiring live in `index.html`.
 - Core cross-cutting concerns are extracted into plain JS modules under `src/core/`.
 - UI polish overrides are in `styles/main.css` (non-redesign, usability-focused layer).
@@ -25,7 +25,7 @@ Current state:
 - **`src/core/sortControls.js`**: per-tab sort state and sort-toggle button synchronization.
 - **`src/core/tsmUi.js`**: TSM notes helpers (age labels, g/s/c preview HTML, per-field save/input rendering).
 - **`src/core/procControls.js`**: proc calculator modal/inline controls and proc-rate update handlers.
-- **`src/core/toolbarActions.js`**: global export/copy and AH reset toolbar actions.
+- **`src/core/toolbarActions.js`**: global export/copy, manual snapshot export, export compare, and AH reset toolbar actions.
 - **`src/core/locks.js`**: lock state read/write and lock-button display behavior.
 - **`src/core/storageRead.js`**: shared localStorage value readers for json/number/int bootstrap state.
 - **`src/core/tabStorage.js`**: shared per-tab save/load localStorage helpers.
@@ -48,6 +48,7 @@ Current state:
 - **`src/tabs/enchantingLogic.js`**: extracted Enchanting calc and selection logic used by `ench*` runtime wrappers.
 - **`src/tabs/leatherworkingLogic.js`**: extracted Leatherworking ingredient-cost, calc, and selection logic used by `lw*` runtime wrappers.
 - **`src/tabs/everythingLogic.js`**: Everything tab TSM/read rendering helpers and calc engine.
+- Runtime also applies cross-tab missing-default warning state (summary icon + detail banner) after tab recalculation.
 - There is **no build step** (plain files directly served by GitHub Pages).
 
 ## High-level flow

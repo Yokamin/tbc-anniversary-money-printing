@@ -1,8 +1,16 @@
 # TBC Crafting Calculator
 
-## Version: 2.1.0
+## Version: 2.2.0
 
 Single-page HTML app for calculating crafting profitability in WoW TBC Anniversary.
+
+### Release highlights (2.2.0)
+
+- **Recipe header**: centered dropdown and **← All** on calculator tabs (Tailoring Gear, Alchemy, Transmutes, Cooking, Enchanting, Leatherworking).
+- **Detail planning**: per-recipe **Crafting amount** scales ingredient totals and detail cost/profit; **Reset** beside the field jumps back to ×1.
+- **Defaults and backup**: warnings when vendor/deposit defaults are missing (overview marker + detail banner); **Manual Snapshot** exports vendor/deposit/AH-cut JSON for backup or promoting defaults.
+- **Export QA**: **Compare export** (toolbar, next to **Ingredients**) compares an in-game Auctionator paste to the current **Export Lists** output (order-insensitive; missing, extra, duplicates).
+- **Leatherworking data**: deeper nested craft chains (for example Knothide Scraps under Cobrahide); export lists recurse so nested AH materials are included.
 
 ## Note on authorship and tooling
 
@@ -17,13 +25,13 @@ This project was made with AI-assisted tooling (started in Claude Code, now Curs
 - **UI polish layer**: `styles/main.css`
 - **Design notes**: `DECISIONS.md`
 - **Samples**: `export_example.txt` (example Auctionator buy-list export output)
-- **Legacy / archived**: `legacy/` (old helpers and OS artifacts; see `legacy/README.md`)
 
 ## Development & deploy workflow
 
 - **Source of truth**: `index.html` is edited directly.
 - **Local testing**: open `index.html` in a browser and sanity-check calculations/import/export before pushing.
 - **Deploy**: pushing to GitHub updates GitHub Pages (repo configured with `origin` at `git@github.com:Yokamin/tbc-anniversary-money-printing.git`).
+- **Development log discipline**: record completed work in `docs/DEV_LOG.md` (including small/unplanned fixes), grouped by date and release version where applicable.
 
 If a future refactor reintroduces a build step, it should be documented in `DECISIONS.md` and reflected here.
 
@@ -32,7 +40,9 @@ If a future refactor reintroduces a build step, it should be documented in `DECI
 - Versioning and stable release policy: `docs/VERSIONING.md`
 - Patch smoke runbook: `docs/SMOKE_TEST_CHECKLIST.md`
 - Extension runbook (new recipes/tabs): `docs/EXTENSION_CHECKLIST.md`
-- Current stable release line: `2.1.x`.
+- Active backlog: `docs/TODO.md`
+- Completed milestones log: `docs/DEV_LOG.md`
+- Current stable release line: `2.2.x` (latest tagged: `v2.2.0`).
 - Netherweave cloth handling policy: `docs/NETHERWEAVE_POLICY.md`
 
 ### Tabs
@@ -90,37 +100,6 @@ If a future refactor reintroduces a build step, it should be documented in `DECI
 - Bolt of Imbued Netherweave shows full craft chain (buy vs craft from Bolt of NW → Cloth + Dust)
 - **Auctionator Export**: generates formatted buy-list text for all tracked recipes, ready to import in-game
 
-### Shared Features
-
-- **🔍 Ingredients button** (global toolbar): search any ingredient name across all tabs — shows every recipe that uses it with tab badge, quantity, and profit; click a recipe to expand full ingredient list and a "Go to recipe" shortcut
-- AH price import: paste Auctionator export data to bulk-update prices. **Reset** button clears the import field; **Reset** button on the export field clears the output.
-- **Reset AH Prices** button (top-right of tab bar): zeroes all AH-imported prices across all tabs. Vendor prices (Imbued Vial, Rune Thread), deposit values, and AH cut % are preserved.
-- **Wider layout**: no max-width constraint — uses full browser width
-- **Profit % (Margin) column**: all profit overview tables show margin % alongside gold profit
-- **Sort toggle**: each profit overview has Gold / % Margin sort buttons in the header
-- **TSM notes columns**: "Daily Sold" (0–9999) and "Avg Price" (gold) editable per-recipe in all profit overview tables; Avg Price shows a live g/s/c colour preview; both fields show a "last updated" age indicator; persisted to localStorage per field with timestamp
-- **Price staleness indicators**: colored dots next to every AH price input and in profit overview rows, showing how recently each price was imported:
-  - 🔵 Blue — updated in the most recent import batch
-  - 🟢 Green — < 5 min ago
-  - 🟡 Yellow — 5–30 min ago
-  - 🟠 Orange — 30–60 min ago
-  - 🔴 Red — > 1 hr ago
-  - ⚫ Grey — never imported
-  - Profit overview rows show the **worst** staleness across all AH ingredients + sale price
-  - Netherweave Cloth is exempt (always locked at a fixed price; excluded from staleness tracking)
-  - Dots update on import and refresh automatically every 30 seconds
-- **Back button** on recipe dropdowns: "← All" appears when viewing a specific recipe, returning to the profit overview without using the dropdown
-- Lock buttons: prevent specific prices from being overwritten on import
-- Silver nudge buttons (+/- 0.01g) next to mote price inputs
-- Gold/Silver/Copper display next to each price input
-- AH cut percentage setting (default 5%)
-- AH deposit tracking per product
-- Collapsible sidebar panels
-- All prices saved to localStorage (persist across reloads)
-- Tab and recipe selection remembered across sessions
-- Shared price sync: updating a material in one tab auto-updates it in all other tabs
-  - Synced: Netherweave Cloth, Arcane Dust (Gear/TX/Enchanting), Bolt of Netherweave, Bolt of Imbued Netherweave, Rune Thread, Lesser/Greater Planar Essence, Mote/Primal of Fire, Earth, Mana, Shadow
-
 **Cooking**
 - Dynamically generated UI from recipe data array, same structure as Alchemy
 - Recipes tracked by buff category:
@@ -155,6 +134,42 @@ If a future refactor reintroduces a build step, it should be documented in `DECI
 - Categories: Battle Elixir, Guardian Elixir, Flask, Food, Potion, Oil — colour-coded badges
 - Primary consumables shown clearly; situational alternatives marked with **ALT** badge
 - Notes shown inline (e.g. "Demons only", "400 Haste — when armour capped")
+
+### Shared Features
+
+- **🔍 Ingredients button** (global toolbar): search any ingredient name across all tabs — shows every recipe that uses it with tab badge, quantity, and profit; click a recipe to expand full ingredient list and a "Go to recipe" shortcut
+- AH price import: paste Auctionator export data to bulk-update prices. **Reset** button clears the import field; **Reset** button on the export field clears the output.
+- **Reset AH Prices** button (top-right of tab bar): zeroes all AH-imported prices across all tabs. Vendor prices (Imbued Vial, Rune Thread), deposit values, and AH cut % are preserved.
+- **Wider layout**: no max-width constraint — uses full browser width
+- **Profit % (Margin) column**: all profit overview tables show margin % alongside gold profit
+- **Sort toggle**: each profit overview has Gold / % Margin sort buttons in the header
+- **TSM notes columns**: "Daily Sold" (0–9999) and "Avg Price" (gold) editable per-recipe in all profit overview tables; Avg Price shows a live g/s/c colour preview; both fields show a "last updated" age indicator; persisted to localStorage per field with timestamp
+- **Price staleness indicators**: colored dots next to every AH price input and in profit overview rows, showing how recently each price was imported:
+  - 🔵 Blue — updated in the most recent import batch
+  - 🟢 Green — < 5 min ago
+  - 🟡 Yellow — 5–30 min ago
+  - 🟠 Orange — 30–60 min ago
+  - 🔴 Red — > 1 hr ago
+  - ⚫ Grey — never imported
+  - Profit overview rows show the **worst** staleness across all AH ingredients + sale price
+  - Netherweave Cloth is exempt (always locked at a fixed price; excluded from staleness tracking)
+  - Dots update on import and refresh automatically every 30 seconds
+- **Back button** on recipe dropdowns: "← All" appears when viewing a specific recipe, returning to the profit overview without using the dropdown
+- **Centered recipe controls**: recipe dropdown + `← All` are in the main content header area for calculator tabs.
+- **Detail craft amount**: recipe detail views include a left-aligned “Crafting amount” control (theme-matched numeric field, no browser steppers) that scales ingredient totals and detail cost/profit values; a **Reset** control next to the field sets the amount back to ×1.
+- **Missing defaults reminders**: summary rows show a warning icon and detail views show a high-contrast banner when required vendor/deposit defaults are missing.
+- Lock buttons: prevent specific prices from being overwritten on import
+- Silver nudge buttons (+/- 0.01g) next to mote price inputs
+- Gold/Silver/Copper display next to each price input
+- AH cut percentage setting (default 5%)
+- AH deposit tracking per product
+- **Manual snapshot export**: toolbar action exports vendor/deposit/AH-cut values as JSON for backup/default promotion.
+- **Export compare tool**: **Compare export** sits next to **Ingredients** in the toolbar — opens a modal to paste in-game Auctionator export, run **Compare** against the current site export list (order-insensitive; missing/extra/duplicates), copy result from the modal.
+- Collapsible sidebar panels
+- All prices saved to localStorage (persist across reloads)
+- Tab and recipe selection remembered across sessions
+- Shared price sync: updating a material in one tab auto-updates it in all other tabs
+  - Synced: Netherweave Cloth, Arcane Dust (Gear/TX/Enchanting), Bolt of Netherweave, Bolt of Imbued Netherweave, Rune Thread, Lesser/Greater Planar Essence, Mote/Primal of Fire, Earth, Mana, Shadow
 
 ### Auctionator Buy-List Export
 

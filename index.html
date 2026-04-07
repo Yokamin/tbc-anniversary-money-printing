@@ -133,6 +133,55 @@
             outline: none;
             border-color: #ffd700;
         }
+        /* All numeric inputs: no browser stepper arrows (project default for new fields) */
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .craft-amount-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 10px 14px;
+            margin: 0 0 14px 0;
+            padding: 2px 0 14px 0;
+            border-bottom: 1px solid #3a3a5c;
+        }
+        .craft-amount-label {
+            font-size: 0.9em;
+            color: #aaa;
+            flex-shrink: 0;
+        }
+        .craft-amount-row .price-control {
+            flex: 0 0 auto;
+        }
+        .craft-amount-row .price-control input {
+            min-width: 72px;
+            width: 7em;
+            max-width: 140px;
+        }
+        .craft-amount-reset-btn {
+            flex-shrink: 0;
+            font-size: 0.72em;
+            padding: 4px 8px;
+            min-height: 28px;
+            line-height: 1.2;
+            border: 1px solid #3a3a5c;
+            background: #2a2a3e;
+            color: #bbb;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .craft-amount-reset-btn:hover {
+            border-color: #ffd700;
+            color: #fff;
+        }
         .gsc-group {
             display: flex;
             gap: 2px;
@@ -213,6 +262,182 @@
         .card-row.highlight {
             margin-top: 10px;
             padding-top: 10px;
+            border-top: 1px solid #3a3a5c;
+        }
+        /* Missing vendor/deposit defaults — must win over .card text color */
+        .card .missing-default-banner {
+            margin: 0 0 14px 0;
+            padding: 12px 14px;
+            border: 2px solid #ef4444;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #450a0a 0%, #3f0d0d 100%);
+            box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.35), 0 4px 14px rgba(0, 0, 0, 0.35);
+            color: #fecaca !important;
+            font-size: 0.92em;
+            line-height: 1.4;
+        }
+        .missing-default-banner-inner {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .missing-default-banner-svg {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            margin-top: 2px;
+        }
+        .missing-default-banner-inner strong {
+            display: block;
+            color: #fca5a5 !important;
+            font-size: 1.05em;
+            margin-bottom: 4px;
+        }
+        .missing-default-banner-detail {
+            color: #f87171 !important;
+            font-weight: 600;
+        }
+        td .missing-default-icon-wrap {
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+            margin-left: 6px;
+        }
+        td .missing-default-icon-wrap .missing-default-icon {
+            display: block;
+            width: 16px;
+            height: 16px;
+        }
+        .compare-export-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.72);
+            box-sizing: border-box;
+        }
+        .compare-export-overlay.open {
+            display: flex;
+        }
+        .compare-export-modal {
+            background: #1a1a2e;
+            border: 1px solid #3a3a5c;
+            border-radius: 10px;
+            max-width: min(1400px, 95vw);
+            max-height: 88vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+        }
+        .compare-export-modal-body {
+            padding: 14px 18px 0 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 0;
+            flex: 1;
+            overflow: hidden;
+        }
+        .compare-export-hint {
+            margin: 0;
+            font-size: 0.82em;
+            color: #888;
+            line-height: 1.4;
+        }
+        .compare-export-run-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+        .compare-export-inline-label {
+            flex-shrink: 0;
+            font-size: 0.78em;
+            color: #888;
+            white-space: nowrap;
+        }
+        .compare-export-run-row .compare-export-paste {
+            flex: 1;
+            min-width: 0;
+            box-sizing: border-box;
+            height: 28px;
+            min-height: 28px;
+            max-height: 28px;
+            padding: 4px 8px;
+            background: #1a1a2e;
+            border: 1px solid #3a3a5c;
+            border-radius: 4px;
+            color: #eee;
+            font-size: 0.82em;
+            font-family: inherit;
+            line-height: 1.25;
+            resize: none;
+            overflow: hidden;
+        }
+        .compare-export-run-row .compare-export-paste:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+        .compare-export-compare-btn {
+            flex-shrink: 0;
+        }
+        .compare-export-results-label {
+            font-size: 0.78em;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #666;
+            margin-top: 6px;
+        }
+        .compare-export-modal-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid #3a3a5c;
+            color: #ffd700;
+            font-weight: 600;
+        }
+        .compare-export-modal-hdr button {
+            background: transparent;
+            border: 1px solid #555;
+            color: #aaa;
+            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            font-size: 1.2em;
+            line-height: 1;
+        }
+        .compare-export-modal-hdr button:hover {
+            border-color: #ffd700;
+            color: #fff;
+        }
+        #compare-export-body {
+            margin: 0;
+            padding: 10px 12px;
+            overflow: auto;
+            font-family: 'Consolas', 'Segoe UI Mono', monospace;
+            font-size: 0.82em;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #e5e7eb;
+            flex: 1 1 auto;
+            min-height: 120px;
+            max-height: 42vh;
+            background: #12121f;
+            border: 1px solid #2a2a44;
+            border-radius: 6px;
+        }
+        .compare-export-modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding: 12px 16px 16px 16px;
             border-top: 1px solid #3a3a5c;
         }
         .best-source {
@@ -598,6 +823,7 @@
             color: #ffd700;
         }
         .recipe-back-btn {
+            flex-shrink: 0;
             background: #1a1a2e;
             border: 1px solid #3a3a5c;
             border-radius: 4px;
@@ -1027,6 +1253,7 @@
         }
         .toolbar-import { flex: 1; border-right: 1px solid #3a3a5c; }
         .toolbar-export { flex: 0.75; border-right: 1px solid #3a3a5c; }
+        .toolbar-tools { border-right: 1px solid #3a3a5c; }
         .toolbar-reset  { padding: 7px 8px; }
         .toolbar-input {
             flex: 1;
@@ -1253,11 +1480,13 @@
             </div>
             <div class="toolbar-section toolbar-export">
                 <button class="toolbar-btn" onclick="globalExport()">Export Lists</button>
+                <button class="toolbar-btn" onclick="exportManualSnapshot()">Manual Snapshot</button>
                 <textarea id="global_export_output" class="toolbar-input" readonly placeholder="Click Export Lists..." rows="1"></textarea>
                 <button class="toolbar-btn toolbar-btn-reset" onclick="document.getElementById('global_export_output').value=''" title="Clear export field">Reset</button>
                 <button class="toolbar-btn" onclick="globalCopyExport()">Copy</button>
             </div>
-            <div class="toolbar-section" style="padding: 7px 8px;">
+            <div class="toolbar-section toolbar-tools" style="padding: 7px 8px;">
+                <button type="button" class="toolbar-btn" onclick="openCompareExportModal()">Compare export</button>
                 <button class="toolbar-btn" onclick="openIngSearch()" title="Search for an ingredient to see which recipes use it">&#128269; Ingredients</button>
             </div>
             <div class="toolbar-section toolbar-reset">
@@ -1270,6 +1499,29 @@
             <div id="cd-popup-box">
                 <div id="cd-popup-msg"></div>
                 <button id="cd-popup-ok" onclick="cdDismissPopup()">OK</button>
+            </div>
+        </div>
+
+        <div id="compare-export-overlay" class="compare-export-overlay" onclick="if (event.target === this) closeCompareExportModal()">
+            <div class="compare-export-modal" onclick="event.stopPropagation()">
+                <div class="compare-export-modal-hdr">
+                    <span>Compare export</span>
+                    <button type="button" onclick="closeCompareExportModal()" title="Close">&times;</button>
+                </div>
+                <div class="compare-export-modal-body">
+                    <p class="compare-export-hint">Paste your in-game Auctionator export into the field next to <strong>Compare</strong>. The site list uses the current <strong>Export Lists</strong> output (generate it first if needed).</p>
+                    <div class="compare-export-run-row">
+                        <label class="compare-export-inline-label" for="compare-export-modal-input">In-game</label>
+                        <textarea id="compare-export-modal-input" class="compare-export-paste" rows="1" spellcheck="false" placeholder="Paste in-game export…"></textarea>
+                        <button type="button" class="toolbar-btn compare-export-compare-btn" onclick="compareExports()">Compare</button>
+                    </div>
+                    <div class="compare-export-results-label">Result</div>
+                    <pre id="compare-export-body"></pre>
+                </div>
+                <div class="compare-export-modal-actions">
+                    <button type="button" class="toolbar-btn" onclick="copyCompareExportSummary()">Copy result</button>
+                    <button type="button" class="toolbar-btn" onclick="closeCompareExportModal()">Close</button>
+                </div>
             </div>
         </div>
 
@@ -1872,6 +2124,81 @@
         // ===== GLOBAL IMPORT =====
         function globalImportPrices() { GLOBAL_IMPORT.run(); }
 
+        function updateMissingDefaultWarnings() {
+            function collectVendorInputs(ingredients, prefix, out) {
+                ingredients.forEach(function(ing) {
+                    if (ing.type === "vendor") out.push(prefix + "_vendor_" + sanitizeId(ing.item));
+                    if (ing.craftFrom && ing.craftFrom.mats) collectVendorInputs(ing.craftFrom.mats, prefix, out);
+                });
+            }
+            var tabs = [
+                { prefix: "alch", recipes: ALCHEMY_RECIPES || [], rowClass: ".alch-summary-row" },
+                { prefix: "gear", recipes: (typeof getAllGearRecipes === "function" ? getAllGearRecipes() : []), rowClass: ".gear-summary-row" },
+                { prefix: "cook", recipes: COOKING_RECIPES || [], rowClass: ".cook-summary-row" },
+                { prefix: "ench", recipes: ENCHANTING_RECIPES || [], rowClass: ".ench-summary-row" },
+                { prefix: "lw", recipes: LW_RECIPES || [], rowClass: ".lw-summary-row" },
+                { prefix: "tx", recipes: (TRANSMUTE_RECIPES || []).concat(CLOTH_DAILIES || []), rowClass: ".tx-summary-row" }
+            ];
+            tabs.forEach(function(tab) {
+                tab.recipes.forEach(function(recipe) {
+                    var missing = [];
+                    var depositEl = document.getElementById(tab.prefix + "_deposit_" + recipe.id);
+                    if (depositEl && !(parseFloat(depositEl.value) > 0)) missing.push("deposit");
+                    var vendorIds = [];
+                    collectVendorInputs(recipe.ingredients || [], tab.prefix, vendorIds);
+                    vendorIds.forEach(function(id) {
+                        var input = document.getElementById(id);
+                        if (input && !(parseFloat(input.value) > 0)) missing.push(id.replace(tab.prefix + "_vendor_", "") + " vendor");
+                    });
+
+                    var row = document.querySelector(tab.rowClass + '[data-recipe="' + recipe.id + '"] td:first-child');
+                    if (row) {
+                        var iconWrap = row.querySelector(".missing-default-icon-wrap");
+                        if (missing.length > 0) {
+                            if (!iconWrap) {
+                                iconWrap = document.createElement("span");
+                                iconWrap.className = "missing-default-icon-wrap";
+                                iconWrap.innerHTML = '<svg class="missing-default-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3L2 21h20L12 3z" stroke="#f97316" stroke-width="1.8" fill="rgba(249,115,22,0.25)"/><path d="M12 9v4.5" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.2" fill="#fbbf24"/></svg>';
+                                row.appendChild(iconWrap);
+                            }
+                            iconWrap.title = "Missing defaults: " + missing.join(", ");
+                        } else if (iconWrap) iconWrap.remove();
+                    }
+
+                    var view = document.getElementById(tab.prefix + "-view-" + recipe.id);
+                    if (!view) return;
+                    var card = view.querySelector(".card");
+                    if (!card) return;
+                    var bannerId = tab.prefix + "_" + recipe.id + "_missing_banner";
+                    var banner = document.getElementById(bannerId);
+                    if (!banner) {
+                        banner = document.createElement("div");
+                        banner.id = bannerId;
+                        banner.className = "missing-default-banner";
+                        var h3El = card.querySelector("h3");
+                        if (h3El) h3El.insertAdjacentElement("afterend", banner);
+                        else card.insertBefore(banner, card.firstChild);
+                    }
+                    if (missing.length > 0) {
+                        banner.style.display = "";
+                        banner.innerHTML = '<div class="missing-default-banner-inner">' +
+                            '<svg class="missing-default-banner-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+                            '<path d="M12 3L2 21h20L12 3z" stroke="#fca5a5" stroke-width="1.8" fill="rgba(248,113,113,0.22)"/>' +
+                            '<path d="M12 9v4.5" stroke="#fecaca" stroke-width="2" stroke-linecap="round"/>' +
+                            '<circle cx="12" cy="17" r="1.2" fill="#fecaca"/></svg>' +
+                            '<div><strong>Missing defaults</strong><div class="missing-default-banner-detail"></div></div></div>';
+                        var det = banner.querySelector(".missing-default-banner-detail");
+                        if (det) det.textContent = missing.join(", ");
+                        var h3Banner = card.querySelector("h3");
+                        if (h3Banner) h3Banner.insertAdjacentElement("afterend", banner);
+                    } else {
+                        banner.style.display = "none";
+                    }
+                });
+            });
+        }
+        window.updateMissingDefaultWarnings = updateMissingDefaultWarnings;
+
         // ===== COOLDOWN TRACKER =====
         var CD_DURATIONS = {
             cloth:     (3 * 24 * 60 + 20) * 60 * 1000,  // 3d 20h
@@ -2097,6 +2424,18 @@
         function computeLwIngCost(ing, recipeId, totalQty) { return LW_LOGIC.computeIngCost(ing, recipeId, totalQty); }
 
         function lwCalculate() { LW_LOGIC.calculate(); }
+
+        /** Detail view: reset craft amount input to 1 and recalculate (mouse-friendly). */
+        window.resetCraftQtyToOne = function(inputId, tab) {
+            var el = document.getElementById(inputId);
+            if (el) el.value = 1;
+            if (tab === "gear") gearCalculate();
+            else if (tab === "alch") alchCalculate();
+            else if (tab === "tx") txCalculate();
+            else if (tab === "cook") cookCalculate();
+            else if (tab === "ench") enchCalculate();
+            else if (tab === "lw") lwCalculate();
+        };
 
         // ===== LEATHERWORKING: SELECT =====
         function lwSelectRecipe(recipeId) { LW_LOGIC.selectRecipe(recipeId); }
@@ -2364,13 +2703,49 @@
         window.procIlUpdate = function(recipeId) { PROC_CONTROLS.inlineUpdate(recipeId); };
         TOOLBAR_ACTIONS = window.AppToolbarActions.createToolbarActions({
             generateExport: txGenerateExport,
+            appVersion: "2.2.0",
             updateGSCDisplay: updateGSCDisplay,
             autoSizeInput: autoSizeInput,
             recalculateAllTabs: function() { window.AppRuntimeTabs.calculateAllTabs(TAB_REGISTRY); }
         });
         window.globalExport = function() { TOOLBAR_ACTIONS.globalExport(); };
         window.globalCopyExport = function() { TOOLBAR_ACTIONS.globalCopyExport(); };
+        window.exportManualSnapshot = function() { TOOLBAR_ACTIONS.exportManualSnapshot(); };
+        window.compareExports = function() { TOOLBAR_ACTIONS.compareExports(); };
         window.resetAHPrices = function() { TOOLBAR_ACTIONS.resetAHPrices(); };
+        window.openCompareExportModal = function() {
+            var overlay = document.getElementById("compare-export-overlay");
+            if (!overlay) return;
+            overlay.classList.add("open");
+            var inp = document.getElementById("compare-export-modal-input");
+            if (inp) setTimeout(function() { inp.focus(); }, 0);
+        };
+        window.closeCompareExportModal = function() {
+            var overlay = document.getElementById("compare-export-overlay");
+            if (overlay) overlay.classList.remove("open");
+        };
+        window.copyCompareExportSummary = function() {
+            var text = window.__lastCompareExportText;
+            var pre = document.getElementById("compare-export-body");
+            if ((!text || !String(text).length) && pre) text = pre.textContent || "";
+            if (!text) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).catch(function() { fallbackCopyCompare(text); });
+            } else fallbackCopyCompare(text);
+        };
+        function fallbackCopyCompare(text) {
+            var ta = document.createElement("textarea");
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand("copy"); } catch (e) {}
+            document.body.removeChild(ta);
+        }
+        window.addEventListener("keydown", function(ev) {
+            if (ev.key !== "Escape") return;
+            var o = document.getElementById("compare-export-overlay");
+            if (o && o.classList.contains("open")) window.closeCompareExportModal();
+        });
         RECIPE_ROUTER = window.AppRecipeRouting.createRecipeRouter({
             routes: [
                 { selector: '#tab-transmutes', select: txSelectRecipe },

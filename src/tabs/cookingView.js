@@ -3,6 +3,7 @@
 
     function buildRecipeDropdownHTML(recipes, categoryOrder) {
         var ddHtml = '<div class="recipe-dropdown-wrapper">' +
+            '<button class="recipe-back-btn" id="cook-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
             '<div class="recipe-dropdown" id="cook-recipe-dropdown">' +
             '<button class="recipe-dropdown-trigger" id="cook-recipe-dropdown-trigger">' +
                 '<span id="cook-recipe-dropdown-label">All (Profit Overview)</span>' +
@@ -18,9 +19,7 @@
                 ddHtml += '<div class="recipe-item" data-recipe="' + r.id + '">' + r.name + "</div>";
             });
         });
-        ddHtml += '</div></div>' +
-            '<button class="recipe-back-btn" id="cook-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
-            "</div>";
+        ddHtml += '</div></div></div>';
         return ddHtml;
     }
 
@@ -62,7 +61,8 @@
             return '<h2 class="collapsible" data-panel="cook-' + panelId + '">' + label + '<span class="collapse-arrow">&#9660;</span></h2>';
         }
 
-        var colLeft = buildRecipeDropdownHTML(recipes, categoryOrder);
+        var controls = buildRecipeDropdownHTML(recipes, categoryOrder);
+        var colLeft = "";
         colLeft += '<div class="panel cook-filterable">' + cookCollH2("AH Ingredients", "ah-mats") + '<div class="panel-body" data-panel-body="cook-ah-mats"><div class="price-table">';
         allAhItems.forEach(function(item) {
             var inputId = "cook_mat_" + sanitizeId(item);
@@ -98,7 +98,7 @@
             '<span style="color:#888;font-size:0.82em;margin-left:2px;">%</span></div></div>';
         colRight += "</div></div></div>";
 
-        var main = '<div id="cook-view-all">' +
+        var main = controls + '<div id="cook-view-all">' +
             '<div class="tier-label">Profit Overview <span class="sort-toggle">' +
                 '<button id="cook-sort-profit" class="sort-btn active" onclick="setSortBy(\'cook\',\'profit\')">Gold</button>' +
                 '<button id="cook-sort-pct" class="sort-btn" onclick="setSortBy(\'cook\',\'pct\')">% Margin</button>' +
@@ -111,12 +111,15 @@
 
         recipes.forEach(function(r) {
             main += '<div id="cook-view-' + r.id + '" class="cook-view" style="display:none">';
-            main += '<div class="card"><h3>' + r.name + "</h3>";
+            main += '<div class="card"><h3>' + r.name + '</h3><div class="craft-amount-row">' +
+                '<label class="craft-amount-label" for="cook_qty_' + r.id + '">Crafting amount</label>' +
+                '<div class="price-control"><input type="number" id="cook_qty_' + r.id + '" value="1" min="1" step="1"></div>' +
+                '<button type="button" class="craft-amount-reset-btn" onclick="resetCraftQtyToOne(' + "'" + 'cook_qty_' + r.id + "'" + ',' + "'" + 'cook' + "'" + ')" title="Reset to 1">Reset</button></div>';
             main += '<div class="sourcing"><div class="sourcing-title">Ingredients</div>';
             r.ingredients.forEach(function(ing) {
                 var baseId = "cook_" + r.id + "_ing_" + sanitizeId(ing.item);
                 var cls = ing.type === "vendor" ? ' style="color:#aaa"' : "";
-                main += '<div class="sourcing-row fixed"><span>' + ing.qty + "x " + ing.item + (ing.type === "vendor" ? ' <span style="color:#888;font-size:0.8em">(vendor)</span>' : "") + '</span><span class="cost" id="' + baseId + '"' + cls + '>-</span></div>';
+                main += '<div class="sourcing-row fixed"><span id="' + baseId + '_qty">' + ing.qty + "x " + ing.item + (ing.type === "vendor" ? ' <span style="color:#888;font-size:0.8em">(vendor)</span>' : "") + '</span><span class="cost" id="' + baseId + '"' + cls + '>-</span></div>';
             });
             main += "</div>";
             main += '<div class="card-row"><span class="label">Craft cost</span><span class="value" id="cook_' + r.id + '_craft_cost">-</span></div>';

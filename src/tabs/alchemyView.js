@@ -75,6 +75,7 @@
 
         function buildRecipeDropdownHTML() {
             var html = '<div class="recipe-dropdown-wrapper">' +
+                '<button class="recipe-back-btn" id="alch-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
                 '<div class="recipe-dropdown" id="recipe-dropdown">' +
                 '<button class="recipe-dropdown-trigger" id="recipe-dropdown-trigger">' +
                     '<span id="recipe-dropdown-label">All (Profit Overview)</span>' +
@@ -92,7 +93,6 @@
             });
             html += '</div></div>' +
                 '<button class="recipe-manage-btn" id="recipe-manage-btn" title="Manage unlocked recipes">&#9881;</button>' +
-                '<button class="recipe-back-btn" id="alch-recipe-back" style="display:none;" title="Back to all recipes">&#8592; All</button>' +
                 "</div>";
             return html;
         }
@@ -106,16 +106,19 @@
         }
 
         function buildRecipeDetailHTML(recipe) {
-            var html = '<div id="alch-view-' + recipe.id + '" class="alch-view" style="display:none"><div class="card"><h3>' + recipe.name + "</h3>";
+            var html = '<div id="alch-view-' + recipe.id + '" class="alch-view" style="display:none"><div class="card"><h3>' + recipe.name + '</h3><div class="craft-amount-row">' +
+                '<label class="craft-amount-label" for="alch_qty_' + recipe.id + '">Crafting amount</label>' +
+                '<div class="price-control"><input type="number" id="alch_qty_' + recipe.id + '" value="1" min="1" step="1"></div>' +
+                '<button type="button" class="craft-amount-reset-btn" onclick="resetCraftQtyToOne(' + "'" + 'alch_qty_' + recipe.id + "'" + ',' + "'" + 'alch' + "'" + ')" title="Reset to 1">Reset</button></div>';
             if (recipe.category === "transmute") html += '<div class="recipe">Transmute - daily cooldown</div>';
             html += '<div class="sourcing"><div class="sourcing-title">Ingredients</div>';
             recipe.ingredients.forEach(function(ing) {
                 var baseId = "alch_" + recipe.id + "_ing_" + sanitizeId(ing.item);
                 if (ing.craftFrom) {
-                    html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_buy_label">' + ing.qty + "x " + ing.item + ' (buy)</span><span class="opt" id="' + baseId + '_buy_price">-</span></div>';
-                    html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_craft_label">' + (ing.qty * ing.craftFrom.qty) + "x " + ing.craftFrom.item + '</span><span class="opt" id="' + baseId + '_craft_price">-</span></div>';
+                    html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_buy_label"><span id="' + baseId + '_buy_qty">' + ing.qty + "x " + ing.item + '</span> (buy)</span><span class="opt" id="' + baseId + '_buy_price">-</span></div>';
+                    html += '<div class="sourcing-row"><span class="opt" id="' + baseId + '_craft_label"><span id="' + baseId + '_craft_qty">' + (ing.qty * ing.craftFrom.qty) + "x " + ing.craftFrom.item + '</span></span><span class="opt" id="' + baseId + '_craft_price">-</span></div>';
                 } else {
-                    html += '<div class="sourcing-row fixed"><span>' + ing.qty + "x " + ing.item + '</span><span class="cost" id="' + baseId + '">-</span></div>';
+                    html += '<div class="sourcing-row fixed"><span id="' + baseId + '_qty">' + ing.qty + "x " + ing.item + '</span><span class="cost" id="' + baseId + '">-</span></div>';
                 }
             });
             html += '</div><div class="card-row"><span class="label">Craft cost</span><span class="value" id="alch_' + recipe.id + '_craft_cost">-</span></div><div class="card-row"><span class="label">Sale price</span><span class="value" id="alch_' + recipe.id + '_sale_display">-</span></div><div class="card-row"><span class="label">AH cut</span><span class="value" id="alch_' + recipe.id + '_ah_cut_display">-</span></div><div class="card-row highlight"><span class="label">Net profit</span><span class="value" id="alch_' + recipe.id + '_profit">-</span></div><div class="deposit-note" id="alch_' + recipe.id + '_deposit_note">-</div></div>';
@@ -126,7 +129,8 @@
             return html;
         }
 
-        var colLeft = buildRecipeDropdownHTML();
+        var controls = buildRecipeDropdownHTML();
+        var colLeft = "";
         colLeft += '<div class="panel alch-filterable">' + collapsibleH2("AH Materials", "ah-mats") + '<div class="panel-body" data-panel-body="ah-mats"><div class="price-table">';
         regularAhItems.forEach(function(item) {
             var inputId = "alch_mat_" + sanitizeId(item);
@@ -165,7 +169,7 @@
         colRight += '<div class="price-table-row"><span class="pt-name">AH Cut</span><div class="price-control"><input type="number" id="alch_ah_cut" value="5" step="0.1"><span style="color: #888; font-size: 0.82em; margin-left: 2px;">%</span></div></div>';
         colRight += "</div></div></div>";
 
-        var main = buildAllViewHTML();
+        var main = controls + buildAllViewHTML();
         recipes.forEach(function(r) { main += buildRecipeDetailHTML(r); });
 
         var procModalHtml =

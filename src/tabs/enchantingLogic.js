@@ -2,6 +2,12 @@
     "use strict";
 
     function createEnchantingLogic(config) {
+        function getCraftAmount(recipeId) {
+            var el = document.getElementById("ench_qty_" + recipeId);
+            var qty = el ? parseInt(el.value, 10) : 1;
+            return qty > 0 ? qty : 1;
+        }
+
         function calculate() {
             var ahCutEl = document.getElementById("ench_ah_cut");
             if (!ahCutEl) return;
@@ -9,20 +15,24 @@
             var results = [];
 
             config.recipes.forEach(function(r) {
+                var craftAmount = getCraftAmount(r.id);
                 var craftCost = 0;
                 r.ingredients.forEach(function(ing) {
                     var price = ing.type === "vendor"
                         ? (parseFloat((document.getElementById("ench_vendor_" + config.sanitizeId(ing.item)) || {}).value) || 0)
                         : (parseFloat((document.getElementById("ench_mat_" + config.sanitizeId(ing.item)) || {}).value) || 0);
-                    var ingCost = price * ing.qty;
+                    var reqQty = ing.qty * craftAmount;
+                    var ingCost = price * reqQty;
                     craftCost += ingCost;
                     var baseId = "ench_" + r.id + "_ing_" + config.sanitizeId(ing.item);
                     var costEl = document.getElementById(baseId);
                     if (costEl) costEl.textContent = config.gold(ingCost);
+                    var qtyEl = document.getElementById(baseId + "_qty");
+                    if (qtyEl) qtyEl.textContent = reqQty + "x " + ing.item + (ing.type === "vendor" ? " (vendor)" : "");
                 });
 
                 var saleEl = document.getElementById("ench_sale_" + r.id);
-                var salePrice = saleEl ? (parseFloat(saleEl.value) || 0) : 0;
+                var salePrice = (saleEl ? (parseFloat(saleEl.value) || 0) : 0) * craftAmount;
                 var ahCut = salePrice * ahCutPct;
                 var deposit = parseFloat((document.getElementById("ench_deposit_" + r.id) || {}).value) || 0;
                 var profit = salePrice - ahCut - craftCost;
@@ -58,6 +68,7 @@
                 summaryBody.innerHTML = tbody;
             }
             config.saveToStorage();
+            if (window.updateMissingDefaultWarnings) window.updateMissingDefaultWarnings();
             config.evCalculate();
         }
 

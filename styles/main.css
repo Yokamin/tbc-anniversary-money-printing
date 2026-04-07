@@ -35,3 +35,9 @@ body {
     min-height: 32px;
 }
 
+/* Stronger missing-default styles live in index.html (.card .missing-default-banner) */
+td .missing-default-icon-wrap {
+    cursor: help;
+    filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.55));
+}
+
