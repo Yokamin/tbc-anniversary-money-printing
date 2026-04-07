@@ -3646,37 +3646,6 @@
         }
 
         // ===== ALCHEMY: UI GENERATION =====
-        function buildPriceInputHTML(label, inputId, defaultValue, hasLock, locksKey, recipeIds) {
-            var lockHTML = '';
-            if (hasLock) {
-                lockHTML = ' <button class="lock-btn" data-input="' + inputId + '" data-locks-key="' + locksKey + '">&#x1f513;</button>';
-            }
-            var recipesAttr = recipeIds ? ' data-recipes="' + recipeIds.join(',') + '"' : '';
-            return '<div class="input-row"' + recipesAttr + '>' +
-                '<label>' + label + lockHTML + '</label>' +
-                '<div class="price-control">' +
-                    '<input type="number" id="' + inputId + '" value="' + defaultValue + '" step="0.0001">' +
-                    '<div class="gsc-group" data-input="' + inputId + '">' +
-                        '<div class="gsc-unit">' +
-                            '<button class="gsc-btn" data-delta="1">&#9650;</button>' +
-                            '<span class="gsc-val gold">0g</span>' +
-                            '<button class="gsc-btn" data-delta="-1">&#9660;</button>' +
-                        '</div>' +
-                        '<div class="gsc-unit">' +
-                            '<button class="gsc-btn" data-delta="0.01">&#9650;</button>' +
-                            '<span class="gsc-val silver">0s</span>' +
-                            '<button class="gsc-btn" data-delta="-0.01">&#9660;</button>' +
-                        '</div>' +
-                        '<div class="gsc-unit">' +
-                            '<button class="gsc-btn" data-delta="0.0001">&#9650;</button>' +
-                            '<span class="gsc-val copper">0c</span>' +
-                            '<button class="gsc-btn" data-delta="-0.0001">&#9660;</button>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
-            '</div>';
-        }
-
         function setAlchBatch(size) {
             alchBatchSize = size;
             localStorage.setItem(ALCH_BATCH_KEY, size);
