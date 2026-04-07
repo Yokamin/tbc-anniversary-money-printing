@@ -2,7 +2,6 @@
     "use strict";
 
     function registerDefaultTabs(registry, hooks) {
-        registry.register({ id: "bags", init: function() {}, load: hooks.loadFromStorage, calc: hooks.calculate, includeInCoreRecalc: true });
         registry.register({ id: "alchemy", init: hooks.alchInit, load: hooks.alchLoadFromStorage, calc: hooks.alchCalculate, includeInCoreRecalc: true });
         registry.register({ id: "gear", init: hooks.gearInit, load: hooks.gearLoadFromStorage, calc: hooks.gearCalculate, includeInCoreRecalc: true });
         registry.register({ id: "tx", init: hooks.txInit, load: hooks.txLoadFromStorage, calc: hooks.txCalculate, includeInCoreRecalc: true });

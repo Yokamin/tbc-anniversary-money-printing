@@ -6,7 +6,7 @@ Current state:
 - Main app shell and most logic still live in `index.html`.
 - Core architecture pieces have been extracted into plain JS modules under `src/core/`.
 - UI polish overrides are in `styles/main.css` (non-redesign, usability-focused layer).
-- Standalone Bags navigation has been merged into Tailoring-facing flows (with compatibility data paths retained during transition).
+- Standalone Bags navigation has been merged into Tailoring-facing flows.
 
 ## Source of truth
 
@@ -14,6 +14,8 @@ Current state:
 - **`src/core/priceStore.js`**: centralized shared-price grouping/sync engine.
 - **`src/core/tabRegistry.js`**: tab lifecycle registration and grouped recalculation.
 - **`src/core/runtimeTabs.js`**: default tab wiring and grouped recalc helpers used by bootstrap.
+- **`src/core/tabNavigation.js`**: tab switching + active-tab re-click reset behavior.
+- **`src/core/recipeRouting.js`**: shared recipe-selection routing by tab context.
 - **`src/core/uiUtils.js`**: shared numeric/UI helpers (g/s/c formatting, sizing, input display).
 - There is **no build step** (plain files directly served by GitHub Pages).
 
@@ -28,7 +30,6 @@ flowchart TD
   Sync --> SyncOne[syncSharedPrice(changedId)]
   Sync --> SyncAll[syncAllSharedPrices()]
 
-  Recalc --> BagsCalc[calculate()_Bags]
   Recalc --> AlchCalc[alchCalculate()]
   Recalc --> GearCalc[gearCalculate()]
   Recalc --> TxCalc[txCalculate()]
@@ -36,8 +37,7 @@ flowchart TD
   Recalc --> EnchCalc[enchCalculate()]
   Recalc --> LwCalc[lwCalculate()]
 
-  BagsCalc --> Everything[evCalculate()_EverythingTab]
-  AlchCalc --> Everything
+  AlchCalc --> Everything[evCalculate()_EverythingTab]
   GearCalc --> Everything
   TxCalc --> Everything
   CookCalc --> Everything

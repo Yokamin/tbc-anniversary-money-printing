@@ -50,7 +50,7 @@ If a future refactor reintroduces a build step, it should be documented in `DECI
   - Bracers of Havok (Bolt of Imbued Netherweave, Primal Earth, Primal Shadow)
   - Cloak of the Black Void (Bolt of Imbued Netherweave, Primal Mana, Primal Shadow)
   - Girdle of Ruination (Shadowcloth, Primal Fire, Primal Nether BOP)
-- Full recursive craft chain breakdown per ingredient (e.g. Bolt of Imbued NW → Bolt of NW → Cloth)
+- Full recursive craft chain breakdown per ingredient (e.g. Bolt of Imbued NW -> Bolt of NW -> Cloth)
 - Buy vs craft comparison at every tier, auto-selects cheapest source
 - BOP items (Primal Nether) show profit-per-BOP metric instead of cost
 - AH import supports item level suffixes e.g. "(112)"

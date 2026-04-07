@@ -11,7 +11,10 @@ This doc is intentionally practical: when you’re adding content, follow this c
 - **Sanity-check**:
   - recipe appears in dropdown and profit overview,
   - craft cost and profit update when you change an ingredient price,
-  - staleness dot logic behaves as expected (import updates dots, manual edits don’t).
+  - staleness dot logic behaves as expected (import updates dots, manual edits don’t),
+  - row hover highlight is present for that tab’s summary rows (same affordance across tabs).
+- **Checklist hygiene**: if your new feature introduces a new failure mode, add a new checklist bullet here so future additions keep that parity.
+- **UI behavior parity**: if you add or change interaction behavior (dropdowns, back buttons, active-tab re-click behavior), update this checklist and `docs/ARCHITECTURE.md` in the same change.
 
 ## Moving/merging existing recipes across tabs
 
@@ -56,7 +59,7 @@ If you forget this, the exact symptom is:
 
 Ensure the tab’s calculate function is triggered when needed:
 
-- Register the tab lifecycle in `registerTabs()` so `TAB_REGISTRY` knows how to init/load/calc it.
+- Register the tab lifecycle in `registerDefaultTabs()` (`src/core/runtimeTabs.js`) so `TAB_REGISTRY` knows how to init/load/calc it.
 - If you rely on delegated handlers, ensure handlers call your tab calc function where appropriate.
 - Prefer registry-driven grouped recalc paths (`calculateCoreTabs()` / `calculateAllTabs()`) instead of adding new ad-hoc manual chains.
 

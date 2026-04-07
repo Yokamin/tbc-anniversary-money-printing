@@ -218,9 +218,8 @@ The Everything tab is the default landing tab. It provides a combined profit ove
 
 ### Data flow
 Each per-tab `calculate()` function populates a global result array after its own rendering:
-- `bagsResults` — populated at end of `calculate()` (Bags tab)
-- `gearResults` — populated at end of `gearCalculate()`
-- `alchResults` — already existed; read directly
+- `gearResults` — populated at end of `gearCalculate()` (includes bag-category recipes)
+- `alchResults` — read directly
 - `txSummaryRows` — `txCalculate()` assigns `txSummaryRows = []; var summaryRows = txSummaryRows;` so all existing `.push()` calls populate the global
 - `cookResults` — populated at end of `cookCalculate()`
 
@@ -249,10 +248,10 @@ ingSearchIndex[itemName.toLowerCase()] = {
     recipes: [{ recipeId, recipeName, tab, tabLabel, qty, viaItem? }]
 }
 ```
-Covers ALCHEMY_RECIPES, GEAR_RECIPES, COOKING_RECIPES, TRANSMUTE_RECIPES, CLOTH_DAILIES, and hardcoded Bags ingredients.
+Covers `ALCHEMY_RECIPES`, `GEAR_RECIPES`/`GEAR_BAG_RECIPES`, `COOKING_RECIPES`, `TRANSMUTE_RECIPES`, `CLOTH_DAILIES`, `ENCHANTING_RECIPES`, and `LW_RECIPES`.
 
 ### Navigation
-`ingGotoRecipe(tab, recipeId)` switches to the correct tab and calls the tab-specific select function (`alchSelectRecipe`, `gearSelectRecipe`, `txSelectRecipe`, `cookSelectRecipe`). Bags tab navigates to `tab-bags` only (no per-recipe selector).
+`ingGotoRecipe(tab, recipeId)` switches to the correct tab and calls the tab-specific select function (`alchSelectRecipe`, `gearSelectRecipe`, `txSelectRecipe`, `cookSelectRecipe`, `enchSelectRecipe`, `lwSelectRecipe`).
 
 ---
 
