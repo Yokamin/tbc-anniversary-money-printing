@@ -41,6 +41,14 @@ When preparing a stable push:
 5. Create an annotated tag with the same version (`v2.1.0`).
 6. Push commit and tag.
 
+### Tagging rule (default)
+
+Use annotated tags as release markers whenever it makes sense:
+
+- Always tag stable releases (`MAJOR`, `MINOR`, and planned stable `PATCH` releases).
+- Use the exact SemVer string as the tag name (for example `v2.0.0`).
+- Keep pre-release checkpoints tagged too when they are intended rollback points (for example `v2.0.0-prep.1`).
+
 ### Docs update rule (follow this)
 
 Documentation is part of the release criteria, not optional cleanup. Any behavior or workflow change should be reflected in docs in the same working cycle before release:
