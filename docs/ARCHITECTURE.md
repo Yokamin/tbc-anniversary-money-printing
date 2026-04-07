@@ -1,12 +1,12 @@
 # Architecture (current)
 
-This project is in a **single-file to modular migration** for GitHub Pages.
+This project uses a **modular plain-file architecture** for GitHub Pages (no build step).
 
 Current state:
-- Main app shell and most logic still live in `index.html`.
-- Core architecture pieces have been extracted into plain JS modules under `src/core/`.
+- Main app shell and tab/domain logic live in `index.html`.
+- Core cross-cutting concerns are extracted into plain JS modules under `src/core/`.
 - UI polish overrides are in `styles/main.css` (non-redesign, usability-focused layer).
-- Standalone Bags navigation has been merged into Tailoring-facing flows.
+- Standalone Bags navigation/DOM has been removed; bag recipes are part of Tailoring flows.
 
 ## Source of truth
 

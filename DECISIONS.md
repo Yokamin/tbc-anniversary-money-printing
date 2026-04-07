@@ -7,7 +7,7 @@
 ## Source of truth (current)
 
 - **Runtime app**: `index.html` is the deployed GitHub Pages artifact and current app shell.
-- **Modular migration in progress**: core logic is being extracted into plain JS modules under `src/` while keeping no-build GitHub Pages deployment.
+- **Modular plain files**: core logic is split into plain JS modules under `src/` while keeping no-build GitHub Pages deployment.
 - **No active build step**: the repo currently does **not** contain a `main.html` template or any script/wiring that regenerates `index.html` as part of a pipeline.
 - **Archived helpers**: any old code-generation helpers are kept only as historical context under `legacy/` (see `legacy/README.md`).
 
@@ -31,7 +31,7 @@ The number prefix controls alphabetical sort order in Auctionator (where lists a
 | Prefix | Tab / Category |
 |--------|---------------|
 | `0.0`  | **Everything** — all AH items from all tabs, deduplicated (sorts first in Auctionator) |
-| `1.x`  | Bags |
+| `1.x`  | Tailoring bags |
 | `2.x`  | Tailoring Gear |
 | `3.x`  | Alchemy (elixirs, potions, flasks) |
 | `4.x`  | Transmutes / Dailies |
@@ -50,7 +50,7 @@ Exception: Tailoring individual items use `2.1` (not `2.0`) to guarantee `2.0 AL
 ### What is included in each list
 - **Individual recipe list**: product name + all AH-searchable ingredients + mote alternatives for primals + craft-chain sub-ingredients (one level deep for bolts)
 - **Category ALL list**: union of all individual lists in that category (deduplicated)
-- **`1.0 ALL BAGS`**: hardcoded from `BAGS_EXPORT_ITEMS` constant (bag crafting has no recipe array)
+- **`1.0 ALL BAGS`**: generated from bag recipes integrated in Tailoring data/export grouping
 - **`2.1 ALL PRIMAL NETHER`**: ingredients from all recipes that require a Primal Nether (BOP), so you can scan prices and decide which Primal Nether recipe is most profitable
 
 ### What is EXCLUDED from lists
@@ -114,13 +114,13 @@ When adding a new tab (or a new set of inputs) that should participate in shared
 - **Use consistent item names**: the key is the *display item name* (e.g. `Arcane Dust`). If the same item is spelled differently across tabs, it will not sync.
 - **Prefer `syncSharedPrice(inputId)` on input changes**: if you add custom inputs or custom handlers, make sure they call `syncSharedPrice()` (or rely on the global delegated handler that already does).
 
-Key synced items: Netherweave Cloth, Arcane Dust (Bags/Gear/TX/Enchanting), Bolts of Netherweave, Rune Thread, Motes of Fire/Earth (Alchemy + Gear + TX), Mote/Primal of Mana/Shadow/Fire/Earth (Gear ↔ TX), Lesser/Greater Planar Essence (Bags ↔ TX), Primal Air / Mote of Air (TX ↔ LW), Netherbloom / Nightmare Vine (Alchemy ↔ Enchanting).
+Key synced items: Netherweave Cloth, Arcane Dust (Gear/TX/Enchanting), Bolts of Netherweave, Rune Thread, Motes of Fire/Earth (Alchemy + Gear + TX), Mote/Primal of Mana/Shadow/Fire/Earth (Gear ↔ TX), Lesser/Greater Planar Essence (Gear ↔ TX), Primal Air / Mote of Air (TX ↔ LW), Netherbloom / Nightmare Vine (Alchemy ↔ Enchanting).
 
 ---
 
 ## Price Staleness Tracking
 
-Each AH price input shows a colored dot indicating how recently that price was imported via "Update Prices". Dots are keyed by **item name** (not inputId) so items shared across tabs (e.g. Arcane Dust in Bags, Gear, TX) all reflect the same timestamp.
+Each AH price input shows a colored dot indicating how recently that price was imported via "Update Prices". Dots are keyed by **item name** (not inputId) so items shared across tabs (e.g. Arcane Dust in Gear, TX, Enchanting) all reflect the same timestamp.
 
 Color thresholds: Blue = most recent import batch → Green < 5 min → Yellow 5–30 min → Orange 30–60 min → Red > 1 hr → Grey = never imported.
 
@@ -189,7 +189,7 @@ Default: **5%**. This is the standard faction AH fee in TBC. Adjustable per-tab 
 
 ---
 
-## Bags Tab: Best Use of Netherweave Cloth
+## Tailoring: Best Use of Netherweave Cloth
 
 The card formerly called "Bandage Vendor Alternative" is now **"Best Use: Netherweave Cloth"**. It shows **profit per cloth** for all 6 uses of Netherweave Cloth:
 

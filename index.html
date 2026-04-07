@@ -117,6 +117,7 @@
             font-family: 'Consolas', monospace;
             font-size: 0.9em;
             text-align: left;
+            appearance: textfield;
             -moz-appearance: textfield;
         }
         .price-control input::-webkit-outer-spin-button,
@@ -762,6 +763,7 @@
             padding: 4px 8px;
             font-size: 0.88em;
             font-family: 'Consolas', monospace;
+            appearance: textfield;
             -moz-appearance: textfield;
         }
         .proc-input-row input[type=number]::-webkit-inner-spin-button,
@@ -856,7 +858,7 @@
         .tsm-input:focus { outline: none; border-bottom-color: #7c6fcd; color: #eee; }
         .tsm-input::placeholder { color: #555; }
         .tsm-input::-webkit-inner-spin-button, .tsm-input::-webkit-outer-spin-button { -webkit-appearance: none; }
-        .tsm-input[type=number] { -moz-appearance: textfield; }
+        .tsm-input[type=number] { appearance: textfield; -moz-appearance: textfield; }
         .tsm-daily { width: 58px; }
         .tsm-price { width: 80px; }
         .tsm-gsc-preview { font-size: 0.72em; line-height: 1; }
@@ -1110,7 +1112,7 @@
         }
         .cd-tracker-field input::-webkit-inner-spin-button,
         .cd-tracker-field input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        .cd-tracker-field input { -moz-appearance: textfield; }
+        .cd-tracker-field input { appearance: textfield; -moz-appearance: textfield; }
         .cd-tracker-field input {
             width: 54px;
             background: #1a1a2e;
@@ -1170,7 +1172,6 @@
         .ev-ftree-item label:hover { color: #ccc; }
         .ev-tab-badge { display: inline-block; font-size: 0.68em; padding: 1px 5px; border-radius: 3px; margin-left: 5px; vertical-align: middle; color: #777; background: #16162a; border: 1px solid #2a2a44; white-space: nowrap; }
         .ev-section-hdr td { background: #1a1a35; color: #a78bfa; font-size: 0.78em; font-weight: bold; text-transform: uppercase; letter-spacing: 0.6px; padding: 7px 10px; border-top: 2px solid #3a3a5c; }
-        .ev-sort-btn, .ev-view-btn { /* inherit sort-btn styles */ }
 
         /* ===== INGREDIENT SEARCH ===== */
         .is-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.55); z-index: 2000; align-items: flex-start; justify-content: center; padding-top: 80px; }

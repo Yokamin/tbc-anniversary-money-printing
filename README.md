@@ -1,6 +1,6 @@
 # TBC Crafting Calculator
 
-## Version: 1.8
+## Version: 2.0.0
 
 Single-page HTML app for calculating crafting profitability in WoW TBC Anniversary.
 
@@ -43,7 +43,7 @@ If a future refactor reintroduces a build step, it should be documented in `DECI
 **Tailoring Gear**
 - Dynamically generated UI from recipe data array
 - Recipes tracked:
-  - Netherweave Bag, Imbued Netherweave Bag (migrated from standalone Bags tab)
+  - Netherweave Bag, Imbued Netherweave Bag
   - Spellstrike Pants, Spellstrike Hood (Primal Might, Spellcloth, Primal Nether BOP)
   - Runic Spellthread (Rune Thread, Primal Mana, Primal Nether BOP)
   - Mystic Spellthread (Rune Thread, Primal Mana)
@@ -115,7 +115,7 @@ If a future refactor reintroduces a build step, it should be documented in `DECI
 - All prices saved to localStorage (persist across reloads)
 - Tab and recipe selection remembered across sessions
 - Shared price sync: updating a material in one tab auto-updates it in all other tabs
-  - Synced: Netherweave Cloth, Arcane Dust (Bags/Gear/TX/Enchanting), Bolt of Netherweave, Bolt of Imbued Netherweave, Rune Thread, Lesser/Greater Planar Essence, Mote/Primal of Fire, Earth, Mana, Shadow
+  - Synced: Netherweave Cloth, Arcane Dust (Gear/TX/Enchanting), Bolt of Netherweave, Bolt of Imbued Netherweave, Rune Thread, Lesser/Greater Planar Essence, Mote/Primal of Fire, Earth, Mana, Shadow
 
 **Cooking**
 - Dynamically generated UI from recipe data array, same structure as Alchemy
