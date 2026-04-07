@@ -1,6 +1,6 @@
 # TBC Crafting Calculator
 
-## Version: 2.0.2
+## Version: 2.0.3
 
 Single-page HTML app for calculating crafting profitability in WoW TBC Anniversary.
 

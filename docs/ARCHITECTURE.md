@@ -19,6 +19,7 @@ Current state:
 - **`src/core/recipeRouting.js`**: shared recipe-selection routing by tab context.
 - **`src/core/uiUtils.js`**: shared numeric/UI helpers (g/s/c formatting, sizing, input display).
 - **`src/tabs/enchantingView.js`**: extracted Enchanting view builders used by `enchInit()`.
+- **`src/tabs/leatherworkingView.js`**: extracted Leatherworking view builders used by `lwInit()`.
 - There is **no build step** (plain files directly served by GitHub Pages).
 
 ## High-level flow
