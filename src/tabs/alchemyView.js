@@ -1,6 +1,22 @@
 (function(global) {
     "use strict";
 
+    function renderManageRecipesModal(recipes, categoryOrder, hidden) {
+        var html = '<div class="recipe-manage-overlay" id="recipe-manage-overlay"><div class="recipe-manage-modal"><div class="recipe-manage-hdr"><h2>Manage Recipes</h2><button class="recipe-manage-close" id="recipe-manage-close">×</button></div><div class="recipe-manage-hint">Uncheck recipes you haven\'t unlocked yet.</div><div class="recipe-manage-scroll">';
+        categoryOrder.forEach(function(cat) {
+            var catRecipes = recipes.filter(function(r) { return cat.includes.indexOf(r.category) !== -1; });
+            if (catRecipes.length === 0) return;
+            var incStr = cat.includes.join(",");
+            html += '<div class="recipe-manage-cat-row"><span class="recipe-manage-cat">' + cat.label + '</span><span class="recipe-manage-cat-btns"><button class="recipe-manage-cat-btn" onclick="toggleManageCat(\'' + incStr + '\', false)">All</button><button class="recipe-manage-cat-btn" onclick="toggleManageCat(\'' + incStr + '\', true)">None</button></span></div>';
+            catRecipes.forEach(function(r) {
+                var checked = !hidden[r.id] ? " checked" : "";
+                html += '<label class="recipe-manage-item"><input type="checkbox" data-recipe-manage="' + r.id + '"' + checked + ">" + r.name + "</label>";
+            });
+        });
+        html += "</div></div></div>";
+        return html;
+    }
+
     function build(config) {
         var recipes = config.recipes;
         var categoryOrder = config.categoryOrder;
@@ -110,22 +126,6 @@
             return html;
         }
 
-        function buildManageRecipesHTML() {
-            var html = '<div class="recipe-manage-overlay" id="recipe-manage-overlay"><div class="recipe-manage-modal"><div class="recipe-manage-hdr"><h2>Manage Recipes</h2><button class="recipe-manage-close" id="recipe-manage-close">×</button></div><div class="recipe-manage-hint">Uncheck recipes you haven\'t unlocked yet.</div><div class="recipe-manage-scroll">';
-            categoryOrder.forEach(function(cat) {
-                var catRecipes = recipes.filter(function(r) { return cat.includes.indexOf(r.category) !== -1; });
-                if (catRecipes.length === 0) return;
-                var incStr = cat.includes.join(",");
-                html += '<div class="recipe-manage-cat-row"><span class="recipe-manage-cat">' + cat.label + '</span><span class="recipe-manage-cat-btns"><button class="recipe-manage-cat-btn" onclick="toggleManageCat(\'' + incStr + '\', false)">All</button><button class="recipe-manage-cat-btn" onclick="toggleManageCat(\'' + incStr + '\', true)">None</button></span></div>';
-                catRecipes.forEach(function(r) {
-                    var checked = !hidden[r.id] ? " checked" : "";
-                    html += '<label class="recipe-manage-item"><input type="checkbox" data-recipe-manage="' + r.id + '"' + checked + ">" + r.name + "</label>";
-                });
-            });
-            html += "</div></div></div>";
-            return html;
-        }
-
         var colLeft = buildRecipeDropdownHTML();
         colLeft += '<div class="panel alch-filterable">' + collapsibleH2("AH Materials", "ah-mats") + '<div class="panel-body" data-panel-body="ah-mats"><div class="price-table">';
         regularAhItems.forEach(function(item) {
@@ -179,12 +179,20 @@
             colLeft: colLeft,
             colRight: colRight,
             main: main,
-            manageHtml: buildManageRecipesHTML(),
+            manageHtml: renderManageRecipesModal(recipes, categoryOrder, hidden),
             procModalHtml: procModalHtml
         };
     }
 
+    function buildManageRecipesModal(config) {
+        var recipes = config.recipes;
+        var categoryOrder = config.categoryOrder;
+        var hidden = config.hidden || {};
+        return renderManageRecipesModal(recipes, categoryOrder, hidden);
+    }
+
     global.AppAlchemyView = {
-        build: build
+        build: build,
+        buildManageRecipesModal: buildManageRecipesModal
     };
 })(window);

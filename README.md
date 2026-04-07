@@ -1,6 +1,6 @@
 # TBC Crafting Calculator
 
-## Version: 2.0.10
+## Version: 2.1.0
 
 Single-page HTML app for calculating crafting profitability in WoW TBC Anniversary.
 
@@ -11,8 +11,9 @@ This project was made with AI-assisted tooling (started in Claude Code, now Curs
 ## Project structure (current)
 
 - **App shell**: `index.html`
-- **Core modules**: `src/core/` (shared price store, tab registry, shared constants)
-- **Tab modules**: `src/tabs/` (incremental tab-specific extraction, no build step)
+- **Data modules**: `src/data/` (recipe constants extracted from app shell for load-time globals)
+- **Core modules**: `src/core/` (shared price store, tab registry, shared constants, locks, storage readers, tab storage, shared price sync, global import, recipe selection helpers, staleness, cooldowns, recipe navigation clicks, profit helpers, sort controls, TSM notes UI helpers, proc controls, toolbar actions, ingredient search, Everything controls)
+- **Tab modules**: `src/tabs/` (incremental tab-specific extraction, including logic modules for Alchemy, Gear, Transmutes, Cooking, Enchanting, Leatherworking, and Everything; no build step)
 - **UI polish layer**: `styles/main.css`
 - **Design notes**: `DECISIONS.md`
 - **Samples**: `export_example.txt` (example Auctionator buy-list export output)
@@ -30,7 +31,8 @@ If a future refactor reintroduces a build step, it should be documented in `DECI
 
 - Versioning and stable release policy: `docs/VERSIONING.md`
 - Patch smoke runbook: `docs/SMOKE_TEST_CHECKLIST.md`
-- Current stable release line: `2.0.x`.
+- Extension runbook (new recipes/tabs): `docs/EXTENSION_CHECKLIST.md`
+- Current stable release line: `2.1.x`.
 - Netherweave cloth handling policy: `docs/NETHERWEAVE_POLICY.md`
 
 ### Tabs

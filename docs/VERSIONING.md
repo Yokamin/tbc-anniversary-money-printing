@@ -72,4 +72,5 @@ Documentation is part of the release criteria, not optional cleanup. Any behavio
 1. Release current baseline as `v2.0.0-prep.1`.
 2. Do refactor/overhaul work on top of that checkpoint.
 3. When stable, release `v2.0.0`.
+4. Refactor-completion milestone release: `v2.1.0` (runtime parity with modularized tabs/core/data layout).
 
